@@ -37,6 +37,10 @@
   overflow-y: scroll;
 }
 
+.chat-body::-webkit-scrollbar {
+  display: none;
+}
+
 .chat-footer {
   padding: 10px;
 }

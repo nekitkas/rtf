@@ -22,7 +22,6 @@ body {
   position: relative;
   display: flex;
   width: 1120px;
-
   margin: 0 auto;
   padding: 20px;
   top: 65px;
@@ -30,3 +29,6 @@ body {
   overflow-y: scroll;
 }
 
+.container::-webkit-scrollbar {
+  display: none;
+}

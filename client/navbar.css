@@ -8,6 +8,8 @@
   padding-left: 50px;
   padding-right: 100px;
   border-bottom: 1px solid var(--border-color);
+  position: fixed;
+  z-index: 100;
 }
 
 .logo {
@@ -85,12 +87,10 @@
   align-items: center;
 }
 
-
-.message-button{
+.message-button {
   display: flex;
   align-items: center;
   cursor: pointer;
-
 }
 
 .user-profile {
@@ -145,7 +145,7 @@
   margin: auto;
 }
 
-.categories{
+.categories {
   color: #000000;
   background-color: #638c47;
   width: 100%;
