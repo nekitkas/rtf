@@ -40,13 +40,14 @@ func newServer(store store.Store, sessionStore sessions.Store) *server {
 }
 
 func (s *server) configureRouter() {
+	//Using middlewares
 	s.router.Use(s.setRequestID)
 	s.router.Use(s.logRequest)
 
 	s.router.HandleFunc("POST", "/users", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
-	//s.router.UseWithPrefix("/private", s.authenticateUser)
+	s.router.UseWithPrefix("/private", s.authenticateUser)
 	//s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
 }
 

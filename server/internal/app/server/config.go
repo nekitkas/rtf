@@ -6,14 +6,13 @@ import (
 )
 
 type Config struct {
-	Port        string `json:"port"`
-	DatabaseURL string `json:"database_url"`
+	Port           string `json:"port"`
+	DatabaseURL    string `json:"database_url"`
+	DatabaseSchema string `json:"database_schema"`
 }
 
 func NewConfig() *Config {
-	return &Config{
-		Port: ":8080",
-	}
+	return &Config{}
 }
 
 func (c *Config) ReadConfig(path string) error {

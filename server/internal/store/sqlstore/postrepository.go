@@ -10,3 +10,7 @@ func (r *PostRepository) Create(post *models.Post) error {
 	//TODO implement me
 	panic("implement me")
 }
+
+func (r *PostRepository) GetPost(id string) error {
+	panic("implement me!")
+}

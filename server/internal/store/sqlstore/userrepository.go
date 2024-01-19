@@ -6,7 +6,7 @@ type UserRepository struct {
 	store *Store
 }
 
-func (r *UserRepository) FindByID(i int) (*models.User, error) {
+func (r *UserRepository) FindByID(id string) (*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
