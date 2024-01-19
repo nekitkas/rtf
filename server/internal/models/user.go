@@ -1,25 +1,35 @@
 package models
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
-	ID                int    `json:"id"`
-	Email             string `json:"email"`
-	Password          string `json:"password,omitempty"`
-	EncryptedPassword string `json:"-"`
+	ID        string    `db:"id" json:"id"`
+	Username  string    `db:"username" json:"username"`
+	Email     string    `db:"email" json:"email"`
+	Password  string    `db:"password" json:"password"`
+	Timestamp time.Time `db:"timestamp" json:"timestamp"`
+	Age       int       `db:"age" json:"age"`
+	FirstName string    `db:"first_name" json:"first_name"`
+	LastName  string    `db:"last_name" json:"last_name"`
+	Gender    string    `db:"gender" json:"gender"`
+	ImageURL  string    `db:"image_url" json:"image_url"`
 }
 
-func (u *User) BeforeCreate() error {
-	if len(u.Password) > 0 {
-		enc, err := encryptString(u.Password)
-		if err != nil {
-			return err
-		}
-		u.EncryptedPassword = enc
-	}
+// func (u *User) BeforeCreate() error {
+// 	if len(u.Password) > 0 {
+// 		enc, err := encryptString(u.Password)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		u.EncryptedPassword = enc
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // Sanitize erase password so it would not appear in respond
 func (u *User) Sanitize() {
@@ -27,7 +37,7 @@ func (u *User) Sanitize() {
 }
 
 func (u *User) ComparePassword(password string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(u.EncryptedPassword), []byte(password)) == nil
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) == nil
 }
 
 func encryptString(str string) (string, error) {
