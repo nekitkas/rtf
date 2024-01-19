@@ -63,7 +63,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
-		Email    string `json:"email"`
+		Login    string `json:"login"`
 		Password string `json:"password"`
 	}
 
@@ -83,13 +83,18 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		user, err := s.store.User().FindByEmail(requestBody.Email)
+		user, err := s.store.User().CheckUser(requestBody.Login)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, user)
+		//Check password
+		if user.ComparePassword(requestBody.Password){
+			s.respond(w, r, http.StatusCreated, user)
+		}else{
+			s.respond(w, r, http.StatusUnauthorized, "Invalid login credentials!")
+		}
 	}
 }
 
