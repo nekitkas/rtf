@@ -140,14 +140,14 @@ VALUES
     'Jones',
     'Non-Binary',
     'http://example.com/images/alex_jones.png'
-  );
+  ) ON CONFLICT DO NOTHING;
 
 INSERT INTO
   reaction (id, emoji, description)
 VALUES
   ('reaction_1', '😀', 'Happy'),
   ('reaction_2', '😢', 'Sad'),
-  ('reaction_3', '👍', 'Like');
+  ('reaction_3', '👍', 'Like') ON CONFLICT DO NOTHING;
 
 INSERT INTO
   category (id, name, description)
@@ -166,4 +166,4 @@ VALUES
     'category_3',
     'Travel',
     'Share travel stories and advice.'
-  );
+  ) ON CONFLICT DO NOTHING;
