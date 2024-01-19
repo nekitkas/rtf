@@ -8,14 +8,14 @@ import (
 )
 
 type Store struct {
-	db             *sql.DB
+	Db             *sql.DB
 	userRepository *UserRepository
 	postRepository *PostRepository
 }
 
 func New(db *sql.DB) *Store {
 	return &Store{
-		db: db,
+		Db: db,
 	}
 }
 

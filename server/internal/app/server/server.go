@@ -3,12 +3,14 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
-	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/sessions"
 )
 
 const (
@@ -44,7 +46,7 @@ func (s *server) configureRouter() {
 	s.router.Use(s.setRequestID)
 	s.router.Use(s.logRequest)
 
-	s.router.HandleFunc("POST", "/users", s.handleUsersCreate())
+	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
 	s.router.UseWithPrefix("/private", s.authenticateUser)
@@ -56,29 +58,20 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+
+		user := &models.User{}
+		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		user := &models.User{
-			Email:    req.Email,
-			Password: req.Password,
-		}
 		if err := s.store.User().Create(user); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
 
-		user.Sanitize()
-		s.respond(w, r, http.StatusCreated, user)
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, user: %v`, user))
 	}
 }
 
