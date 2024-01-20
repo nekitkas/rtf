@@ -51,6 +51,18 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category)
 	return nil
 }
 
-func (r *PostRepository) GetPost(id string) error {
-	panic("implement me!")
+func (r *PostRepository) GetPost(id string) (*models.Post, error) {
+	query := `SELECT * FROM post WHERE id = ?`
+
+	var post models.Post
+
+	err := r.store.Db.QueryRow(query, id).Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf(`Post containing id %v does not exist`, id)
+		} else {
+			return nil, fmt.Errorf(`Error occured while checking posts: %v`, err)
+		}
+	}
+	return &post, nil
 }

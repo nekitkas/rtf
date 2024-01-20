@@ -50,6 +50,7 @@ func (s *server) configureRouter() {
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
+	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
@@ -215,6 +216,25 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, post: %v, successfull categories %v`, req.Post, req.Categories))
 	}
 
+}
+
+func (s *server) serveSinglePostInformation() http.HandlerFunc {
+	type request struct {
+		Post string `json:"post_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request){
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		post, err := s.store.Post().GetPost(req.Post)
+		if err != nil{
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull post information: %v`, post))
+	}
 }
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {

@@ -11,7 +11,7 @@ type UserRepository interface {
 
 type PostRepository interface {
 	Create(*models.Post, []models.Category) error
-	GetPost(string) error
+	GetPost(string) (*models.Post, error)
 }
 
 type CategoryRepository interface {
