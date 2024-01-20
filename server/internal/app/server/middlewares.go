@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var jwtKey = []byte("secret_key")
+
 func (s *server) setRequestID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := uuid.New().String()
@@ -62,5 +64,12 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, u)))
+	})
+}
+
+func (s *server) JWTAuth() http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		// expirationTime := time.Now().Add(time.Minute * 1)
+		// claims := 
 	})
 }
