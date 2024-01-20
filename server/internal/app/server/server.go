@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
-	"log"
-	"net/http"
 
 	"github.com/gorilla/sessions"
 )
@@ -42,24 +44,88 @@ func newServer(store store.Store, sessionStore sessions.Store) *server {
 }
 
 func (s *server) configureRouter() {
-	//Using middlewares
+	// Using middlewares
 	s.router.Use(s.setRequestID)
 	s.router.Use(s.logRequest)
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
+	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
+	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
 	s.router.UseWithPrefix("/private", s.authenticateUser)
-	//s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
+	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
+func (s *server) handleUsersLogin() http.HandlerFunc {
+	type RequestBody struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			// Handle error
+			http.Error(w, "Error reading body", http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
+
+		var requestBody RequestBody
+		err = json.Unmarshal(body, &requestBody)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		user, err := s.store.User().FindByEmail(requestBody.Email)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, user)
+	}
+}
+
+func (s *server) handleUsersGetById() http.HandlerFunc {
+	type RequestBody struct {
+		ID string `json:"id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			// Handle error
+			http.Error(w, "Error reading body", http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
+
+		var requestBody RequestBody
+		err = json.Unmarshal(body, &requestBody)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		user, err := s.store.User().FindByID(requestBody.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, user)
+	}
+}
+
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		user := &models.User{}
 		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)

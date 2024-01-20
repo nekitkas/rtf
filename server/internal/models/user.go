@@ -19,18 +19,6 @@ type User struct {
 	ImageURL  string    `db:"image_url" json:"image_url"`
 }
 
-// func (u *User) BeforeCreate() error {
-// 	if len(u.Password) > 0 {
-// 		enc, err := encryptString(u.Password)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		u.EncryptedPassword = enc
-// 	}
-
-// 	return nil
-// }
-
 // Sanitize erase password so it would not appear in respond
 func (u *User) Sanitize() {
 	u.Password = ""
@@ -47,4 +35,16 @@ func encryptString(str string) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+func (u *User) BeforeCreate() error {
+	if len(u.Password) > 0 {
+		enc, err := encryptString(u.Password)
+		if err != nil {
+			return err
+		}
+		u.Password = enc
+	}
+
+	return nil
 }
