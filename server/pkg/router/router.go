@@ -6,8 +6,10 @@ import (
 	"strings"
 )
 
-type paramContextKey string
-type MiddlewareFunc func(http.Handler) http.Handler
+type (
+	paramContextKey string
+	MiddlewareFunc  func(http.Handler) http.Handler
+)
 
 type Router struct {
 	routes      []*route

@@ -3,12 +3,16 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
+	"net/http"
+
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
+
 	"github.com/gorilla/sessions"
-	"log"
-	"net/http"
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -16,6 +20,11 @@ const (
 	ctxKeyUser  ctxKey = iota
 	ctxKeyRequestID
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
 type ctxKey int8
 
@@ -43,15 +52,50 @@ func (s *server) configureRouter() {
 	s.router.Use(s.setRequestID)
 	s.router.Use(s.logRequest)
 
+	fs := http.FileServer(http.Dir("server/cmd/api/static"))
+	s.router.HandleFunc("*", "/static/", http.StripPrefix("/static/", fs).ServeHTTP)
 	s.router.HandleFunc("POST", "/users", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
+	s.router.HandleFunc("*", "/ws", s.wsHandler())
 
-	//s.router.UseWithPrefix("/private", s.authenticateUser)
-	//s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
+	// s.router.HandleFunc("*", "/", fs.ServeHTTP)
+
+	// s.router.UseWithPrefix("/private", s.authenticateUser)
+	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
+}
+
+func (s *server) wsHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// fmt.Println("PARY")
+		rw := &responseWriter{w, http.StatusOK}
+		conn, err := upgrader.Upgrade(rw, r, nil)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Println("Client connected")
+		defer conn.Close()
+
+		for {
+			messageType, message, err := conn.ReadMessage()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			fmt.Println("Received message:", string(message))
+
+			err = conn.WriteMessage(messageType, message)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}
+	}
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
