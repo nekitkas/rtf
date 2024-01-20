@@ -1,0 +1,22 @@
+{
+  "name": "real-spa",
+  "version": "1.0.0",
+  "description": "\"spa application\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kood-voyage/real-time-forum.git"
+  },
+  "keywords": [
+    "REAL"
+  ],
+  "author": "kood-voyage",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kood-voyage/real-time-forum/issues"
+  },
+  "homepage": "https://github.com/kood-voyage/real-time-forum#readme"
+}
