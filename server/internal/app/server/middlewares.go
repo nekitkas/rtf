@@ -54,7 +54,7 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 			return
 		}
 
-		u, err := s.store.User().FindByID(id.(int))
+		u, err := s.store.User().FindByID(id.(string))
 		if err != nil {
 			fmt.Println("2")
 			s.error(w, r, http.StatusUnauthorized, errors.New("not authenticated"))

@@ -101,6 +101,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func Param(ctx context.Context, param string) string {
+	// chcekcs if its string
 	vStr, ok := ctx.Value(paramContextKey(param)).(string)
 	if !ok {
 		return ""
