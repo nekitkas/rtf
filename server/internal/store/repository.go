@@ -10,6 +10,11 @@ type UserRepository interface {
 }
 
 type PostRepository interface {
-	Create(*models.Post) error
+	Create(*models.Post, []models.Category) error
 	GetPost(string) error
+}
+
+type CategoryRepository interface {
+	Create(*models.Category) error
+	GetCategory(string) (*models.Category, error)
 }
