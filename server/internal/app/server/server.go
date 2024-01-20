@@ -93,7 +93,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		if user.ComparePassword(requestBody.Password){
 			s.respond(w, r, http.StatusCreated, user)
 		}else{
-			s.respond(w, r, http.StatusUnauthorized, "Invalid login credentials!")
+			s.error(w, r, http.StatusUnauthorized, errors.New("Invalid login credentials!"))
 		}
 	}
 }
