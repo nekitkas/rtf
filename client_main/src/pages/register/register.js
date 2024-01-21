@@ -15,6 +15,7 @@ export function RenderRegisterPage() {
         <h1 class="auth-title">REGISTER</h1>
         <label>EMAIL</label>
         <input
+        id="email"
           type="email"
           placeholder="Email address"
           name="email"
