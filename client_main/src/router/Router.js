@@ -1,6 +1,6 @@
-import { RenderHomePage } from "../pages/HomePage/HomePage.js";
-import { RenderLoginPage } from "../pages/LoginPage/RenderLoginPage.js";
-import { RenderRegisterPage } from "../pages/RegisterPage/RenderRegisterPage.js";
+import { RenderHomePage } from "../pages/home/Home.js";
+import { RenderLoginPage } from "../pages/login/Login.js";
+import { RenderRegisterPage } from "../pages/register/register.js";
 
 export const RouterFunction = () => {
   const path = window.location.hash.slice(1);
