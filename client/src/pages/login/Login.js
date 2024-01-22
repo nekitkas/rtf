@@ -1,5 +1,5 @@
 import { Navbar } from "../../components/Navbar/Navbar";
-import "../../styles/loginpage_styles/login.css";
+import "../../styles/auth.css";
 
 export function RenderLoginPage() {
   const mainContainer = document.querySelector(".root");

@@ -1,4 +1,4 @@
-import "../../styles/components_styles/navbar.css";
+import "../../styles/navbar.css";
 import searchSvg from "../../assets/img/search.svg";
 import plusSvg from "../../assets/img/plus.svg";
 import avatar from "../../assets/img/avatar.svg.png";

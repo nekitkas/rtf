@@ -1,5 +1,5 @@
 import { Navbar } from "../../components/Navbar/Navbar.js";
-import "../../styles/homepage_styles/home.css"
+import "../../styles/style.css"
 
 export function RenderHomePage(){
    const rootContainer = document.querySelector('.root');

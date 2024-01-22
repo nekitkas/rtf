@@ -101,11 +101,6 @@
   border-radius: 10px;
 }
 
-.user-profile img {
-  width: 25px;
-  height: 25px;
-}
-
 .user-profile-selector {
   display: flex;
   font-size: 14px;
@@ -130,19 +125,17 @@
   display: flex;
   text-decoration: none;
   color: var(--text-color);
-
+  margin: auto;
 }
 
 .navbar-button {
   width: 100px;
   height: 38px;
   border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
   border: 1px solid var(--border-color);
   cursor: pointer;
-  margin-right: 20px;
+
   /* margin-right: 20px; */
   display: flex;
 }
