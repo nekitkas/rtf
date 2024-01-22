@@ -123,6 +123,15 @@ export function RenderRegisterPage() {
   function handleFormSubmit(e) {
     e.preventDefault(); // Prevent the default form submission
 
+    const password = document.querySelector('input[name="password"]').value;
+    const confirm_password = document.querySelector('input[name="confirm_password"]').value;
+
+    if (password !== confirm_password) {
+      alert('Passwords do not match');
+      return;
+    }
+
+
     // Get form data
     const formData = new FormData(registerForm);
 
