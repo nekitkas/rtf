@@ -1,12 +1,12 @@
-import { Navbar } from "../../components/Navbar/Navbar";
-import "../../styles/auth.css";
+import { Navbar } from "../../components/Navbar/Navbar"
+import "../../styles/auth.css"
 
 export function RenderLoginPage() {
-  const mainContainer = document.querySelector(".root");
-  Navbar();
+  const mainContainer = document.querySelector(".root")
+  Navbar()
 
-  const main = document.createElement("main");
-  main.className = "main";
+  const main = document.createElement("main")
+  main.className = "main"
   main.innerHTML = `
         <div class="container">
             <div class="auth">
@@ -23,14 +23,14 @@ export function RenderLoginPage() {
 
                     <p>
                         Don't have an account?
-                        <a href="/./src/templates/register.html">register</a>
+                        <a href="#/register">register</a>
                     </p>
 
                     <div class="errorMsg"></div>
                 </form>
             </div>
         </div>
-    `;
+    `
 
-  mainContainer.appendChild(main);
+  mainContainer.appendChild(main)
 }

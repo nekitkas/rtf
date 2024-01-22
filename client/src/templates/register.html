@@ -51,24 +51,84 @@
               minlength="3"
               required
             />
+
+
+            <div class="fullName">
+
+              <div>
+                <label>FIRST NAME</label>
+                <input
+                        type="text"
+                        placeholder="First name"
+                        name="firstname"
+                        minlength="3"
+                        required
+                />
+
+              </div>
+
+
+              <div>
+                <label>LAST NAME</label>
+                <input
+                        type="text"
+                        placeholder="Last name"
+                        name="lastname"
+                        minlength="3"
+                        required
+                />
+
+              </div>
+
+
+
+
+
+
+
+            </div>
+
+
+
+
+<!--            <fieldset>-->
+              <label>GENDER</label>
+            <div>
+              <select id="gender" name="gender">
+                <option value="male" selected>MALE</option>
+                <option value="female">FEMALE</option>
+                <option value="diverse">DIVERSE</option>
+              </select>
+            </div>
+<!--            </fieldset>-->
+
+
+
             <label>PASSWORD</label>
             <input
-              type="password"
-              name="password"
-              placeholder="********"
-              minlength="8"
-              maxlength="32"
-              required
+                    type="password"
+                    name="password"
+                    placeholder="********"
+                    minlength="8"
+                    maxlength="32"
+                    required
             />
+
+
             <label>CONFIRM PASSWORD</label>
             <input
-              type="password"
-              name="confirm_password"
-              placeholder="********"
-              minlength="8"
-              maxlength="32"
-              required
+                    type="password"
+                    name="confirm_password"
+                    placeholder="********"
+                    minlength="8"
+                    maxlength="32"
+                    required
             />
+
+
+
+
+
             <button type="submit">REGISTER</button>
             <p>
               Already have an account? <a href="/./src/templates/login.html">sign-in</a>
