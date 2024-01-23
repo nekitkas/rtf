@@ -9,12 +9,6 @@ export const PostFeed = document.createElement("div")
 PostFeed.classList.add("post-feed")
 
 
-
-
-
-
-
-
 export function RenderHomePage(){
    const rootContainer = document.querySelector('.root');
     Navbar()
@@ -24,10 +18,10 @@ export function RenderHomePage(){
     rootContainer.append(Container)
 
     const post = RenderPost(PostDataTest)
- const post2 = RenderPost(PostDataTest)
+    const post2 = RenderPost(PostDataTest)
 
     PostFeed.appendChild(post)
- PostFeed.appendChild(post2)
+    PostFeed.appendChild(post2)
 
 
  Container.appendChild(PostFeed)

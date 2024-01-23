@@ -49,13 +49,13 @@ func (s *server) configureRouter() {
 	// s.router.Use(s.logRequest)
 	s.router.Use()
 
-	//TODO:
+	//TODO: Preflight
 	s.router.HandleFunc("OPTIONS", "/api/v1/users/create", OptionResponseCORS)
 	s.router.HandleFunc("OPTIONS", "/api/v1/users/login", OptionResponseCORS)
 	s.router.HandleFunc("OPTIONS", "/api/v1/users/findById", OptionResponseCORS)
 	s.router.HandleFunc("OPTIONS", "/sessions", OptionResponseCORS)
 
-	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
+	s.router.HandleFunc("POST", "/api/v1/users/create", CORSMiddleware(s.handleUsersCreate()))
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
@@ -196,6 +196,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
 	fmt.Println(code)
+	fmt.Println(data)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
@@ -210,4 +211,26 @@ func OptionResponseCORS(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Content-Type", "text/plain charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+}
+
+func CORSMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers dynamically based on the request's Origin header
+		origin := r.Header.Get("Origin")
+		if origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Allow only specific methods for actual requests
+		if r.Method == http.MethodOptions {
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Call the next handler in the chain for actual requests
+		next.ServeHTTP(w, r)
+	})
 }
