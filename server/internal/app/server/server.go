@@ -105,7 +105,10 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			Name:     sessionName,
 			Value:    token,
 			Expires:  expiration,
+			Path:     "/",
 			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteNoneMode,
 		}
 
 		http.SetCookie(w, &cookie)

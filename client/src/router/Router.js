@@ -48,7 +48,7 @@ export const RouterFunction = () => {
 
 // Function to check the presence of a cookie (pseudocode, implement according to your logic)
 const checkUserLoggedIn = () => {
-  console.log(getCookie("session"));
+  console.log("click");
   const userCookie = getCookie("session"); // Implement the getCookie function
   return !!userCookie; // Returns true if the cookie is present, otherwise false
 };
