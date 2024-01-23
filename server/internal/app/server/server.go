@@ -48,8 +48,8 @@ func (s *server) configureRouter() {
 	s.router.Use(s.logRequest)
 	s.router.Use(s.CORSMiddleware)
 
-	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
-	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
+	s.router.HandleFunc("POST", "/api/v1/users/create", CORSMiddleware(s.handleUsersCreate()))
+	s.router.HandleFunc("POST", "/api/v1/users/login", CORSMiddleware(s.handleUsersLogin()))
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
