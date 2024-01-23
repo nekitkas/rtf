@@ -13,8 +13,8 @@ export function RenderLoginPage() {
                 <form type="submit" action="/login" class="form" method="POST">
                     <h1 class="auth-title">SIGN-IN</h1>
 
-                    <label>EMAIL</label>
-                    <input type="email" placeholder="Email address" name="email" />
+                    <label>Email/Nickname</label>
+                    <input type="text" placeholder="Email,Login" name="email" />
 
                     <label>PASSWORD</label>
                     <input type="password" name="password" placeholder="********" />
