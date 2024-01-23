@@ -22,7 +22,7 @@ func (s *server) setRequestID(next http.Handler) http.Handler {
 func (s *server) logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
-		s.logger.Printf("started %s %s\nremote_addr:%s  request_id:%s",
+		s.logger.Printf("started %s %s ----- remote_addr:%s request_id:%s",
 			r.Method,
 			r.RequestURI,
 			r.RemoteAddr,
@@ -30,7 +30,7 @@ func (s *server) logRequest(next http.Handler) http.Handler {
 		)
 		start := time.Now()
 		next.ServeHTTP(rw, r)
-		s.logger.Printf("completed in %s with %d %s\nremote_addr:%s  request_id:%s",
+		s.logger.Printf("completed in %s with %d %s ----- remote_addr:%s  request_id:%s",
 			time.Now().Sub(start),
 			rw.code,
 			http.StatusText(rw.code),
