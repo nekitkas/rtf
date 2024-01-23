@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -62,36 +61,29 @@ func (s *server) CORSMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// Middleware for auth
-func (s *server) authenticateUser(next http.Handler) http.Handler {
-	fmt.Println("method authenticateUser")
+func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, err := s.sessionStore.Get(r, sessionName)
+		// Extract the token from the Authorization header
+		tokenString := extractToken(r.Header.Get("Authorization"))
+		fmt.Println("Extracted Token:", tokenString)
+		// Parse the token
+		claims, err := parseToken(tokenString)
+		fmt.Println(err)
 		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-		}
-
-		id, ok := session.Values["user_id"]
-		if !ok {
-			fmt.Println("1")
-			s.error(w, r, http.StatusUnauthorized, errors.New("not authenticated"))
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		u, err := s.store.User().FindByID(id.(string))
-		if err != nil {
-			fmt.Println("2")
-			s.error(w, r, http.StatusUnauthorized, errors.New("not authenticated"))
+		// Check if the token is expired
+		if time.Now().Unix() > claims.Exp {
+			http.Error(w, "Token expired", http.StatusUnauthorized)
 			return
 		}
 
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, u)))
-	})
-}
+		// Set user information in the request context or handle it as needed
+		fmt.Println("UserID:", claims.UserID)
 
-func (s *server) JWTAuth() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// expirationTime := time.Now().Add(time.Minute * 1)
-		// claims :=
+		// Call the next handler
+		next.ServeHTTP(w, r)
 	})
 }

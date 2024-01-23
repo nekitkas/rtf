@@ -44,7 +44,7 @@ func (r *UserRepository) Create(user *models.User) error {
 	//if err != nil {
 	//	return fmt.Errorf(err.Error())
 	//}
-	//if user.Email == u.Email || user.Username == u.Username {
+	//if user.Email == u.Email || user.UserID == u.UserID {
 	//	return fmt.Errorf("User already created with this username/email")
 	//}
 	// Maybe add checks for example: whether all the neccessary information is given or checks in front end for that?

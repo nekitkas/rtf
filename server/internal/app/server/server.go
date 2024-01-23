@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"forum/server/internal/models"
 	"forum/server/internal/store"
@@ -50,15 +51,26 @@ func (s *server) configureRouter() {
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
-	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
-	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
+	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 
-	// s.router.UseWithPrefix("/private", s.authenticateUser)
-	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
+	s.router.UseWithPrefix("/private", s.jwtMiddleware)
+
+	s.router.HandleFunc("*", "/api/v1/users/private/findById", s.handleUsersGetById())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
+}
+
+func (s *server) handleCheckCookie() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie(sessionName)
+		if err != nil {
+			s.logger.Printf("error: %s", err)
+			return
+		}
+		fmt.Println(cookie.Value)
+	}
 }
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
@@ -81,20 +93,25 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		session, err := s.sessionStore.Get(r, sessionName)
+		expiration := time.Now().Add(5 * time.Minute)
+		token, err := s.generateToken(user.ID, expiration)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		session.Values["user_id"] = user.ID
-		err = s.sessionStore.Save(r, w, session)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
+		r.Header.Set("Authorization", "Bearer "+token)
+		cookie := http.Cookie{
+			Name:     sessionName,
+			Value:    token,
+			Expires:  expiration,
+			HttpOnly: true,
 		}
 
-		s.respond(w, r, http.StatusOK, nil)
+		http.SetCookie(w, &cookie)
+
+		// we don't actually need token in respond
+		s.respond(w, r, http.StatusOK, token)
 	}
 }
 
