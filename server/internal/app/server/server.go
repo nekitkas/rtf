@@ -48,8 +48,8 @@ func (s *server) configureRouter() {
 	s.router.Use(s.logRequest)
 	s.router.Use(s.CORSMiddleware)
 
-	s.router.HandleFunc("POST", "/api/v1/users/create", CORSMiddleware(s.handleUsersCreate()))
-	s.router.HandleFunc("POST", "/api/v1/users/login", CORSMiddleware(s.handleUsersLogin()))
+	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
+	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
@@ -76,17 +76,25 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		user, err := s.store.User().CheckUser(requestBody.Login)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err != nil && !user.ComparePassword(requestBody.Password) {
+			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
 
-		//Check password
-		if user.ComparePassword(requestBody.Password) {
-			s.respond(w, r, http.StatusCreated, user)
-		} else {
-			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
+		session, err := s.sessionStore.Get(r, sessionName)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
 		}
+
+		session.Values["user_id"] = user.ID
+		err = s.sessionStore.Save(r, w, session)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
@@ -171,8 +179,6 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
-	fmt.Println(code)
-	fmt.Println(data)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
