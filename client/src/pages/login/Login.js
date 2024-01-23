@@ -67,6 +67,7 @@ export function RenderLoginPage() {
         "Content-Type": "application/json",
         "Access-Control-Request-Method": "POST",
       },
+      credentials: 'include',
       body: JSON.stringify(formDataObject),
     })
       .then((response) => {
