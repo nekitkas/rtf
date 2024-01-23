@@ -21,7 +21,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 	// get the row and add it to the user variable
-	err := r.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.Age, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
+	err := r.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where no user was found
@@ -40,7 +40,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 func (r *UserRepository) Create(user *models.User) error {
 	//Check if user exists in the firstPlace
 	u, err := r.FindByEmail(user.Email)
-	if (err != nil) {
+	if err != nil {
 		return fmt.Errorf(err.Error())
 	}
 	if user.Email == u.Email || user.Username == u.Username {
@@ -55,9 +55,9 @@ func (r *UserRepository) Create(user *models.User) error {
 	fmt.Println(user.Password)
 
 	// Adding that stuff to db
-	query := `INSERT INTO user (id, username, email, password, timestamp, age, first_name, last_name, gender, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO user (id, username, email, password, timestamp, date_of_birth, first_name, last_name, gender, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	_, err = r.store.Db.Exec(query, user.ID, user.Username, user.Email, user.Password, user.Timestamp, user.Age, user.FirstName, user.LastName, user.Gender, user.ImageURL)
+	_, err = r.store.Db.Exec(query, user.ID, user.Username, user.Email, user.Password, user.Timestamp, user.DateOfBirth, user.FirstName, user.LastName, user.Gender, user.ImageURL)
 	if err != nil {
 		return fmt.Errorf("Database SQL query error: %v", err)
 	}
@@ -71,7 +71,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 
 	var user models.User
 	// get the row and add it to the user variable
-	err := r.store.Db.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.Age, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
+	err := r.store.Db.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where no user was found
@@ -91,15 +91,15 @@ func (r *UserRepository) CheckUser(login string) (*models.User, error) {
 
 	var user models.User
 
-	err := r.store.Db.QueryRow(query, login, login).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.Age, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
+	err := r.store.Db.QueryRow(query, login, login).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &user, fmt.Errorf(`User is not registered!`)
-		}else{
+		} else {
 			return &user, fmt.Errorf(`Error occured while checking user: %v`, err)
 		}
 	}
 	//check if passwords match
-	
+
 	return &user, nil
 }

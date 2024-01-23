@@ -49,6 +49,12 @@ func (s *server) configureRouter() {
 	// s.router.Use(s.logRequest)
 	s.router.Use()
 
+	//TODO:
+	s.router.HandleFunc("OPTIONS", "/api/v1/users/create", OptionResponseCORS)
+	s.router.HandleFunc("OPTIONS", "/api/v1/users/login", OptionResponseCORS)
+	s.router.HandleFunc("OPTIONS", "/api/v1/users/findById", OptionResponseCORS)
+	s.router.HandleFunc("OPTIONS", "/sessions", OptionResponseCORS)
+
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
@@ -91,9 +97,9 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		//Check password
-		if user.ComparePassword(requestBody.Password){
+		if user.ComparePassword(requestBody.Password) {
 			s.respond(w, r, http.StatusCreated, user)
-		}else{
+		} else {
 			s.error(w, r, http.StatusUnauthorized, errors.New("Invalid login credentials!"))
 		}
 	}
@@ -189,7 +195,19 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
+	fmt.Println(code)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
+}
+
+func OptionResponseCORS(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("CORS")
+	origin := r.Header.Get("Origin")
+	w.Header().Set("Access-Control-Allow-Origin", origin)
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Content-Type", "text/plain charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 }
