@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -45,17 +44,11 @@ func newServer(store store.Store, sessionStore sessions.Store) *server {
 
 func (s *server) configureRouter() {
 	// Using middlewares
-	// s.router.Use(s.setRequestID)
-	// s.router.Use(s.logRequest)
-	s.router.Use()
+	s.router.Use(s.setRequestID)
+	s.router.Use(s.logRequest)
+	s.router.Use(s.CORSMiddleware)
 
-	//TODO: Preflight
-	s.router.HandleFunc("OPTIONS", "/api/v1/users/create", OptionResponseCORS)
-	s.router.HandleFunc("OPTIONS", "/api/v1/users/login", OptionResponseCORS)
-	s.router.HandleFunc("OPTIONS", "/api/v1/users/findById", OptionResponseCORS)
-	s.router.HandleFunc("OPTIONS", "/sessions", OptionResponseCORS)
-
-	s.router.HandleFunc("POST", "/api/v1/users/create", CORSMiddleware(s.handleUsersCreate()))
+	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
@@ -75,24 +68,16 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			// Handle error
-			http.Error(w, "Error reading body", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
-
 		var requestBody RequestBody
-		err = json.Unmarshal(body, &requestBody)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
 		user, err := s.store.User().CheckUser(requestBody.Login)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -100,7 +85,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		if user.ComparePassword(requestBody.Password) {
 			s.respond(w, r, http.StatusCreated, user)
 		} else {
-			s.error(w, r, http.StatusUnauthorized, errors.New("Invalid login credentials!"))
+			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 		}
 	}
 }
@@ -111,24 +96,15 @@ func (s *server) handleUsersGetById() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			// Handle error
-			http.Error(w, "Error reading body", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
-
 		var requestBody RequestBody
-		err = json.Unmarshal(body, &requestBody)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
 		user, err := s.store.User().FindByID(requestBody.ID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -200,37 +176,4 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
-}
-
-func OptionResponseCORS(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("CORS")
-	origin := r.Header.Get("Origin")
-	w.Header().Set("Access-Control-Allow-Origin", origin)
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Content-Type", "text/plain charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}
-
-func CORSMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers dynamically based on the request's Origin header
-		origin := r.Header.Get("Origin")
-		if origin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-		}
-
-		// Allow only specific methods for actual requests
-		if r.Method == http.MethodOptions {
-			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		// Call the next handler in the chain for actual requests
-		next.ServeHTTP(w, r)
-	})
 }

@@ -40,6 +40,28 @@ func (s *server) logRequest(next http.Handler) http.Handler {
 	})
 }
 
+func (s *server) CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers dynamically based on the request's Origin header
+		origin := r.Header.Get("Origin")
+		if origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Allow only specific methods for actual requests
+		if r.Method == http.MethodOptions {
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Call the next handler in the chain for actual requests
+		next.ServeHTTP(w, r)
+	})
+}
+
 // Middleware for auth
 func (s *server) authenticateUser(next http.Handler) http.Handler {
 	fmt.Println("method authenticateUser")
@@ -67,9 +89,9 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 	})
 }
 
-func (s *server) JWTAuth() http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+func (s *server) JWTAuth() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// expirationTime := time.Now().Add(time.Minute * 1)
-		// claims := 
+		// claims :=
 	})
 }
