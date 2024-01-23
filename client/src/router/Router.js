@@ -6,7 +6,6 @@ export const RouterFunction = () => {
   const path = window.location.hash.slice(1);
   console.log("Current Path:", path);
 
-  // Check for the presence of a cookie to determine user authentication
 
 
   if (path.startsWith("/post/")) {
@@ -16,9 +15,8 @@ export const RouterFunction = () => {
   } else {
     switch (path) {
       case "/home":
-        const isUserLoggedIn = checkUserLoggedIn(); // Implement the checkUserLoggedIn function
 
-        if (!isUserLoggedIn) {
+        if (!checkUserLoggedIn()) {
           // If the user is not authenticated, redirect to the Login Page
           console.log("User not logged in, redirecting to Login Page");
           RenderLoginPage();
@@ -36,6 +34,12 @@ export const RouterFunction = () => {
         RenderRegisterPage();
         break;
       default:
+        if (!checkUserLoggedIn()) {
+          // If the user is not authenticated, redirect to the Login Page
+          console.log("User not logged in, redirecting to Login Page");
+          RenderLoginPage();
+          return;
+        }
         console.log("Unknown Path, Rendering Home Page");
         RenderHomePage();
     }
