@@ -95,11 +95,45 @@
 
 .user-profile {
   display: flex;
+  width: 163px;
   border: 1px solid var(--border-color);
   padding: 5px;
   margin-left: 20px;
   border-radius: 10px;
+  position: relative;
+
 }
+
+.user-profile:hover{
+  cursor: pointer;
+}
+.hideModal {
+   display: none !important;
+}
+
+.userprofile-modal {
+  position: absolute;
+  height: 70px;
+  width: 163px;
+  background-color: var(--background-secondory);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 10px 10px;
+  border-top: none;
+  top: 29px;
+  right: -1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px;
+  font-size: 16px;
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s, opacity 0.5s linear;
+}
+.userprofile-modal p{
+  margin-top: 6px;
+  cursor: pointer;
+  }
 
 .user-profile-selector {
   display: flex;

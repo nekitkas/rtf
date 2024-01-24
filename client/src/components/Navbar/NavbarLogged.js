@@ -43,8 +43,22 @@ export function NavbarLogged() {
       <div class="user-profile-selector">
         <p>Filthy Frank</p>
         <img   src="${arrowSvg}" alt="arrow">
+        <div class="userprofile-modal">
+        <p>My profile</p>
+        <p>Log out</p>
+      </div>
       </div>
     </div>
   </div>
 </nav>`;
+
+
+
+const userProfile = document.querySelector('.userprofile-modal')
+const userBlock = document.querySelector('.user-profile')
+userBlock.addEventListener('click', displayUserModal)
+
+function displayUserModal(){
+  userProfile.classList.toggle("hideModal");
+}
 }
