@@ -1,5 +1,5 @@
 .messenger {
-  width: 330px;
+  width: 300px;
   position: fixed;
   bottom: 0;
   right: 15%;
@@ -59,6 +59,7 @@
   border-radius: 10px;
   background-color: #303030;
   color: white;
+  border: 1px solid var(--border-color);
 }
 
 .chat-footer img {
@@ -87,7 +88,7 @@
   padding: 8px 12px;
   max-width: 240px;
   border-radius: 10px;
-  background-color: var(--primary-color);
+  background-color: #2723a1;
   margin-left: auto; /* This will push it to the right */
   height: auto;
   text-wrap: wrap;
