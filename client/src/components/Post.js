@@ -1,15 +1,7 @@
 
 
-
-
-
-
 export function RenderPost (data){
-
     const {category,title,text,imageURL,commentCounter} = data
-
-
-
     const post = document.createElement('div')
     post.classList.add("post")
 
