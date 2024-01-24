@@ -1,9 +1,21 @@
-import { Navbar } from "../../components/Navbar/Navbar"
+import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import "../../styles/auth.css"
+import { RouterFunction } from "../../router/Router.js"
+import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
 
-export function RenderLoginPage() {
+
+export async function RenderLoginPage() {
+try{
+  const isUserLogged = await CheckUserLoggedIn();
+  console.log(isUserLogged);
+
+  if (isUserLogged) {
+    window.location.href = '#/home';
+    RouterFunction();
+  } else {
+
   const mainContainer = document.querySelector(".root")
-  Navbar()
+  NavbarNotLogged()
 
   const main = document.createElement("main")
   main.className = "main"
@@ -80,6 +92,8 @@ export function RenderLoginPage() {
       .then((data) => {
         // Handle the response from the server
         console.log("Server response:", data)
+        window.location.href = '#/home';
+        RouterFunction();
       })
       .catch((error) => {
         // Handle fetch errors
@@ -89,3 +103,9 @@ export function RenderLoginPage() {
 }
 
 
+}catch (error) {
+  console.error("Error checking user login:", error);
+  // Handle the error as needed
+}
+
+}

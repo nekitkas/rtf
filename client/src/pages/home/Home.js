@@ -1,4 +1,4 @@
-import { Navbar } from "../../components/Navbar/Navbar.js";
+import { NavbarLogged } from "../../components/Navbar/NavbarLogged.js";
 import "../../styles/style.css"
 import "../../styles/post.css"
 import "../../styles/messenger.css"
@@ -7,9 +7,6 @@ import {RenderPost} from "../../components/Post";
 import {PostDataTest} from "../../components/postDataTest";
 import {RenderMessenger} from "../../components/Messenger";
 
-export const Container = document.createElement("div")
-export const PostFeed = document.createElement("div")
-PostFeed.classList.add("post-feed")
 
 
 const Messenger = RenderMessenger()
@@ -17,11 +14,13 @@ const Messenger = RenderMessenger()
 
 export function RenderHomePage(){
    const rootContainer = document.querySelector('.root');
-    Navbar()
+   rootContainer.innerHTML = "";
+   NavbarLogged()
 
 
-
-
+     const Container = document.createElement("div")
+     const PostFeed = document.createElement("div")
+    PostFeed.classList.add("post-feed")
 
     Container.classList.add("container")
     rootContainer.append(Container)
@@ -41,7 +40,7 @@ export function RenderHomePage(){
 
  rootContainer.appendChild(Messenger)
 
-    
+
 
 
 }

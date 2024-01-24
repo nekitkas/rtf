@@ -61,17 +61,25 @@ func (s *server) configureRouter() {
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
-
 func (s *server) handleCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
 		if err != nil {
 			s.logger.Printf("error: %s", err)
+			// Cookie not present, respond with JSON indicating false
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]bool{"cookiePresent": false})
 			return
 		}
 		fmt.Println(cookie.Value)
+		// Cookie is present, respond with JSON indicating true
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]bool{"cookiePresent": true})
 	}
 }
+
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
@@ -93,7 +101,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		expiration := time.Now().Add(5 * time.Minute)
+		expiration := time.Now().Add(5 * time.Hour)
 		token, err := s.generateToken(user.ID, expiration)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
@@ -109,6 +117,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			HttpOnly: true,
 			Secure:   true,
 			SameSite: http.SameSiteNoneMode,
+
 		}
 
 		http.SetCookie(w, &cookie)

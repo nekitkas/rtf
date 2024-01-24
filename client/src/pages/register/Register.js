@@ -1,9 +1,20 @@
-import { Navbar } from "../../components/Navbar/Navbar.js"
+import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
+import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js";
+import { RouterFunction } from "../../router/Router.js";
 
-export function RenderRegisterPage() {
-  const mainContainer = document.querySelector(".root")
-  mainContainer.innerHTML = ""
-  Navbar()
+export async function RenderRegisterPage() {
+  try {
+    const isUserLogged = await CheckUserLoggedIn();
+    console.log(isUserLogged);
+
+    if (isUserLogged) {
+      window.location.href = '#/home';
+      RouterFunction();
+    } else {
+      const mainContainer = document.querySelector(".root");
+      mainContainer.innerHTML = "";
+      NavbarNotLogged();
+
 
   const main = document.createElement("main")
   main.className = "main"
@@ -119,4 +130,9 @@ export function RenderRegisterPage() {
         console.log("Fetch error:", error)
       })
   }
+}
+} catch (error) {
+  console.error("Error checking user login:", error);
+  // Handle the error as needed
+}
 }
