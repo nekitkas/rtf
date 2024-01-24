@@ -1,18 +1,19 @@
-import { Navbar } from "../../components/Navbar/Navbar.js";
+import { NavbarLogged } from "../../components/Navbar/NavbarLogged.js";
 import "../../styles/style.css"
 import "../../styles/post.css"
 import {RenderPost} from "../../components/Post";
 import {PostDataTest} from "../../components/postDataTest";
 
-export const Container = document.createElement("div")
-export const PostFeed = document.createElement("div")
-PostFeed.classList.add("post-feed")
 
 
 export function RenderHomePage(){
    const rootContainer = document.querySelector('.root');
-    Navbar()
+   rootContainer.innerHTML = "";
+   NavbarLogged()
 
+     const Container = document.createElement("div")
+     const PostFeed = document.createElement("div")
+    PostFeed.classList.add("post-feed")
 
     Container.classList.add("container")
     rootContainer.append(Container)
@@ -26,7 +27,7 @@ export function RenderHomePage(){
 
  Container.appendChild(PostFeed)
 
-    
+
 
 
 }

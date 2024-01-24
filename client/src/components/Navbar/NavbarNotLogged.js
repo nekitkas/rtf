@@ -5,7 +5,7 @@ import avatar from "../../assets/img/avatar.svg.png";
 import arrowSvg from "../../assets/img/arrow.svg";
 import messageButtonImage from "../../assets/img/message.svg";
 
-export function Navbar() {
+export function NavbarNotLogged() {
   const mainContainer = document.querySelector(".root");
   mainContainer.innerHTML = `
     <nav class="navbar">
