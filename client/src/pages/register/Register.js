@@ -124,6 +124,8 @@ export async function RenderRegisterPage() {
       .then((data) => {
         // Handle the response from the server
         console.log("Server response:", data)
+        window.location.href = "#/login";
+        RouterFunction();
       })
       .catch((error) => {
         // Handle fetch errors
