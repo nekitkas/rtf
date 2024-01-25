@@ -11,8 +11,6 @@ import (
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
-
-	"github.com/gorilla/sessions"
 )
 
 const (
@@ -24,18 +22,16 @@ const (
 type ctxKey int8
 
 type server struct {
-	router       *router.Router
-	logger       *log.Logger
-	store        store.Store
-	sessionStore sessions.Store
+	router *router.Router
+	logger *log.Logger
+	store  store.Store
 }
 
-func newServer(store store.Store, sessionStore sessions.Store) *server {
+func newServer(store store.Store) *server {
 	s := &server{
-		router:       router.NewRouter(),
-		logger:       log.Default(),
-		store:        store,
-		sessionStore: sessionStore,
+		router: router.NewRouter(),
+		logger: log.Default(),
+		store:  store,
 	}
 
 	s.configureRouter()
@@ -51,35 +47,30 @@ func (s *server) configureRouter() {
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
-	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
+	//s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 
-	s.router.UseWithPrefix("/private", s.jwtMiddleware)
+	s.router.UseWithPrefix("/auth", s.jwtMiddleware)
 
-	s.router.HandleFunc("*", "/api/v1/users/private/findById", s.handleUsersGetById())
+	s.router.HandleFunc("GET", "/api/v1/auth/users/profile", s.handleUsersGetByEmail())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
+
 func (s *server) handleCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
 		if err != nil {
 			s.logger.Printf("error: %s", err)
-			// Cookie not present, respond with JSON indicating false
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]bool{"cookiePresent": false})
+			s.respond(w, r, http.StatusOK, map[string]bool{"cookiePresent": false})
 			return
 		}
 		fmt.Println(cookie.Value)
-		// Cookie is present, respond with JSON indicating true
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]bool{"cookiePresent": true})
+
+		s.respond(w, r, http.StatusOK, map[string]bool{"cookiePresent": true})
 	}
 }
-
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
@@ -95,7 +86,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		user, err := s.store.User().CheckUser(requestBody.Email)
+		user, err := s.store.User().Check(requestBody.Email)
 		if err != nil && !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
@@ -117,19 +108,17 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			HttpOnly: true,
 			Secure:   true,
 			SameSite: http.SameSiteNoneMode,
-
 		}
 
 		http.SetCookie(w, &cookie)
 
-		// we don't actually need token in respond
-		s.respond(w, r, http.StatusOK, token)
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
-func (s *server) handleUsersGetById() http.HandlerFunc {
+func (s *server) handleUsersGetByEmail() http.HandlerFunc {
 	type RequestBody struct {
-		ID string `json:"id"`
+		Email string `json:"email"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -139,13 +128,13 @@ func (s *server) handleUsersGetById() http.HandlerFunc {
 			return
 		}
 
-		user, err := s.store.User().FindByID(requestBody.ID)
+		user, err := s.store.User().FindByEmail(requestBody.Email)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, user)
+		s.respond(w, r, http.StatusOK, user)
 	}
 }
 
@@ -163,42 +152,6 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, user: %v`, user))
-	}
-}
-
-func (s *server) handleSessionsCreate() http.HandlerFunc {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		u, err := s.store.User().FindByEmail(req.Email)
-		if err != nil || !u.ComparePassword(req.Password) {
-			s.error(w, r, http.StatusUnauthorized, errors.New("incorrect email or password"))
-			return
-		}
-
-		session, err := s.sessionStore.Get(r, sessionName)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		session.Values["user_id"] = u.ID
-		err = s.sessionStore.Save(r, w, session)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 

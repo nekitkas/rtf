@@ -79,7 +79,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) CheckUser(login string) (*models.User, error) {
+func (r *UserRepository) Check(login string) (*models.User, error) {
 	//command to find a user no matter if its email or username
 	query := `SELECT * FROM user u WHERE u.email = ? OR u.username = ?`
 

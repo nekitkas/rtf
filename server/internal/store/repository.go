@@ -6,10 +6,10 @@ type UserRepository interface {
 	Create(*models.User) error
 	FindByID(string) (*models.User, error)
 	FindByEmail(string) (*models.User, error)
-	CheckUser(string) (*models.User, error)
+	Check(string) (*models.User, error)
 }
 
 type PostRepository interface {
 	Create(*models.Post) error
-	GetPost(string) error
+	FindByID(string) error
 }

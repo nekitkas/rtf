@@ -11,6 +11,6 @@ func (r *PostRepository) Create(post *models.Post) error {
 	panic("implement me")
 }
 
-func (r *PostRepository) GetPost(id string) error {
+func (r *PostRepository) FindByID(id string) error {
 	panic("implement me!")
 }

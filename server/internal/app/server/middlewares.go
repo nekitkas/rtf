@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-var jwtKey = []byte("secret_key")
-
 func (s *server) setRequestID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := uuid.New().String()
@@ -21,6 +19,10 @@ func (s *server) setRequestID(next http.Handler) http.Handler {
 func (s *server) logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
+		if r.Method == http.MethodOptions {
+			next.ServeHTTP(rw, r)
+		}
+
 		s.logger.Printf("started %s %s ----- remote_addr:%s request_id:%s",
 			r.Method,
 			r.RequestURI,
@@ -63,26 +65,34 @@ func (s *server) CORSMiddleware(next http.Handler) http.Handler {
 
 func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie(sessionName)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+
+		fmt.Println(cookie.Value)
+
 		// Extract the token from the Authorization header
 		tokenString := extractToken(r.Header.Get("Authorization"))
 		fmt.Println("Extracted Token:", tokenString)
 		// Parse the token
-		claims, err := parseToken(tokenString)
+		claims, err := parseToken(cookie.Value)
 		fmt.Println(err)
 		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
 
 		// Check if the token is expired
 		if time.Now().Unix() > claims.Exp {
-			http.Error(w, "Token expired", http.StatusUnauthorized)
+			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("expired token"))
 			return
 		}
 
 		// Set user information in the request context or handle it as needed
 		fmt.Println("UserID:", claims.UserID)
-
+		s.respond(w, r, http.StatusOK, nil)
 		// Call the next handler
 		next.ServeHTTP(w, r)
 	})
