@@ -12,14 +12,14 @@ export const CheckUserLoggedIn = async () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Request failed with status: ${response.status}`);
+        return response.ok
       }
 
-      const data = await response.json();
-      console.log("Server response:", data);
 
-      return data.cookiePresent;
+
+      return response.ok
     } catch (error) {
+     
       console.error("Fetch error:", error);
       throw error;
     }
