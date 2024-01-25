@@ -47,11 +47,11 @@ func (s *server) configureRouter() {
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
-	//s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
+	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 
-	s.router.UseWithPrefix("/auth", s.jwtMiddleware)
-
-	s.router.HandleFunc("GET", "/api/v1/auth/users/profile", s.handleUsersGetByEmail())
+	//s.router.UseWithPrefix("/auth", s.jwtMiddleware)
+	//
+	//s.router.HandleFunc("GET", "/api/v1/auth/users/profile", s.handleUsersGetByEmail())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -62,13 +62,32 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
 		if err != nil {
-			s.logger.Printf("error: %s", err)
-			s.respond(w, r, http.StatusOK, map[string]bool{"cookiePresent": false})
+			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
+
 		fmt.Println(cookie.Value)
 
-		s.respond(w, r, http.StatusOK, map[string]bool{"cookiePresent": true})
+		// Extract the token from the Authorization header
+		tokenString := extractToken(r.Header.Get("Authorization"))
+		fmt.Println("Extracted Token:", tokenString)
+		// Parse the token
+		claims, err := parseToken(cookie.Value)
+		fmt.Println(err)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+
+		// Check if the token is expired
+		if time.Now().Unix() > claims.Exp {
+			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("expired token"))
+			return
+		}
+
+		// Set user information in the request context or handle it as needed
+		fmt.Println("UserID:", claims.UserID)
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
