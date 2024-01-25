@@ -1,6 +1,7 @@
 import { CheckUserLoggedIn } from "../helpers/ServerRequests.js";
 import { RenderHomePage } from "../pages/home/Home.js";
 import { RenderLoginPage } from "../pages/login/Login.js";
+import { RenderPostPage } from "../pages/post/PostPage.js";
 import { RenderRegisterPage } from "../pages/register/Register.js";
 
 export const RouterFunction = async () => {
@@ -34,6 +35,10 @@ export const RouterFunction = async () => {
           console.log("Rendering Register Page");
           RenderRegisterPage();
           break;
+        case "/create-post":
+          console.log("Rendering Register Page");
+          RenderPostPage();
+          break;
         default:
           if (!userLoggedIn) {
             // If the user is not authenticated, redirect to the Login Page
@@ -50,30 +55,15 @@ export const RouterFunction = async () => {
   }
 };
 
+// try {
+//   const userCookie = getCookie("session");
 
-
-
-
-
-
-
-
-
-
-
-
-
-  // try {
-  //   const userCookie = getCookie("session");
-
-
-  //   console.log("User Cookie:", userCookie);
-  //   return userCookie ? true : false;
-  // } catch (error) {
-  //   console.error("Error checking user login:", error);
-  //   return false;
-  // }
-
+//   console.log("User Cookie:", userCookie);
+//   return userCookie ? true : false;
+// } catch (error) {
+//   console.error("Error checking user login:", error);
+//   return false;
+// }
 
 // Function to retrieve the value of a cookie by name
 // const getCookie = (cookieName) => {

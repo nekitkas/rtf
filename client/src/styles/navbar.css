@@ -12,6 +12,20 @@
   z-index: 100;
 }
 
+.navbar-post{
+  display: flex;
+  background-color: var(--background-secondory);
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  height: 65px;
+  padding-left: 50px;
+  padding-right: 100px;
+  border-bottom: 1px solid var(--border-color);
+  position: fixed;
+  z-index: 100;
+}
+
 .logo {
   font-size: 40px;
   color: white;
@@ -107,13 +121,10 @@
 .user-profile:hover{
   cursor: pointer;
 }
-.hideModal {
-   display: none !important;
-}
 
 .userprofile-modal {
   position: absolute;
-  height: 70px;
+  height: 0;
   width: 163px;
   background-color: var(--background-secondory);
   border: 1px solid var(--border-color);
@@ -127,13 +138,32 @@
   padding: 10px;
   font-size: 16px;
   visibility: visible;
-  opacity: 1;
-  transition: visibility 0s, opacity 0.5s linear;
+
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.1s ease-out, opacity 0.5s ease-in-out;
+  overflow: hidden;
+
 }
+
+.showModal {
+  display: block !important;
+  transform: scaleY(1);
+
+  height: 70px;
+}
+
+
 .userprofile-modal p{
   margin-top: 6px;
-  cursor: pointer;
+
   }
+
+  .userprofile-modal p:hover {
+    color: var(--primary-color);
+    cursor: pointer;
+  }
+
 
 .user-profile-selector {
   display: flex;
@@ -196,3 +226,15 @@
   width: 25px;
   height: 25px;
 }
+
+.modal-icon{
+  width: 15px;
+  height: 15px;
+}
+
+.modal-div{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
