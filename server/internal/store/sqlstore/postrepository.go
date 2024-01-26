@@ -7,7 +7,7 @@ type PostRepository struct {
 }
 
 func (r *PostRepository) Create(post *models.Post) error {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

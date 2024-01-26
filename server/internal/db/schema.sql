@@ -5,7 +5,7 @@ CREATE TABLE
     email text UNIQUE NOT NULL,
     password text NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    age number NOT NULL,
+    date_of_birth text NOT NULL,
     first_name text,
     last_name text,
     gender text,
