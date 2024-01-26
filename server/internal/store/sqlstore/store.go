@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-
 	"forum/server/internal/store"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -12,7 +11,6 @@ type Store struct {
 	Db             *sql.DB
 	userRepository *UserRepository
 	postRepository *PostRepository
-	chatRepository *ChatRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -43,16 +41,4 @@ func (s *Store) Post() store.PostRepository {
 	}
 
 	return s.postRepository
-}
-
-func (s *Store) Chat() store.ChatRepository {
-	if s.chatRepository != nil {
-		return s.chatRepository
-	}
-
-	s.chatRepository = &ChatRepository{
-		store: s,
-	}
-
-	return s.chatRepository
 }

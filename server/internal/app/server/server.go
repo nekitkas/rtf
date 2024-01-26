@@ -49,7 +49,6 @@ func (s *server) configureRouter() {
 	// s.router.Use(s.logRequest)
 	s.router.Use()
 
-	s.router.HandleFunc("POST", "/api/v1/chat/create", s.handleChatCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
@@ -63,12 +62,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func (s *server) handleChatCreate() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, user: %v`, "test"))
-	}
-}
-
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
 		Login    string `json:"login"`
@@ -79,7 +72,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			// Handle error
-			s.error(w, r, http.StatusBadRequest, err)
+			http.Error(w, "Error reading body", http.StatusBadRequest)
 			return
 		}
 		defer r.Body.Close()
@@ -87,13 +80,13 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		var requestBody RequestBody
 		err = json.Unmarshal(body, &requestBody)
 		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		user, err := s.store.User().CheckUser(requestBody.Login)
 		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -115,7 +108,7 @@ func (s *server) handleUsersGetById() http.HandlerFunc {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			// Handle error
-			s.error(w, r, http.StatusBadRequest, err)
+			http.Error(w, "Error reading body", http.StatusBadRequest)
 			return
 		}
 		defer r.Body.Close()
@@ -123,13 +116,13 @@ func (s *server) handleUsersGetById() http.HandlerFunc {
 		var requestBody RequestBody
 		err = json.Unmarshal(body, &requestBody)
 		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		user, err := s.store.User().FindByID(requestBody.ID)
 		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
