@@ -13,7 +13,3 @@ type PostRepository interface {
 	Create(*models.Post) error
 	GetPost(string) error
 }
-
-type ChatRepository interface {
-	Create(*models.Chat) error
-}

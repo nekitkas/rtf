@@ -2,11 +2,10 @@ package server
 
 import (
 	"database/sql"
+	"forum/server/internal/store/sqlstore"
 	"log"
 	"net/http"
 	"os"
-
-	"forum/server/internal/store/sqlstore"
 
 	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"

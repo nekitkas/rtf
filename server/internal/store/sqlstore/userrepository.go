@@ -21,7 +21,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 	// get the row and add it to the user variable
-	err := r.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
+	err := r.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.Age, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where no user was found
@@ -57,8 +57,7 @@ func (r *UserRepository) Create(user *models.User) error {
 	// Adding that stuff to db
 	query := `INSERT INTO user (id, username, email, password, timestamp, age, first_name, last_name, gender, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	_, err := r.store.Db.Exec(query, user.ID, user.Username, user.Email, user.Password, user.Timestamp, user.DateOfBirth, user.FirstName, user.LastName, user.Gender, user.ImageURL)
-
+	_, err = r.store.Db.Exec(query, user.ID, user.Username, user.Email, user.Password, user.Timestamp, user.Age, user.FirstName, user.LastName, user.Gender, user.ImageURL)
 	if err != nil {
 		return fmt.Errorf("Database SQL query error: %v", err)
 	}
@@ -72,7 +71,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 
 	var user models.User
 	// get the row and add it to the user variable
-	err := r.store.Db.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
+	err := r.store.Db.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.Age, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where no user was found
