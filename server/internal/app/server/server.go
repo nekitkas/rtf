@@ -49,6 +49,8 @@ func (s *server) configureRouter() {
 	s.router.Use()
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
+	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
+	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 
@@ -59,6 +61,8 @@ func (s *server) configureRouter() {
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
+
+//-------------------------USER STUFF--------------------------//
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
@@ -80,6 +84,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+
 
 		// Check password
 		if user.ComparePassword(requestBody.Password) {
@@ -130,6 +135,57 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 
 		user.Sanitize()
 		s.respond(w, r, http.StatusCreated, user)
+	}
+}
+
+//-------------------------POST STUFF--------------------------//
+
+func (s *server) handlePostCreation() http.HandlerFunc {
+	type request struct {
+		Post    models.Post `json:"post"`
+		Categories []models.Category `json:"categories"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		//Create category if needed
+		for _, category := range req.Categories{
+			if err := s.store.Category().Create(&category); err != nil {
+				s.error(w, r, http.StatusUnprocessableEntity, err)
+				return
+			}
+		} 
+		//Create post
+		if err := s.store.Post().Create(&req.Post, req.Categories); err != nil {
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, post: %v, successfull categories %v`, req.Post, req.Categories))
+	}
+
+}
+
+func (s *server) serveSinglePostInformation() http.HandlerFunc {
+	type request struct {
+		Post string `json:"post_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request){
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		post, err := s.store.Post().GetPost(req.Post)
+		if err != nil{
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull post information: %v`, post))
 	}
 }
 
