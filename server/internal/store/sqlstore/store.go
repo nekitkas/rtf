@@ -11,6 +11,7 @@ type Store struct {
 	Db             *sql.DB
 	userRepository *UserRepository
 	postRepository *PostRepository
+	categoryRepository *CategoryRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -41,4 +42,16 @@ func (s *Store) Post() store.PostRepository {
 	}
 
 	return s.postRepository
+}
+
+func (s *Store) Category() store.CategoryRepository {
+	if s.categoryRepository != nil {
+		return s.categoryRepository
+	}
+
+	s.categoryRepository = &CategoryRepository{
+		store: s,
+	}
+
+	return s.categoryRepository
 }
