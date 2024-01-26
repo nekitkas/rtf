@@ -1,9 +1,5 @@
 import "../../styles/navbar.css";
-import searchSvg from "../../assets/img/search.svg";
-import plusSvg from "../../assets/img/plus.svg";
-import avatar from "../../assets/img/avatar.svg.png";
-import arrowSvg from "../../assets/img/arrow.svg";
-import messageButtonImage from "../../assets/img/message.svg";
+
 
 export function NavbarNotLogged() {
   const mainContainer = document.querySelector(".root");

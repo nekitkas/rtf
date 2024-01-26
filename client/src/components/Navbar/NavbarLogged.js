@@ -10,10 +10,8 @@ import logout from "../../assets/img/logout.svg";
 export function NavbarLogged() {
   const currentUrl = window.location.href;
 
-
-
   const mainContainer = document.querySelector(".root");
-  if(currentUrl.includes("create-post")){
+  if (currentUrl.includes("create-post")) {
     mainContainer.innerHTML = `
     <nav class="navbar-post">
     <div class="nav-start">
@@ -36,7 +34,7 @@ export function NavbarLogged() {
       </div>
     </div>
   </nav>`;
-  }else{
+  } else {
     mainContainer.innerHTML = `
     <nav class="navbar">
     <div class="nav-start">
@@ -47,15 +45,14 @@ export function NavbarLogged() {
           <img src=${searchSvg} alt="" class="search-icon" />
         </div>
         <div class="select-block">
-
-          <select name="categories" class="categories">
-            <option value="categories">categories</option>
-            <option value="Sport">Sport</option>
-            <option value="Politics">Politics</option>
-            <option value="Fun">Fun</option>
-            <option value="Technologies">Technologies</option>
-          </select>
-
+          <p>Category</p>
+          <img class="select-arrow"  src="${arrowSvg}" alt="arrow">
+            <div class="select-dropdown">
+                <p>Fun</p>
+                <p>Sport</p>
+                <p>Cars</p>
+                <p>Politics</p>
+                </div>
         </div>
 
       </div>
@@ -74,7 +71,7 @@ export function NavbarLogged() {
 
         <div class="user-profile-selector">
           <p>Filthy Frank</p>
-          <img   src="${arrowSvg}" alt="arrow">
+          <img class="modal-arrow"  src="${arrowSvg}" alt="arrow">
           <div class="userprofile-modal">
           <div class = "modal-div"><p>My profile</p><img src="${modalProfile}" class="modal-icon" alt="profile"></img></div>
          <div class = "modal-div"><p>Log out</p><img src="${logout}" class="modal-icon"  alt="logout"></img></div>
@@ -85,14 +82,25 @@ export function NavbarLogged() {
   </nav>`;
   }
 
+  const userProfile = document.querySelector(".userprofile-modal");
+  const userBlock = document.querySelector(".user-profile");
+  userBlock.addEventListener("click", displayUserModal);
+  const modalArrow = document.querySelector(".modal-arrow");
 
+  function displayUserModal() {
+    userProfile.classList.toggle("showModal");
+    modalArrow.classList.toggle("show-modal-arrow");
+  }
 
+  const selectBlock = document.querySelector(".select-block");
+  if (selectBlock) {
+    selectBlock.addEventListener("click", displayCategoryModal);
+    const dropdown = document.querySelector(".select-dropdown");
+    const selectArrow = document.querySelector(".select-arrow");
 
-const userProfile = document.querySelector('.userprofile-modal')
-const userBlock = document.querySelector('.user-profile')
-userBlock.addEventListener('click', displayUserModal)
-
-function displayUserModal(){
-  userProfile.classList.toggle("showModal");
-}
+    function displayCategoryModal() {
+      dropdown.classList.toggle("showSelectModal");
+      selectArrow.classList.toggle("select-arrow-rotate");
+    }
+  }
 }

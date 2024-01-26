@@ -102,7 +102,7 @@
 
 
     .add-image-button:hover{
-      background-color: #405c2d;
+      background-color:  #79ac56;
     }
 
   .add-post-button-container {
@@ -130,8 +130,7 @@
   }
 
     .add-post-button:hover {
-      background-color: var(--primary-color);
-      border: 1px solid var(--border-color);
+      background-color: #79ac56;
     }
 
     .add-category-btn{
@@ -174,7 +173,7 @@
     }
 
     .add-category-btn:hover{
-      background-color: #405c2d;
+      background-color: #79ac56;
     }
 
     .category-container{

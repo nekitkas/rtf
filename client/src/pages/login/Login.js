@@ -5,6 +5,7 @@ import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js";
 
 export async function RenderLoginPage() {
   try {
+    
     const isUserLogged = await CheckUserLoggedIn();
     console.log(isUserLogged);
 
@@ -79,7 +80,7 @@ export async function RenderLoginPage() {
             if (!response.ok) {
               throw new Error("Network response was not ok");
             }
-           
+
           })
           .then((data) => {
             // Handle the response from the server
