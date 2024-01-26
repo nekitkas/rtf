@@ -39,15 +39,6 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 }
 
 func (r *UserRepository) Create(user *models.User) error {
-	//Check if user exists in the firstPlace
-	//u, err := r.FindByEmail(user.Email)
-	//if err != nil {
-	//	return fmt.Errorf(err.Error())
-	//}
-	//if user.Email == u.Email || user.UserID == u.UserID {
-	//	return fmt.Errorf("User already created with this username/email")
-	//}
-	// Maybe add checks for example: whether all the neccessary information is given or checks in front end for that?
 	user.ID = uuid.New().String()
 	user.Timestamp = time.Now()
 	// hash the password and store it
@@ -92,6 +83,5 @@ func (r *UserRepository) Check(login string) (*models.User, error) {
 		}
 	}
 	//check if passwords match
-
 	return &user, nil
 }
