@@ -50,10 +50,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
-	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
-
-	// s.router.UseWithPrefix("/private", s.authenticateUser)
-	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
+	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetByID())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -128,9 +125,9 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleUsersGetByEmail() http.HandlerFunc {
+func (s *server) handleUsersGetByID() http.HandlerFunc {
 	type RequestBody struct {
-		Email string `json:"email"`
+		ID string `json:"id"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -164,7 +161,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, user: %v`, user))
+		s.respond(w, r, http.StatusCreated, nil)
 	}
 }
 

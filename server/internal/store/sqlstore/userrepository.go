@@ -3,8 +3,6 @@ package sqlstore
 import (
 	"database/sql"
 	"errors"
-	"fmt"
-	"log"
 	"time"
 
 	"forum/server/internal/models"
@@ -38,8 +36,7 @@ func (r *UserRepository) Create(user *models.User) error {
 	user.BeforeCreate()
 
 	// Adding that stuff to db
-	query := `INSERT INTO user (id, username, email, password, timestamp, age, first_name, last_name, gender, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-
+	query := `INSERT INTO user (id, username, email, password, timestamp, date_of_birth, first_name, last_name, gender, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	_, err := r.store.Db.Exec(query, user.ID, user.Username, user.Email, user.Password, user.Timestamp, user.DateOfBirth, user.FirstName, user.LastName, user.Gender, user.ImageURL)
 	user.Sanitize()
