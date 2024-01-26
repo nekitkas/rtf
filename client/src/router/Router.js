@@ -36,6 +36,12 @@ export const RouterFunction = async () => {
           RenderRegisterPage();
           break;
         case "/create-post":
+          if (!userLoggedIn) {
+            // If the user is not authenticated, redirect to the Login Page
+            console.log("User not logged in, redirecting to Login Page");
+            RenderLoginPage();
+            return;
+          }
           console.log("Rendering Register Page");
           RenderPostPage();
           break;

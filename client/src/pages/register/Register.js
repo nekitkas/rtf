@@ -119,11 +119,11 @@ export async function RenderRegisterPage() {
           throw new Error("Network response was not ok",error)
 
         }
-        return response.json()
+      
       })
-      .then((data) => {
+      .then(() => {
         // Handle the response from the server
-        console.log("Server response:", data)
+
         window.location.href = "#/login";
         RouterFunction();
       })

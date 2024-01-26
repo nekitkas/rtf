@@ -5,7 +5,7 @@ import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js";
 
 export async function RenderLoginPage() {
   try {
-    
+
     const isUserLogged = await CheckUserLoggedIn();
     console.log(isUserLogged);
 
@@ -82,9 +82,8 @@ export async function RenderLoginPage() {
             }
 
           })
-          .then((data) => {
-            // Handle the response from the server
-            console.log("Server response:", data);
+          .then(() => {
+
             window.location.href = "#/home";
             RouterFunction();
           })
