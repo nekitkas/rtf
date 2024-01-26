@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -52,7 +51,6 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
-	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
 	// s.router.UseWithPrefix("/private", s.authenticateUser)
 	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
@@ -69,18 +67,11 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			// Handle error
-			http.Error(w, "Error reading body", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
 
 		var requestBody RequestBody
-		err = json.Unmarshal(body, &requestBody)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+
 			return
 		}
 
@@ -90,10 +81,11 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		//Check password
-		if user.ComparePassword(requestBody.Password){
+		// Check password
+		if user.ComparePassword(requestBody.Password) {
+			user.Sanitize()
 			s.respond(w, r, http.StatusCreated, user)
-		}else{
+		} else {
 			s.error(w, r, http.StatusUnauthorized, errors.New("Invalid login credentials!"))
 		}
 	}
@@ -105,18 +97,11 @@ func (s *server) handleUsersGetById() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			// Handle error
-			http.Error(w, "Error reading body", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
 
 		var requestBody RequestBody
-		err = json.Unmarshal(body, &requestBody)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+
 			return
 		}
 
@@ -143,43 +128,8 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, user: %v`, user))
-	}
-}
-
-func (s *server) handleSessionsCreate() http.HandlerFunc {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		u, err := s.store.User().FindByEmail(req.Email)
-		if err != nil || !u.ComparePassword(req.Password) {
-			s.error(w, r, http.StatusUnauthorized, errors.New("incorrect email or password"))
-			return
-		}
-
-		session, err := s.sessionStore.Get(r, sessionName)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		session.Values["user_id"] = u.ID
-		err = s.sessionStore.Save(r, w, session)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, nil)
+		user.Sanitize()
+		s.respond(w, r, http.StatusCreated, user)
 	}
 }
 
