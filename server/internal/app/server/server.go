@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	sessionName        = "session"
-	ctxKeyUser  ctxKey = iota
+	sessionName = "session"
 	ctxKeyRequestID
 )
 
@@ -48,10 +47,6 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
-
-	//s.router.UseWithPrefix("/auth", s.jwtMiddleware)
-	//
-	//s.router.HandleFunc("GET", "/api/v1/auth/users/profile", s.handleUsersGetByEmail())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -66,14 +61,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		fmt.Println(cookie.Value)
-
-		// Extract the token from the Authorization header
-		tokenString := extractToken(r.Header.Get("Authorization"))
-		fmt.Println("Extracted Token:", tokenString)
-		// Parse the token
 		claims, err := parseToken(cookie.Value)
-		fmt.Println(err)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
@@ -85,8 +73,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		// Set user information in the request context or handle it as needed
-		fmt.Println("UserID:", claims.UserID)
+		//In the future we can send userID from claims as respond
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }
@@ -118,7 +105,6 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		r.Header.Set("Authorization", "Bearer "+token)
 		cookie := http.Cookie{
 			Name:     sessionName,
 			Value:    token,
@@ -179,6 +165,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 }
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
