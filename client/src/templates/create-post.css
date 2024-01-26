@@ -1,15 +1,15 @@
-:root {
-  --background-color: rgb(24, 24, 24);
-  --primary-color: #638c47;
-  --background-secondory: #242424;
-  --border-color: rgba(79, 79, 79, 0.72);
-  --text-color: rgba(255, 255, 255, 0.72);
-}
+/*:root {*/
+/*  --background-color: rgb(24, 24, 24);*/
+/*  --primary-color: #638c47;*/
+/*  --background-secondory: #242424;*/
+/*  --border-color: rgba(79, 79, 79, 0.72);*/
+/*  --text-color: rgba(255, 255, 255, 0.72);*/
+/*}*/
 
-main {
-  display: flex;
-  justify-content: center;
-}
+/*main {*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*}*/
 .create-post-container {
   width: 500px;
   height: 700px;

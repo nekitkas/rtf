@@ -45,8 +45,9 @@ func newServer(store store.Store, sessionStore sessions.Store) *server {
 
 func (s *server) configureRouter() {
 	// Using middlewares
-	s.router.Use(s.setRequestID)
-	s.router.Use(s.logRequest)
+	// s.router.Use(s.setRequestID)
+	// s.router.Use(s.logRequest)
+	s.router.Use()
 
 	s.router.HandleFunc("POST", "/api/v1/chat/create", s.handleChatCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
@@ -54,7 +55,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
 	s.router.HandleFunc("POST", "/sessions", s.handleSessionsCreate())
 
-	s.router.UseWithPrefix("/private", s.authenticateUser)
+	// s.router.UseWithPrefix("/private", s.authenticateUser)
 	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
 }
 
@@ -70,7 +71,7 @@ func (s *server) handleChatCreate() http.HandlerFunc {
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
-		Email    string `json:"email"`
+		Login    string `json:"login"`
 		Password string `json:"password"`
 	}
 
@@ -90,13 +91,18 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		user, err := s.store.User().FindByEmail(requestBody.Email)
+		user, err := s.store.User().CheckUser(requestBody.Login)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, user)
+		//Check password
+		if user.ComparePassword(requestBody.Password){
+			s.respond(w, r, http.StatusCreated, user)
+		}else{
+			s.error(w, r, http.StatusUnauthorized, errors.New("Invalid login credentials!"))
+		}
 	}
 }
 

@@ -38,3 +38,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 
 	return nil, errors.New("not found")
 }
+
+func (r *UserRepository) CheckUser(login string) (*models.User, error){
+	panic("need implement")
+}
