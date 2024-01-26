@@ -71,7 +71,6 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var requestBody RequestBody
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -84,7 +83,6 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
 
 		// Check password
 		if user.ComparePassword(requestBody.Password) {
@@ -102,7 +100,6 @@ func (s *server) handleUsersGetById() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var requestBody RequestBody
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -142,7 +139,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 
 func (s *server) handlePostCreation() http.HandlerFunc {
 	type request struct {
-		Post    models.Post `json:"post"`
+		Post       models.Post       `json:"post"`
 		Categories []models.Category `json:"categories"`
 	}
 
@@ -152,14 +149,14 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		//Create category if needed
-		for _, category := range req.Categories{
+		// Create category if needed
+		for _, category := range req.Categories {
 			if err := s.store.Category().Create(&category); err != nil {
 				s.error(w, r, http.StatusUnprocessableEntity, err)
 				return
 			}
-		} 
-		//Create post
+		}
+		// Create post
 		if err := s.store.Post().Create(&req.Post, req.Categories); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
@@ -167,7 +164,6 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, post: %v, successfull categories %v`, req.Post, req.Categories))
 	}
-
 }
 
 func (s *server) serveSinglePostInformation() http.HandlerFunc {
@@ -175,14 +171,14 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		Post string `json:"post_id"`
 	}
 
-	return func(w http.ResponseWriter, r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 		post, err := s.store.Post().GetPost(req.Post)
-		if err != nil{
+		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull post information: %v`, post))
