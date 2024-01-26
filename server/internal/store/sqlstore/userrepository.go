@@ -18,7 +18,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 	// get the row and add it to the user variable
-	err := r.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.Age, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
+	err := r.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)
 	if err != nil {
 		return nil, err
 	}
