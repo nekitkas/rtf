@@ -24,6 +24,5 @@ type CategoryRepository interface {
 
 type CommentRepository interface {
 	Create(*models.Comment) error
-	GetComment(string) (*models.Comment, error)
-	GetSubComments(id string) (*[]models.Comment, error)
+	GetComment(id string) (*[]models.Comment, error)
 }

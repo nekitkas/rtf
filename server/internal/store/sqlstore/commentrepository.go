@@ -1,7 +1,6 @@
 package sqlstore
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/server/internal/models"
 	"time"
@@ -30,24 +29,37 @@ func (c *CommentRepository) Create(comment *models.Comment) error {
 	return nil
 }
 
-func (c *CommentRepository) GetComment(id string) (*models.Comment, error) {
-	query := `SELECT * FROM comment WHERE id = ?`
+func (c *CommentRepository) GetComment(id string) (*[]models.Comment, error) {
+	query := `
+	WITH RECURSIVE CommentHierarchy AS (
+		SELECT
+			id,
+			user_id,
+			post_id,
+			parent_id,
+			content,
+			timestamp
+		FROM
+			comment
+		WHERE
+			id = ?
 
-	var comment models.Comment
-	err := c.store.Db.QueryRow(query, id).Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.ParentID, &comment.Content, &comment.Timestamp)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf(`Comment containing id %v does not exist`, id)
-		} else {
-			return nil, fmt.Errorf(`Error occured while checking comments: %v`, err)
-		}
-	}
+		UNION ALL
 
-	return &comment, nil
-}
-
-func (c *CommentRepository) GetSubComments(id string) (*[]models.Comment, error) {
-	query := `SELECT * FROM comment WHERE parent_id = ?`
+		SELECT
+			c.id,
+			c.user_id,
+			c.post_id,
+			c.parent_id,
+			c.content,
+			c.timestamp
+		FROM
+			comment c
+		JOIN
+			CommentHierarchy ch ON c.parent_id = ch.id
+	)
+	SELECT * FROM CommentHierarchy;
+`
 
 	rows, err := c.store.Db.Query(query, id)
 	if err != nil {

@@ -207,10 +207,6 @@ func (s *server) handleCommentGetById() http.HandlerFunc {
 	type RequestBody struct {
 		ID string `json:"comment_id"`
 	}
-	type ResponseBody struct {
-		Comment models.Comment `json:"comment"`
-		SubComments []models.Comment `json:"subComments"`
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestBody RequestBody
@@ -225,18 +221,7 @@ func (s *server) handleCommentGetById() http.HandlerFunc {
 			return
 		}
 
-		subComments, err := s.store.Comment().GetSubComments(comment.ID)
-		if err != nil {
-			s.error(w, r, http.StatusBadGateway, err)
-			return
-		}
-
-		response := ResponseBody{
-			Comment: *comment,
-			SubComments: *subComments,
-		}
-
-		s.respond(w, r, http.StatusCreated, response)
+		s.respond(w, r, http.StatusCreated, comment)
 	}
 }
 
