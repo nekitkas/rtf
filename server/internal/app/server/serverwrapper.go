@@ -3,12 +3,10 @@ package server
 import (
 	"database/sql"
 	"forum/server/internal/store/sqlstore"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/gorilla/sessions"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func Start(config *Config) error {
@@ -20,8 +18,7 @@ func Start(config *Config) error {
 	defer db.Close()
 
 	store := sqlstore.New(db)
-	sessionStore := sessions.NewCookieStore([]byte("test_key"))
-	srv := newServer(store, sessionStore)
+	srv := newServer(store)
 
 	srv.logger.Printf("Server started at port %v", config.Port)
 

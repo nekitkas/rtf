@@ -6,35 +6,31 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
-
-	"github.com/gorilla/sessions"
 )
 
 const (
-	sessionName        = "session"
-	ctxKeyUser  ctxKey = iota
+	sessionName = "session"
 	ctxKeyRequestID
 )
 
 type ctxKey int8
 
 type server struct {
-	router       *router.Router
-	logger       *log.Logger
-	store        store.Store
-	sessionStore sessions.Store
+	router *router.Router
+	logger *log.Logger
+	store  store.Store
 }
 
-func newServer(store store.Store, sessionStore sessions.Store) *server {
+func newServer(store store.Store) *server {
 	s := &server{
-		router:       router.NewRouter(),
-		logger:       log.Default(),
-		store:        store,
-		sessionStore: sessionStore,
+		router: router.NewRouter(),
+		logger: log.Default(),
+		store:  store,
 	}
 
 	s.configureRouter()
@@ -44,57 +40,92 @@ func newServer(store store.Store, sessionStore sessions.Store) *server {
 
 func (s *server) configureRouter() {
 	// Using middlewares
-	// s.router.Use(s.setRequestID)
-	// s.router.Use(s.logRequest)
-	s.router.Use()
+	s.router.Use(s.setRequestID)
+	s.router.Use(s.logRequest)
+	s.router.Use(s.CORSMiddleware)
 
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
+	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
+	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
-	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
-
-	// s.router.UseWithPrefix("/private", s.authenticateUser)
-	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
+	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetByID())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-//-------------------------USER STUFF--------------------------//
+func (s *server) handleCheckCookie() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie(sessionName)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+
+		claims, err := parseToken(cookie.Value)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+
+		// Check if the token is expired
+		if time.Now().Unix() > claims.Exp {
+			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("expired token"))
+			return
+		}
+
+		//In the future we can send userID from claims as respond
+		s.respond(w, r, http.StatusOK, nil)
+	}
+}
 
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
-		Login    string `json:"login"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestBody RequestBody
+
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
-
 			return
 		}
 
-		user, err := s.store.User().CheckUser(requestBody.Login)
+		user, err := s.store.User().Check(requestBody.Email)
+		if err != nil && !user.ComparePassword(requestBody.Password) {
+			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
+			return
+		}
+
+		expiration := time.Now().Add(5 * time.Hour)
+		token, err := s.generateToken(user.ID, expiration)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		// Check password
-		if user.ComparePassword(requestBody.Password) {
-			user.Sanitize()
-			s.respond(w, r, http.StatusCreated, user)
-		} else {
-			s.error(w, r, http.StatusUnauthorized, errors.New("Invalid login credentials!"))
+		cookie := http.Cookie{
+			Name:     sessionName,
+			Value:    token,
+			Expires:  expiration,
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteNoneMode,
 		}
+
+		http.SetCookie(w, &cookie)
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
-func (s *server) handleUsersGetById() http.HandlerFunc {
+func (s *server) handleUsersGetByID() http.HandlerFunc {
 	type RequestBody struct {
 		ID string `json:"id"`
 	}
@@ -130,8 +161,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 
-		user.Sanitize()
-		s.respond(w, r, http.StatusCreated, user)
+		s.respond(w, r, http.StatusCreated, nil)
 	}
 }
 
@@ -190,6 +220,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 }
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)

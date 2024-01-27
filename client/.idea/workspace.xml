@@ -5,23 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="63b16b48-0206-4b93-82a4-3ea6828f4e98" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/test.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Navbar/Navbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Navbar/Navbar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/HomePage/HomePage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/LoginPage/RenderLoginPage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/RegisterPage/RenderRegisterPage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/router/Router.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/router/Router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/components_styles/navbar.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/homepage_styles/home.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/loginpage_styles/login.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -45,7 +41,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "javascript.nodejs.core.library.configured.version": "14.21.3",
     "javascript.nodejs.core.library.typings.version": "14.18.63",
-    "last_opened_file_path": "/Users/arniszindiks/JOHVI/KOOD/JS/real-time-forum/client",
+    "last_opened_file_path": "/Users/arniszindiks/JOHVI/KOOD/JS/real-time-forum/client/dist/assets",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -56,6 +52,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/dist/assets" />
+    </key>
+  </component>
   <component name="RunManager" selected="JavaScript Debug.index.html">
     <configuration name="index.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/client/client/src/templates/index.html" useBuiltInWebServerPort="true">
       <method v="2" />
@@ -86,7 +87,7 @@
       <option name="presentableId" value="Default" />
       <updated>1705701665975</updated>
       <workItem from="1705701667363" duration="2927000" />
-      <workItem from="1705707627374" duration="10854000" />
+      <workItem from="1705707627374" duration="11457000" />
     </task>
     <servers />
   </component>
