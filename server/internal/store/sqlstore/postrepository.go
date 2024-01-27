@@ -18,6 +18,8 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category)
 	post.ID = uuid.New().String()
 	post.Timestamp = time.Now()
 	//Get user id from Sessions/Cookeis
+	post.UserID = "NEEDS IMPLEMENTING!"
+
 	//TO-DO
 
 	insertQuery := `INSERT INTO post (id, title, content, user_id, image_url, timestamp) VALUES (?, ?, ?, ?, ?, ?)`
@@ -37,10 +39,10 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category)
 			if err != nil {
 				return fmt.Errorf("Database SQL query error: %v", err)
 			}
-		}else if err1 != nil {
+		} else if err1 != nil {
 			return fmt.Errorf(err.Error())
-		//If there is category added to db, then just take the existing category and add it
-		}else{
+			//If there is category added to db, then just take the existing category and add it
+		} else {
 			_, err1 = r.store.Db.Exec(insertQuery, uuid.New().String(), post.ID, &categoryToCheck.ID)
 			if err != nil {
 				return fmt.Errorf("Database SQL query error: %v", err)
