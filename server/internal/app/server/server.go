@@ -53,6 +53,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
+	s.router.HandleFunc("GET", "/api/v1/users/getReactions", s.handleGetReactions())
 
 	// s.router.UseWithPrefix("/private", s.authenticateUser)
 	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
@@ -165,6 +166,21 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, post: %v, successfull categories %v`, req.Post, req.Categories))
 	}
 }
+
+//-------------------------REACTION STUFF--------------------------//
+
+func (s *server) handleGetReactions() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reactions, err := s.store.Reaction().GetAllReactions()
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
+
+		s.respond(w, r, http.StatusFound, reactions)
+	}
+}
+
+//-------------------------SERVER STUFF--------------------------//
 
 func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	type request struct {

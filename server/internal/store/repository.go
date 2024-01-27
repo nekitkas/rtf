@@ -12,6 +12,12 @@ type UserRepository interface {
 	CheckUser(string) (*models.User, error)
 }
 
+type ReactionRepository interface {
+	Create(*models.Reaction) error
+	AddReactionTo(string, string) error
+	GetAllReactions() ([]models.Reaction, error)
+}
+
 type PostRepository interface {
 	Create(*models.Post, []models.Category) error
 	GetPost(string) (*models.Post, error)
