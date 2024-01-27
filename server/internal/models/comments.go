@@ -9,4 +9,5 @@ type Comment struct {
 	ParentID  string    `db:"parent_id" json:"parent_id"`
 	Content   string    `db:"content" json:"content"`
 	Timestamp time.Time `db:"datetime" json:"datetime"`
+	SubcommentCount int 
 }

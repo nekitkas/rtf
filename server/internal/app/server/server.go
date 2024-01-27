@@ -172,6 +172,11 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		Post string `json:"post_id"`
 	}
 
+	type responseBody struct {
+		postBody    models.Post
+		commentBody []models.Comment
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -182,14 +187,22 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull post information: %v`, post))
+		comments, err := s.store.Comment().GetComment(post.ID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+		response := responseBody{
+			postBody:    *post,
+			commentBody: *comments,
+		}
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull post information: %v`, response))
 	}
 }
 
 //-------------------------COMMENT STUFF--------------------------//
 
 func (s *server) handleCommentCreation() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		c := &models.Comment{}
 		if err := json.NewDecoder(r.Body).Decode(c); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -224,7 +237,6 @@ func (s *server) handleCommentGetById() http.HandlerFunc {
 		s.respond(w, r, http.StatusCreated, comment)
 	}
 }
-
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.respond(w, r, code, map[string]string{"error": err.Error()})

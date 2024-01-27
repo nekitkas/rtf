@@ -30,36 +30,38 @@ func (c *CommentRepository) Create(comment *models.Comment) error {
 }
 
 func (c *CommentRepository) GetComment(id string) (*[]models.Comment, error) {
-	query := `
-	WITH RECURSIVE CommentHierarchy AS (
-		SELECT
-			id,
-			user_id,
-			post_id,
-			parent_id,
-			content,
-			timestamp
-		FROM
-			comment
-		WHERE
-			id = ?
-
-		UNION ALL
-
+	query := `WITH RECURSIVE CommentHierarchy AS (
+		-- Anchor member: Start with the top-level comments for the post
 		SELECT
 			c.id,
 			c.user_id,
 			c.post_id,
 			c.parent_id,
 			c.content,
-			c.timestamp
+			c.timestamp,
+			(SELECT COUNT(*) FROM comment subc WHERE subc.parent_id = c.id) AS subcomment_count
+		FROM
+			comment c
+		WHERE
+			c.post_id = 'your_post_id' AND c.parent_id IS NULL
+	
+		UNION ALL
+	
+		-- Recursive member: Join with sub-comments
+		SELECT
+			c.id,
+			c.user_id,
+			c.post_id,
+			c.parent_id,
+			c.content,
+			c.timestamp,
+			(SELECT COUNT(*) FROM comment subc WHERE subc.parent_id = c.id) AS subcomment_count
 		FROM
 			comment c
 		JOIN
 			CommentHierarchy ch ON c.parent_id = ch.id
 	)
-	SELECT * FROM CommentHierarchy;
-`
+	SELECT * FROM CommentHierarchy;`
 
 	rows, err := c.store.Db.Query(query, id)
 	if err != nil {
