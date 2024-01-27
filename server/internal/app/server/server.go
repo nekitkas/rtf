@@ -48,6 +48,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
+	s.router.HandleFunc("POST", "/api/v1/comments/create", s.handleCommentCreation())
+	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
+	s.router.HandleFunc("GET", "/api/v1/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetByID())
@@ -127,20 +130,19 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 func (s *server) handleUsersGetByID() http.HandlerFunc {
 	type RequestBody struct {
-		ID string `json:"id"`
+		ID string `json:"user_id"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestBody RequestBody
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
-
 			return
 		}
 
 		user, err := s.store.User().FindByID(requestBody.ID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
@@ -164,6 +166,20 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		s.respond(w, r, http.StatusCreated, nil)
 	}
 }
+
+//-------------------------CATEGORY STUFF--------------------------//
+
+func (s *server) handleGetAllCategories() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request){
+		categories, err := s.store.Category().GetAllCategories()
+		if err != nil {
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+		}
+		s.respond(w, r, http.StatusOK, categories)
+	}
+}
+
+
 
 //-------------------------POST STUFF--------------------------//
 
@@ -201,6 +217,12 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		Post string `json:"post_id"`
 	}
 
+	type responseBody struct {
+		PostBody    models.Post       `json:"post"`
+		CommentBody []models.Comment  `json:"comments"`
+		Category    []models.Category `json:"categories"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -211,7 +233,38 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull post information: %v`, post))
+
+		comments, err := s.store.Comment().GetComment(post.ID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+
+		categories, err := s.store.Category().GetCategoriesForPosts(post.ID)
+
+		response := responseBody{
+			PostBody:    *post,
+			CommentBody: *comments,
+			Category: *categories,
+		}
+
+		s.respond(w, r, http.StatusCreated, response)
+	}
+}
+
+//-------------------------COMMENT STUFF--------------------------//
+
+func (s *server) handleCommentCreation() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		c := &models.Comment{}
+		if err := json.NewDecoder(r.Body).Decode(c); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		err := s.store.Comment().Create(c)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfully created comment`))
 	}
 }
 
