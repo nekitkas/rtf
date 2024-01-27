@@ -20,6 +20,8 @@ type PostRepository interface {
 type CategoryRepository interface {
 	Create(*models.Category) error
 	GetCategory(string) (*models.Category, error)
+	GetCategoriesForPosts(postId string) (*[]models.Category, error)
+	GetAllCategories() (*[]models.Category, error)
 }
 
 type CommentRepository interface {

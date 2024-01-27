@@ -52,6 +52,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("POST", "/api/v1/comments/create", s.handleCommentCreation())
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
+	s.router.HandleFunc("GET", "/api/v1/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetById())
@@ -136,6 +137,20 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 }
 
+//-------------------------CATEGORY STUFF--------------------------//
+
+func (s *server) handleGetAllCategories() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request){
+		categories, err := s.store.Category().GetAllCategories()
+		if err != nil {
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+		}
+		s.respond(w, r, http.StatusOK, categories)
+	}
+}
+
+
+
 //-------------------------POST STUFF--------------------------//
 
 func (s *server) handlePostCreation() http.HandlerFunc {
@@ -173,8 +188,9 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	}
 
 	type responseBody struct {
-		PostBody    models.Post      `json:"post"`
-		CommentBody []models.Comment `json:"comments"`
+		PostBody    models.Post       `json:"post"`
+		CommentBody []models.Comment  `json:"comments"`
+		Category    []models.Category `json:"categories"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -192,9 +208,13 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
+
+		categories, err := s.store.Category().GetCategoriesForPosts(post.ID)
+
 		response := responseBody{
 			PostBody:    *post,
 			CommentBody: *comments,
+			Category: *categories,
 		}
 
 		s.respond(w, r, http.StatusCreated, response)
@@ -217,28 +237,6 @@ func (s *server) handleCommentCreation() http.HandlerFunc {
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfully created comment`))
 	}
 }
-
-// func (s *server) handleCommentGetById() http.HandlerFunc {
-// 	type RequestBody struct {
-// 		ID string `json:"comment_id"`
-// 	}
-
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var requestBody RequestBody
-// 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-// 			s.error(w, r, http.StatusBadRequest, err)
-// 			return
-// 		}
-
-// 		comment, err := s.store.Comment().GetComment(requestBody.ID)
-// 		if err != nil {
-// 			s.error(w, r, http.StatusBadRequest, err)
-// 			return
-// 		}
-
-// 		s.respond(w, r, http.StatusCreated, comment)
-// 	}
-// }
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.respond(w, r, code, map[string]string{"error": err.Error()})
