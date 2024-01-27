@@ -52,7 +52,7 @@ func (r *Router) UseWithPrefix(prefix string, mwf ...MiddlewareFunc) {
 	prefixMiddleware := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			// Check if the request path has the specified prefix
-			if strings.HasPrefix(req.URL.Path, prefix) {
+			if strings.Contains(req.URL.Path, prefix) {
 				// Apply the provided middlewares only if the prefix matches
 				for _, fn := range mwf {
 					next = fn.Middleware(next)
@@ -65,13 +65,6 @@ func (r *Router) UseWithPrefix(prefix string, mwf ...MiddlewareFunc) {
 	// Add the prefix-aware middleware to the global middlewares
 	r.middlewares = append(r.middlewares, MiddlewareFunc(prefixMiddleware))
 }
-
-//func (r *Router) UseWithPrefix(prefix string, mwf ...MiddlewareFunc) {
-//
-//	for _, fn := range mwf {
-//		r.middlewares = append(r.middlewares, fn)
-//	}
-//}
 
 func (r *Router) HandleFunc(method, pattern string, fn http.HandlerFunc) {
 	r.Handle(method, pattern, fn)
