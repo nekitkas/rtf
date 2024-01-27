@@ -29,8 +29,27 @@ body {
   top: 65px;
   height: 100vh;
   /* overflow-y: scroll; */
+
 }
 
 .container::-webkit-scrollbar {
   display: none;
+}
+
+
+.root{
+  position: relative;
+}
+
+.info-div{
+  width: 300px;
+  height: 150px;
+  border: 1px solid var(--border-color);
+  position: fixed;
+  top:90px;
+  left: 40px;
+  background-color: var(--background-secondory);
+  border-radius: 10px;
+  padding: 20px;
+
 }

@@ -1,5 +1,5 @@
 const path = require('path');
-const webpack = require('webpack'); 
+const webpack = require('webpack');
 
 module.exports = {
     entry:path.resolve(__dirname,'src/index.js'),
@@ -8,7 +8,7 @@ module.exports = {
        filename:"main.js",
        assetModuleFilename: 'assets/[name][ext]'
     },
-    mode:'production',
+    mode:'development',
     devServer:{
         port:9000,
         compress:true,
@@ -37,7 +37,7 @@ module.exports = {
             checkResource(resource) {
                 // specify the assets to ignore
                 return /userProfile\.svg/.test(resource);
-            },  
+            },
           }),
     ],
 }
