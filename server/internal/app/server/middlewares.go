@@ -71,14 +71,8 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		fmt.Println(cookie.Value)
-
-		// Extract the token from the Authorization header
-		tokenString := extractToken(r.Header.Get("Authorization"))
-		fmt.Println("Extracted Token:", tokenString)
 		// Parse the token
 		claims, err := parseToken(cookie.Value)
-		fmt.Println(err)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
@@ -91,9 +85,14 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Set user information in the request context or handle it as needed
-		fmt.Println("UserID:", claims.UserID)
+		claims, err = parseToken(cookie.Value)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, err)
+		}
+
 		s.respond(w, r, http.StatusOK, nil)
+
 		// Call the next handler
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, claims.UserID)))
 	})
 }

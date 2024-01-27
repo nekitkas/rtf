@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	sessionName = "session"
-	ctxKeyRequestID
+	sessionName     = "session"
+	ctxKeyRequestID = iota
+	ctxUserID
 )
 
 type ctxKey int8
@@ -47,18 +48,31 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
-	s.router.HandleFunc("POST", "/api/v1/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("POST", "/api/v1/comments/create", s.handleCommentCreation())
+
+	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
+
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
-	s.router.HandleFunc("GET", "/api/v1/categories/getAll", s.handleGetAllCategories())
-	s.router.HandleFunc("GET", "/api/v1/posts/findById", s.serveSinglePostInformation())
-	s.router.HandleFunc("GET", "/api/v1/users/login", s.handleUsersLogin())
-	s.router.HandleFunc("GET", "/api/v1/users/findById", s.handleUsersGetByID())
+	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
+	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
+	s.router.HandleFunc("GET", "/api/v1/jwt/users/findById", s.handleUsersGetByID())
+	// EXAMPLE OF DYNAMIC PATH
+	//s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
+
+// EXAMPLE OF DYNAMIC PATH
+//func (s *server) handleTest() http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		value := router.Param(r.Context(), "test")
+//		fmt.Println("RETRIED VALUE", value)
+//		s.respond(w, r, http.StatusOK, nil)
+//	}
+//}
 
 func (s *server) handleCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -170,7 +184,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 //-------------------------CATEGORY STUFF--------------------------//
 
 func (s *server) handleGetAllCategories() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		categories, err := s.store.Category().GetAllCategories()
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
@@ -178,8 +192,6 @@ func (s *server) handleGetAllCategories() http.HandlerFunc {
 		s.respond(w, r, http.StatusOK, categories)
 	}
 }
-
-
 
 //-------------------------POST STUFF--------------------------//
 
@@ -224,6 +236,11 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		//EXAMPLE OF USAGE
+		//userID := r.Context().Value(ctxUserID).(string)
+		//
+		//fmt.Println("USER ID", userID)
+
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -244,7 +261,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		response := responseBody{
 			PostBody:    *post,
 			CommentBody: *comments,
-			Category: *categories,
+			Category:    *categories,
 		}
 
 		s.respond(w, r, http.StatusCreated, response)
