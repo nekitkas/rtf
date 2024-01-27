@@ -13,14 +13,12 @@ type PostRepository struct {
 	store *Store
 }
 
-func (r *PostRepository) Create(post *models.Post, categories []models.Category) error {
+func (r *PostRepository) Create(post *models.Post, categories []models.Category, userId string) error {
 	//Add other neccessary information for posts
 	post.ID = uuid.New().String()
 	post.Timestamp = time.Now()
 	//Get user id from Sessions/Cookeis
-	post.UserID = "NEEDS IMPLEMENTING!"
-
-	//TO-DO
+	post.UserID = userId
 
 	insertQuery := `INSERT INTO post (id, title, content, user_id, image_url, timestamp) VALUES (?, ?, ?, ?, ?, ?)`
 
@@ -32,7 +30,7 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category)
 	//Insert info to join tabel
 	insertQuery = `INSERT INTO postCategory (id, post_id, category_id) VALUES (?, ?, ?)`
 	for _, category := range categories {
-		categoryToCheck, err1 := r.store.Category().GetCategory(category.Name)
+		categoryToCheck, err1 := r.store.Category().Get(category.Name)
 		//If there is not added category to db, then add
 		if err1 == sql.ErrNoRows {
 			_, err = r.store.Db.Exec(insertQuery, uuid.New().String(), post.ID, category.ID)
@@ -53,7 +51,7 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category)
 	return nil
 }
 
-func (r *PostRepository) GetPost(id string) (*models.Post, error) {
+func (r *PostRepository) Get(id string) (*models.Post, error) {
 	query := `SELECT * FROM post WHERE id = ?`
 
 	var post models.Post

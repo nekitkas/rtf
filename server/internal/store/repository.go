@@ -13,18 +13,18 @@ type UserRepository interface {
 }
 
 type PostRepository interface {
-	Create(*models.Post, []models.Category) error
-	GetPost(string) (*models.Post, error)
+	Create(*models.Post, []models.Category, string) error
+	Get(string) (*models.Post, error)
 }
 
 type CategoryRepository interface {
 	Create(*models.Category) error
-	GetCategory(string) (*models.Category, error)
-	GetCategoriesForPosts(postId string) (*[]models.Category, error)
-	GetAllCategories() (*[]models.Category, error)
+	Get(string) (*models.Category, error)
+	GetForPost(postId string) (*[]models.Category, error)
+	GetAll() (*[]models.Category, error)
 }
 
 type CommentRepository interface {
-	Create(*models.Comment) error
-	GetComment(id string) (*[]models.Comment, error)
+	Create(*models.Comment, string) error
+	Get(id string) (*[]models.Comment, error)
 }
