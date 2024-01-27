@@ -84,12 +84,6 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Set user information in the request context or handle it as needed
-		claims, err = parseToken(cookie.Value)
-		if err != nil {
-			s.error(w, r, http.StatusUnauthorized, err)
-		}
-
 		s.respond(w, r, http.StatusOK, nil)
 
 		// Call the next handler
