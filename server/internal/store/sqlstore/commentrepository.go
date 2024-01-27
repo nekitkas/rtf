@@ -43,7 +43,7 @@ func (c *CommentRepository) GetComment(id string) (*[]models.Comment, error) {
 		FROM
 			comment c
 		WHERE
-			c.post_id = 'your_post_id' AND c.parent_id IS NULL
+			c.post_id = ? AND c.parent_id IS NULL OR c.parent_id = ''
 	
 		UNION ALL
 	
@@ -72,7 +72,7 @@ func (c *CommentRepository) GetComment(id string) (*[]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var comment models.Comment
-		err := rows.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.ParentID, &comment.Content, &comment.Timestamp)
+		err := rows.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.ParentID, &comment.Content, &comment.Timestamp, &comment.SubcommentCount)
 		if err != nil {
 			return nil, fmt.Errorf(`Error while looping through comments - %v`, err)
 		}
