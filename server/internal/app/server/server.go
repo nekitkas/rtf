@@ -136,6 +136,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 		user, err := s.store.User().Check(requestBody.Email)
 
+		//if there is no user like we got from resp body
 		if err == sql.ErrNoRows {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
