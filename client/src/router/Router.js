@@ -2,6 +2,7 @@ import { CheckUserLoggedIn } from "../helpers/ServerRequests.js";
 import { RenderHomePage } from "../pages/home/Home.js";
 import { RenderLoginPage } from "../pages/login/Login.js";
 import { RenderPostPage } from "../pages/post/PostPage.js";
+import { RenderProfilePage } from "../pages/profile/ProfilePage.js";
 import { RenderRegisterPage } from "../pages/register/Register.js";
 
 export const RouterFunction = async () => {
@@ -42,8 +43,18 @@ export const RouterFunction = async () => {
             RenderLoginPage();
             return;
           }
-          console.log("Rendering Register Page");
+          console.log("Rendering Post Page");
           RenderPostPage();
+          break;
+        case "/profile":
+          if (!userLoggedIn) {
+            // If the user is not authenticated, redirect to the Login Page
+            console.log("User not logged in, redirecting to Login Page");
+            RenderLoginPage();
+            return;
+          }
+
+          RenderProfilePage();
           break;
         default:
           if (!userLoggedIn) {

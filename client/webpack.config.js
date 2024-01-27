@@ -1,5 +1,5 @@
 const path = require('path');
-const webpack = require('webpack'); 
+const webpack = require('webpack');
 
 module.exports = {
     entry:path.resolve(__dirname,'src/index.js'),
@@ -37,7 +37,7 @@ module.exports = {
             checkResource(resource) {
                 // specify the assets to ignore
                 return /userProfile\.svg/.test(resource);
-            },  
+            },
           }),
     ],
 }

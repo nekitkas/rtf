@@ -36,12 +36,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 
 .search_input {
   border: transparent;
   background-color: var(--primary-color);
-  width: 440px;
+  width: 100%;
   height: 35px;
   border-radius: 50px;
   padding: 8px;
@@ -49,6 +50,7 @@
   color: rgba(255, 255, 255, 0.8);
   padding-left: 40px;
   margin-right: 20px;
+  margin-bottom: 1rem;
 }
 
 .search_input::placeholder {
@@ -74,9 +76,9 @@
 
 .input-select-block {
   display: flex;
-  min-width: 38rem;
 
-  margin-left: 210px;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .select-block img{
@@ -236,18 +238,20 @@
 
 .select-block{
   margin-top: 5px;
-  width: 120px;
+  width: 100%;
   height: 28px;
   border: 2px solid var(--primary-color);
   border-radius: 12px;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
+  padding: 0 15px;
   background-color: transparent;
   color: var(--text-color);
-  padding-top: 3px;
+  padding-top: 1px;
   position: relative;
   transition: all 0.4s ease-out;
+
 
 }
 .select-block:hover{
@@ -275,9 +279,10 @@
   border-left: 2px solid var(--primary-color);
   border-top: 2px solid var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
-  width: 120px;
+  width: 100%;
   position: absolute;
   top: 42px;
+  left: 0;
   border-radius: 12px;
   background-color: var(--background-secondory);
   padding: 15px;

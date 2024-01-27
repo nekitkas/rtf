@@ -190,13 +190,18 @@ sendPostDataBtn.addEventListener("click", (e) => {
 
 
 async function sendPostData(title, content, categories, image) {
-  const url = "/create-post";
+  const url = "http://localhost:8080/api/v1/posts/create";
 
   const requestBody = {
-    title: title,
-    content: content,
-    categories: categories,
-    image: image,
+    post: {
+      title: title,
+      content: content,
+      image_url: image,
+    },
+    categories: categories.map(categoryName => ({
+      name: categoryName,
+      description: `Description for ${categoryName}`,
+    })),
   };
 
   console.log("Request Body:", requestBody);
