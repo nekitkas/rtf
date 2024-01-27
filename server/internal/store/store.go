@@ -5,4 +5,5 @@ type Store interface {
 	Post() PostRepository
 	Category() CategoryRepository
 	Reaction() ReactionRepository
+	Comment() CommentRepository
 }

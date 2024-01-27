@@ -2,6 +2,7 @@ const http = require("http")
 const fs = require("fs")
 const path = require("path")
 const url = require("url")
+const { log } = require("console")
 
 const mimeTypes = {
   ".aac": "audio/aac",
@@ -53,6 +54,7 @@ const server = http.createServer((req, res) => {
     }
 
     const extension = path.extname(pathname)
+    console.log(filePath);
 
     // const contentType = getContentType(pathname);
 

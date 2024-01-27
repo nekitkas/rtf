@@ -13,6 +13,7 @@ type Store struct {
 	userRepository     *UserRepository
 	postRepository     *PostRepository
 	categoryRepository *CategoryRepository
+	commentRepository  *CommentRepository
 	reactionRepository *ReactionRepository
 }
 
@@ -56,6 +57,18 @@ func (s *Store) Category() store.CategoryRepository {
 	}
 
 	return s.categoryRepository
+}
+
+func (s *Store) Comment() store.CommentRepository {
+	if s.commentRepository != nil {
+		return s.commentRepository
+	}
+
+	s.commentRepository = &CommentRepository{
+		store: s,
+	}
+
+	return s.commentRepository
 }
 
 func (s *Store) Reaction() store.ReactionRepository {
