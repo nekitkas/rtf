@@ -39,3 +39,51 @@ func (r *CategoryRepository) GetCategory(name string) (*models.Category, error) 
 	}
 	return &category, nil
 }
+
+func (r *CategoryRepository) GetCategoriesForPosts(postId string) (*[]models.Category, error) {
+	query := `SELECT c.id, c.name, c.description FROM category c
+		JOIN postCategory ON c.id = postCategory.category_id
+		WHERE post_id = ?`
+
+	row, err := r.store.Db.Query(query, postId)
+	if err != nil {
+		return nil, fmt.Errorf(`Something went wrong while trying to retrieve categories for posts - %v`, err)
+	}
+
+	var categories []models.Category
+	for row.Next() {
+		var category models.Category
+		err = row.Scan(&category.ID, &category.Name, &category.Description)
+		if err != nil {
+			return nil, fmt.Errorf(`Error while looping through categories - %v`, err)
+		}
+		categories = append(categories, category)
+
+	}
+	defer row.Close()
+
+	return &categories, nil
+}
+
+func (r *CategoryRepository) GetAllCategories() (*[]models.Category, error) {
+	query := `SELECT * FROM category`
+
+	row, err := r.store.Db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf(`Something went wrong while trying to retrieve all categories - %v`, err)
+	}
+
+	var categories []models.Category
+	for row.Next() {
+		var category models.Category
+		err = row.Scan(&category.ID, &category.Name, &category.Description)
+		if err != nil {
+			return nil, fmt.Errorf(`Error while looping through categories - %v`, err)
+		}
+		categories = append(categories, category)
+
+	}
+	defer row.Close()
+
+	return &categories, nil
+}
