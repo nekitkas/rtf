@@ -190,7 +190,7 @@ sendPostDataBtn.addEventListener("click", (e) => {
 
 
 async function sendPostData(title, content, categories, image) {
-  const url = "http://localhost:8080/api/v1/posts/create";
+  const url = "http://localhost:8080/api/v1/jwt/posts/create";
 
   const requestBody = {
     post: {
