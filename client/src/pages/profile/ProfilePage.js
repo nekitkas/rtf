@@ -3,12 +3,19 @@ import "../../styles/profile.css";
 
 
 export function RenderProfilePage(){
-    const mainContainer = document.querySelector(".root");
-    mainContainer.innerHTML= ""
+    const rootContainer = document.querySelector(".root");
+    rootContainer.innerHTML= ""
     NavbarLogged()
 
 
-    const ProfileContainer = document.createElement("div");
-    ProfileContainer.className = "profile-container";
-    mainContainer.appendChild(ProfileContainer)
+    const Container = document.createElement("div")
+    const PostFeed = document.createElement("div")
+   PostFeed.classList.add("post-feed")
+
+   Container.classList.add("container")
+   rootContainer.append(Container)
+
+   const ProfileContainer = document.createElement("div")
+   ProfileContainer.classList.add("profile-container")
+   Container.appendChild(ProfileContainer)
 }

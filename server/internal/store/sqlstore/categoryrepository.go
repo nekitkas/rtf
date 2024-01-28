@@ -24,7 +24,7 @@ func (r *CategoryRepository) Create(category *models.Category) error {
 	return nil
 }
 
-func (r *CategoryRepository) GetCategory(name string) (*models.Category, error) {
+func (r *CategoryRepository) Get(name string) (*models.Category, error) {
 	query := `SELECT * FROM category WHERE name = ?`
 
 	var category models.Category
@@ -40,7 +40,7 @@ func (r *CategoryRepository) GetCategory(name string) (*models.Category, error) 
 	return &category, nil
 }
 
-func (r *CategoryRepository) GetCategoriesForPosts(postId string) (*[]models.Category, error) {
+func (r *CategoryRepository) GetForPost(postId string) (*[]models.Category, error) {
 	query := `SELECT c.id, c.name, c.description FROM category c
 		JOIN postCategory ON c.id = postCategory.category_id
 		WHERE post_id = ?`
@@ -65,7 +65,7 @@ func (r *CategoryRepository) GetCategoriesForPosts(postId string) (*[]models.Cat
 	return &categories, nil
 }
 
-func (r *CategoryRepository) GetAllCategories() (*[]models.Category, error) {
+func (r *CategoryRepository) GetAll() (*[]models.Category, error) {
 	query := `SELECT * FROM category`
 
 	row, err := r.store.Db.Query(query)

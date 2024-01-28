@@ -8,7 +8,7 @@ module.exports = {
        filename:"main.js",
        assetModuleFilename: 'assets/[name][ext]'
     },
-    mode:'development',
+    mode:'production',
     devServer:{
         port:9000,
         compress:true,
