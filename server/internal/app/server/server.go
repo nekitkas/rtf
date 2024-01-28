@@ -143,7 +143,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 			return
 		}
 
-		if err != nil && !user.ComparePassword(requestBody.Password) {
+		if err != nil || !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
