@@ -14,7 +14,7 @@ func (r *ReactionRepository) Create(reaction *models.Reaction) error {
 	return nil
 }
 
-func (r *ReactionRepository) AddReactionToParent(parent_id string, reaction_id string, user_id string) error {
+func (r *ReactionRepository) AddToParent(parent_id string, reaction_id string, user_id string) error {
 	id := uuid.New().String()
 
 	query := `
@@ -31,7 +31,7 @@ func (r *ReactionRepository) RemoveFromParent(post_id string, reaction_id string
 	return nil
 }
 
-func (r *ReactionRepository) GetReactionsToParent(parent_id string) (*[]models.Reaction, error) {
+func (r *ReactionRepository) GetByParentID(parent_id string) (*[]models.Reaction, error) {
 	query := ` 
 SELECT r.id, r.emoji, r.description
 FROM parentReaction pr
@@ -58,7 +58,7 @@ WHERE pr.parent_id = ?;
 	return &reactions, nil
 }
 
-func (r *ReactionRepository) GetUserReactionsToParent(parent_id string, user_id string) (*[]models.Reaction, error) {
+func (r *ReactionRepository) GetByUserParentID(parent_id string, user_id string) (*[]models.Reaction, error) {
 	query := ` 
 SELECT r.id, r.emoji, r.description
 FROM parentReaction pr
@@ -85,7 +85,7 @@ WHERE pr.user_id = ? AND pr.parent_id = ?;
 	return &reactions, nil
 }
 
-func (r *ReactionRepository) GetAllReactions() (*[]models.Reaction, error) {
+func (r *ReactionRepository) GetAll() (*[]models.Reaction, error) {
 	query := ` 
 	SELECT * FROM reaction
 	`

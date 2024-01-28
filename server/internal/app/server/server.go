@@ -60,8 +60,8 @@ func (s *server) configureRouter() {
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getUserReactionsToParent", s.handleGetUserReactions())
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getReactionsToParent", s.handleGetReactionsToParent())
+	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
+	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
@@ -235,12 +235,11 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 }
 
 // }}}
-
 // -------------------------REACTION STUFF--------------------------//
 // {{{
 func (s *server) handleGetReactionsOptions() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		reactions, err := s.store.Reaction().GetAllReactions()
+		reactions, err := s.store.Reaction().GetAll()
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
@@ -249,7 +248,7 @@ func (s *server) handleGetReactionsOptions() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleGetReactionsToParent() http.HandlerFunc {
+func (s *server) handleGetReactionsByParentID() http.HandlerFunc {
 	type requestBody struct {
 		ParentID string `json:"parent_id"`
 	}
@@ -261,7 +260,7 @@ func (s *server) handleGetReactionsToParent() http.HandlerFunc {
 			return
 		}
 
-		reactions, err := s.store.Reaction().GetReactionsToParent(req.ParentID)
+		reactions, err := s.store.Reaction().GetByParentID(req.ParentID)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
@@ -284,7 +283,7 @@ func (s *server) handleGetUserReactions() http.HandlerFunc {
 			return
 		}
 
-		reactions, err := s.store.Reaction().GetUserReactionsToParent(req.ParentID, userID)
+		reactions, err := s.store.Reaction().GetByUserParentID(req.ParentID, userID)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
@@ -308,7 +307,7 @@ func (s *server) handleAddReactionsToParent() http.HandlerFunc {
 			return
 		}
 
-		err := s.store.Reaction().AddReactionToParent(req.ParentID, req.ReactionID, userID)
+		err := s.store.Reaction().AddToParent(req.ParentID, req.ReactionID, userID)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
@@ -326,10 +325,16 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		Post string `json:"post_id"`
 	}
 
+	type commentsBody struct {
+		Comment  models.Comment    `json:"comment"`
+		Reaction []models.Reaction `json:"reactions"`
+	}
+
 	type responseBody struct {
 		PostBody    models.Post       `json:"post"`
-		CommentBody []models.Comment  `json:"comments"`
+		CommentBody []commentsBody    `json:"comments"`
 		Category    []models.Category `json:"categories"`
+		Reactions   []models.Reaction `json:"reactions"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -353,11 +358,24 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
 
+		var commentBody commentsBody
+		var aLotOfCommentBodies []commentsBody
+		for _, comment := range *comments {
+			reaction, err := s.store.Reaction().GetByParentID(comment.ID)
+			if err != nil {
+				s.error(w, r, http.StatusBadRequest, err)
+			}
+
+			commentBody.Comment = comment
+			commentBody.Reaction = *reaction
+			aLotOfCommentBodies = append(aLotOfCommentBodies, commentBody)
+		}
+
 		categories, err := s.store.Category().GetCategoriesForPosts(post.ID)
 
 		response := responseBody{
 			PostBody:    *post,
-			CommentBody: *comments,
+			CommentBody: aLotOfCommentBodies,
 			Category:    *categories,
 		}
 
