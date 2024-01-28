@@ -57,7 +57,11 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/findById", s.handleUsersGetByID())
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactions())
+	// -------------------- REACTION PATHS --------------------------- //
+	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
+	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
+	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getUserReactionsToParent", s.handleGetUserReactions())
+	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getReactionsToParent", s.handleGetReactionsToParent())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
@@ -67,14 +71,17 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // EXAMPLE OF DYNAMIC PATH
-//func (s *server) handleTest() http.HandlerFunc {
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		value := router.Param(r.Context(), "test")
-//		fmt.Println("RETRIED VALUE", value)
-//		s.respond(w, r, http.StatusOK, nil)
+//
+//	func (s *server) handleTest() http.HandlerFunc {
+//		return func(w http.ResponseWriter, r *http.Request) {
+//			value := router.Param(r.Context(), "test")
+//			fmt.Println("RETRIED VALUE", value)
+//			s.respond(w, r, http.StatusOK, nil)
+//		}
 //	}
-//}
+//
 
+// {{{
 func (s *server) handleCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
@@ -115,7 +122,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		user, err := s.store.User().Check(requestBody.Email)
-		if err != nil && !user.ComparePassword(requestBody.Password) {
+		if err != nil || !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
@@ -182,8 +189,9 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 }
 
-//-------------------------CATEGORY STUFF--------------------------//
-
+// }}}
+// -------------------------CATEGORY STUFF--------------------------//
+// {{{
 func (s *server) handleGetAllCategories() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		categories, err := s.store.Category().GetAllCategories()
@@ -194,8 +202,9 @@ func (s *server) handleGetAllCategories() http.HandlerFunc {
 	}
 }
 
-//-------------------------POST STUFF--------------------------//
-
+// }}}
+// -------------------------POST STUFF--------------------------//
+// {{{
 func (s *server) handlePostCreation() http.HandlerFunc {
 	type request struct {
 		Post       models.Post       `json:"post"`
@@ -225,9 +234,11 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 	}
 }
 
-//-------------------------REACTION STUFF--------------------------//
+// }}}
 
-func (s *server) handleGetReactions() http.HandlerFunc {
+// -------------------------REACTION STUFF--------------------------//
+// {{{
+func (s *server) handleGetReactionsOptions() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reactions, err := s.store.Reaction().GetAllReactions()
 		if err != nil {
@@ -238,7 +249,77 @@ func (s *server) handleGetReactions() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleGetReactionsToParent() http.HandlerFunc {
+	type requestBody struct {
+		ParentID string `json:"parent_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req requestBody
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		reactions, err := s.store.Reaction().GetReactionsToParent(req.ParentID)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
+
+		s.respond(w, r, http.StatusFound, reactions)
+	}
+}
+
+func (s *server) handleGetUserReactions() http.HandlerFunc {
+	type requestBody struct {
+		ParentID string `json:"parent_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(ctxUserID).(string)
+
+		var req requestBody
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		reactions, err := s.store.Reaction().GetUserReactionsToParent(req.ParentID, userID)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
+
+		s.respond(w, r, http.StatusFound, reactions)
+	}
+}
+
+func (s *server) handleAddReactionsToParent() http.HandlerFunc {
+	type requestBody struct {
+		ParentID   string `json:"parent_id"`
+		ReactionID string `json:"reaction_id"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(ctxUserID).(string)
+
+		var req requestBody
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		err := s.store.Reaction().AddReactionToParent(req.ParentID, req.ReactionID, userID)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
+
+		s.respond(w, r, http.StatusCreated, nil)
+	}
+}
+
+// }}}
 //-------------------------SERVER STUFF--------------------------//
+// {{{
 
 func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	type request struct {
@@ -253,7 +334,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		//EXAMPLE OF USAGE
-		//userID := r.Context().Value(ctxUserID).(string)
+		// userID := r.Context().Value(ctxUserID).(string)
 		//
 		//fmt.Println("USER ID", userID)
 
@@ -284,8 +365,9 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	}
 }
 
-//-------------------------COMMENT STUFF--------------------------//
-
+// }}}
+// -------------------------COMMENT STUFF--------------------------//
+// {{{
 func (s *server) handleCommentCreation() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := &models.Comment{}
@@ -312,3 +394,5 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 		json.NewEncoder(w).Encode(data)
 	}
 }
+
+//}}}

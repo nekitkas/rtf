@@ -2,6 +2,8 @@ package sqlstore
 
 import (
 	"forum/server/internal/models"
+
+	"github.com/google/uuid"
 )
 
 type ReactionRepository struct {
@@ -12,15 +14,12 @@ func (r *ReactionRepository) Create(reaction *models.Reaction) error {
 	return nil
 }
 
-func (r *ReactionRepository) AddReactionTo(post_id string, reaction_id string) error {
-	// id := uuid.New().String()
+func (r *ReactionRepository) AddReactionToParent(parent_id string, reaction_id string, user_id string) error {
+	id := uuid.New().String()
 
 	query := `
-	INSERT INTO parentReaction p (id, user_id, reaction_id, parent_id, parent_type)
-	VALUES
-		(?, ?, ?, ?, ?);
-	`
-	_, err := r.store.Db.Exec(query)
+	INSERT INTO parentReaction (id, user_id, reaction_id, parent_id, parent_type) VALUES (?, ?, ?, ?, ?);`
+	_, err := r.store.Db.Exec(query, id, user_id, reaction_id, parent_id, "")
 	if err != nil {
 		return err
 	}
@@ -28,7 +27,65 @@ func (r *ReactionRepository) AddReactionTo(post_id string, reaction_id string) e
 	return nil
 }
 
-func (r *ReactionRepository) GetAllReactions() ([]models.Reaction, error) {
+func (r *ReactionRepository) RemoveFromParent(post_id string, reaction_id string, user_id string) error {
+	return nil
+}
+
+func (r *ReactionRepository) GetReactionsToParent(parent_id string) (*[]models.Reaction, error) {
+	query := ` 
+SELECT r.id, r.emoji, r.description
+FROM parentReaction pr
+INNER JOIN reaction r ON pr.reaction_id = r.id
+WHERE pr.parent_id = ?;
+	`
+
+	var reactions []models.Reaction
+
+	resp, err := r.store.Db.Query(query, parent_id)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Close()
+
+	for resp.Next() {
+		var reaction models.Reaction
+		if err := resp.Scan(&reaction.ID, &reaction.Emoji, &reaction.Description); err != nil {
+			return nil, err
+		}
+		reactions = append(reactions, reaction)
+	}
+
+	return &reactions, nil
+}
+
+func (r *ReactionRepository) GetUserReactionsToParent(parent_id string, user_id string) (*[]models.Reaction, error) {
+	query := ` 
+SELECT r.id, r.emoji, r.description
+FROM parentReaction pr
+INNER JOIN reaction r ON pr.reaction_id = r.id
+WHERE pr.user_id = ? AND pr.parent_id = ?;
+	`
+
+	var reactions []models.Reaction
+
+	resp, err := r.store.Db.Query(query, user_id, parent_id)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Close()
+
+	for resp.Next() {
+		var reaction models.Reaction
+		if err := resp.Scan(&reaction.ID, &reaction.Emoji, &reaction.Description); err != nil {
+			return nil, err
+		}
+		reactions = append(reactions, reaction)
+	}
+
+	return &reactions, nil
+}
+
+func (r *ReactionRepository) GetAllReactions() (*[]models.Reaction, error) {
 	query := ` 
 	SELECT * FROM reaction
 	`
@@ -49,5 +106,5 @@ func (r *ReactionRepository) GetAllReactions() ([]models.Reaction, error) {
 		reactions = append(reactions, reaction)
 	}
 
-	return reactions, nil
+	return &reactions, nil
 }
