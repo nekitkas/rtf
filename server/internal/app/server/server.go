@@ -385,6 +385,8 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
 
+		categories, err := s.store.Category().GetForPost(post.ID)
+
 		var commentBody commentsBody
 		var aLotOfCommentBodies []commentsBody
 		for _, comment := range *comments {
@@ -400,7 +402,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 
 		response := responseBody{
 			PostBody:    *post,
-			CommentBody: *comments,
+			CommentBody: aLotOfCommentBodies,
 			Category:    *categories,
 		}
 
