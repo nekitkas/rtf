@@ -52,13 +52,13 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
-
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
+	s.router.HandleFunc("GET", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	// EXAMPLE OF DYNAMIC PATH
 	//s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
@@ -245,12 +245,15 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, post: %v, successfull categories %v`, req.Post, req.Categories))
+		s.respond(w, r, http.StatusCreated, request{
+			Post:       req.Post,
+			Categories: req.Categories,
+		})
 	}
 }
 
 func (s *server) serveSinglePostInformation() http.HandlerFunc {
-	type request struct {
+	type requestBody struct {
 		Post string `json:"post_id"`
 	}
 
@@ -266,7 +269,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		//
 		//fmt.Println("USER ID", userID)
 
-		req := &request{}
+		req := &requestBody{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
@@ -290,6 +293,39 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, response)
+	}
+}
+
+func (s *server) handleAllPostInformation() http.HandlerFunc {
+	type requestBody struct {
+		Index int       `json:"current_index"`
+		Time  time.Time `json:"page_open_time_stamp"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		//get index from body
+		request := &requestBody{}
+		if err := json.NewDecoder(r.Body).Decode(request); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		for i, post := range posts {
+			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
+			if err != nil {
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+			posts[i].CommentCount = commentCount
+		}
+
+		s.respond(w, r, http.StatusOK, posts)
 	}
 }
 
