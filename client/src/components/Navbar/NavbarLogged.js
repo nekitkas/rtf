@@ -91,6 +91,9 @@ export function NavbarLogged() {
 const logoutBtn = document.querySelector(".logoutBtn");
 logoutBtn.addEventListener("click", () => {
   Logout()
+
+  window.location.href = "#/login";
+  RouterFunction();
 });
 
 
