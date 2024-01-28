@@ -1,9 +1,14 @@
+body{
+    background-color: black;
+display: flex;
+justify-content: center;
+}
+
 
 
 .profile-container{
-    background-color: var(--background-secondory);
     background-color: #1e1d1d;
-    width: 80%;
+    width: 60%;
     height: 500px;
     margin-top: 4rem;
     padding: 30px;
@@ -11,8 +16,9 @@
 display: flex;
 justify-content: space-between;
 
-}
 
+
+}
 
 .imgBlock{
     background-color: #131313;
