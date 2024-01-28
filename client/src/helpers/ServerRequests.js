@@ -31,7 +31,7 @@ export const CheckUserLoggedIn = async () => {
 
 export const Logout = async () => {
   try {
-    const response = await fetch("http://localhost:8080/api/v1/jwt/logout", {
+    const response = await fetch("http://localhost:8080/api/v1/logout", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
