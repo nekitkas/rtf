@@ -16,6 +16,15 @@ type UserRepository interface {
 	Check(string) (*models.User, error)
 }
 
+type ReactionRepository interface {
+	Create(*models.Reaction) error
+	AddToParent(post_id string, reaction_id string, user_id string) error
+	RemoveFromParent(post_id string, reaction_id string, user_id string) error
+	GetByUserParentID(parent_id string, user_id string) (*[]models.Reaction, error)
+	GetByParentID(parent_id string) (*[]models.Reaction, error)
+	GetAll() (*[]models.Reaction, error)
+}
+
 type PostRepository interface {
 	Create(*models.Post, []models.Category, string) error
 	Get(string) (*models.Post, error)

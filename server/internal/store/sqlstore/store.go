@@ -2,17 +2,19 @@ package sqlstore
 
 import (
 	"database/sql"
+
 	"forum/server/internal/store"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type Store struct {
-	Db             *sql.DB
-	userRepository *UserRepository
-	postRepository *PostRepository
+	Db                 *sql.DB
+	userRepository     *UserRepository
+	postRepository     *PostRepository
 	categoryRepository *CategoryRepository
-	commentRepository *CommentRepository
+	commentRepository  *CommentRepository
+	reactionRepository *ReactionRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -69,4 +71,14 @@ func (s *Store) Comment() store.CommentRepository {
 	return s.commentRepository
 }
 
+func (s *Store) Reaction() store.ReactionRepository {
+	if s.reactionRepository != nil {
+		return s.reactionRepository
+	}
 
+	s.reactionRepository = &ReactionRepository{
+		store: s,
+	}
+
+	return s.reactionRepository
+}
