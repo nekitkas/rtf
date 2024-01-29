@@ -61,7 +61,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	// EXAMPLE OF DYNAMIC PATH
-	//s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
+	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -97,15 +97,14 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		//In the future we can send userID from claims as respond
+		// In the future we can send userID from claims as respond
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
 func (s *server) handleLogOut() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		//Replace the cookie with expired cookie
+		// Replace the cookie with expired cookie
 		deletedCookie := http.Cookie{
 			Name:     sessionName,
 			Value:    "",
@@ -117,7 +116,7 @@ func (s *server) handleLogOut() http.HandlerFunc {
 		}
 
 		http.SetCookie(w, &deletedCookie)
-		//In the future we can send userID from claims as respond
+		// In the future we can send userID from claims as respond
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }
@@ -137,7 +136,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 		user, err := s.store.User().Check(requestBody.Email)
 
-		//if there is no user like we got from resp body
+		// if there is no user like we got from resp body
 		if err == sql.ErrNoRows {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
@@ -172,9 +171,8 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 }
 
 func (s *server) handleUsersGetByID() http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
-		//get id from cookie
+		// get id from cookie
 		userID := r.Context().Value(ctxUserID).(string)
 
 		user, err := s.store.User().FindByID(userID)
@@ -230,7 +228,7 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		//Get the userId who does the request
+		// Get the userId who does the request
 		userID := r.Context().Value(ctxUserID).(string)
 		// Create category if needed
 		for _, category := range req.Categories {
@@ -303,12 +301,14 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		//get index from body
+		// get index from body
 		request := &requestBody{}
 		if err := json.NewDecoder(r.Body).Decode(request); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
+
+		fmt.Println(*request)
 
 		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
 		if err != nil {

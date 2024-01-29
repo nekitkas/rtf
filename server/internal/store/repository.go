@@ -1,8 +1,9 @@
 package store
 
 import (
-	"forum/server/internal/models"
 	"time"
+
+	"forum/server/internal/models"
 )
 
 type UserRepository interface {
@@ -19,7 +20,7 @@ type PostRepository interface {
 	Create(*models.Post, []models.Category, string) error
 	Get(string) (*models.Post, error)
 	GetFeed(offset, limit int, timeStamp time.Time) ([]models.Post, error)
-	GetCommentNumber(postId string)(int, error)
+	GetCommentNumber(postId string) (int, error)
 }
 
 type CategoryRepository interface {

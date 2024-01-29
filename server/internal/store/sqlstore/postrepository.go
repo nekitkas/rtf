@@ -3,8 +3,10 @@ package sqlstore
 import (
 	"database/sql"
 	"fmt"
-	"forum/server/internal/models"
+	"strings"
 	"time"
+
+	"forum/server/internal/models"
 
 	"github.com/google/uuid"
 )
@@ -14,10 +16,10 @@ type PostRepository struct {
 }
 
 func (r *PostRepository) Create(post *models.Post, categories []models.Category, userId string) error {
-	//Add other neccessary information for posts
+	// Add other neccessary information for posts
 	post.ID = uuid.New().String()
 	post.Timestamp = time.Now()
-	//Get user id from Sessions/Cookeis
+	// Get user id from Sessions/Cookeis
 	post.UserID = userId
 
 	insertQuery := `INSERT INTO post (id, title, content, user_id, image_url, timestamp) VALUES (?, ?, ?, ?, ?, ?)`
@@ -27,11 +29,11 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category,
 		return fmt.Errorf("Database SQL query error: %v", err)
 	}
 
-	//Insert info to join tabel
+	// Insert info to join tabel
 	insertQuery = `INSERT INTO postCategory (id, post_id, category_id) VALUES (?, ?, ?)`
 	for _, category := range categories {
 		categoryToCheck, err1 := r.store.Category().Get(category.Name)
-		//If there is not added category to db, then add
+		// If there is not added category to db, then add
 		if err1 == sql.ErrNoRows {
 			_, err = r.store.Db.Exec(insertQuery, uuid.New().String(), post.ID, category.ID)
 			if err != nil {
@@ -39,7 +41,7 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category,
 			}
 		} else if err1 != nil {
 			return fmt.Errorf(err.Error())
-			//If there is category added to db, then just take the existing category and add it
+			// If there is category added to db, then just take the existing category and add it
 		} else {
 			_, err1 = r.store.Db.Exec(insertQuery, uuid.New().String(), post.ID, &categoryToCheck.ID)
 			if err != nil {
@@ -72,7 +74,15 @@ func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time) ([]mode
 	WHERE timestamp <= ?
 	ORDER BY timestamp DESC
 	LIMIT ? OFFSET ?`
-	rows, err := r.store.Db.Query(query, timeStamp, limit, offset*limit)
+
+	dateTimeParts := strings.Split(timeStamp.String(), " ")
+
+	timeParts := strings.Split(dateTimeParts[1], ".")
+
+	nearestSecond := dateTimeParts[0] + "T" + timeParts[0]
+	fmt.Println(nearestSecond)
+
+	rows, err := r.store.Db.Query(query, nearestSecond, limit, offset*limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch posts from the database: %v", err)
 	}
@@ -84,6 +94,7 @@ func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time) ([]mode
 		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp); err != nil {
 			return nil, fmt.Errorf("failed to scan post row: %v", err)
 		}
+		fmt.Println(post.Timestamp)
 		posts = append(posts, post)
 	}
 
@@ -95,7 +106,6 @@ func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time) ([]mode
 }
 
 func (r *PostRepository) GetCommentNumber(postId string) (int, error) {
-
 	query := `WITH RECURSIVE CommentIDs AS (
         SELECT
             c.id
