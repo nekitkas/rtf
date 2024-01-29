@@ -1,7 +1,6 @@
 package server
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -131,9 +130,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		user, err := s.store.User().Check(requestBody.Email)
-		//if there is no user like we got from resp body
-
-		if err != nil || !user.ComparePassword(requestBody.Password) || errors.Is(err, sql.ErrNoRows) {
+		if err != nil || !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
