@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
+	"forum/server/pkg/errors"
 	"hash"
 	"strings"
 	"time"
@@ -117,6 +117,7 @@ func (a *Algorithm) DecodeAndValidate(token string) (*Claims, error) {
 	}
 
 	if err = a.validateSignature(token); err != nil {
+
 		err = errors.Join(errors.New("failed to validate signature"), err)
 		return claims, err
 	}
