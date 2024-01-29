@@ -1,10 +1,10 @@
 package server
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"forum/server/pkg/jwttoken"
 	"log"
 	"net/http"
 	"time"
@@ -16,11 +16,10 @@ import (
 
 const (
 	sessionName     = "session"
+	jwtKey          = "JWT_KEY"
 	ctxKeyRequestID = iota
 	ctxUserID
 )
-
-type ctxKey int8
 
 type server struct {
 	router *router.Router
@@ -50,6 +49,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
+
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
@@ -93,19 +93,13 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		claims, err := parseToken(cookie.Value)
+		alg := jwttoken.HmacSha256(jwtKey)
+		err = alg.Validate(cookie.Value)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
 
-		// Check if the token is expired
-		if time.Now().Unix() > claims.Exp {
-			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("expired token"))
-			return
-		}
-
-		// In the future we can send userID from claims as respond
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }
@@ -124,7 +118,6 @@ func (s *server) handleLogOut() http.HandlerFunc {
 		}
 
 		http.SetCookie(w, &deletedCookie)
-		// In the future we can send userID from claims as respond
 
 		s.respond(w, r, http.StatusOK, nil)
 	}
@@ -144,20 +137,15 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		user, err := s.store.User().Check(requestBody.Email)
-
-		// if there is no user like we got from resp body
-		if err == sql.ErrNoRows {
-			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
-			return
-		}
-
 		if err != nil || !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
 
 		expiration := time.Now().Add(5 * time.Hour)
-		token, err := s.generateToken(user.ID, expiration)
+		alg := jwttoken.HmacSha256(jwtKey)
+		claims := jwttoken.NewClaims(user.ID, expiration.Unix())
+		token, err := alg.Encode(claims)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
@@ -402,11 +390,6 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		//EXAMPLE OF USAGE
-		// userID := r.Context().Value(ctxUserID).(string)
-		//
-		//fmt.Println("USER ID", userID)
-
 		req := &requestBody{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)

@@ -4,11 +4,17 @@ import (
 	"flag"
 	"forum/server/internal/app/server"
 	"log"
+	"os"
 )
 
 var configPath string
 
 func init() {
+	jwtKey := os.Getenv("JWT_KEY")
+	if jwtKey == "" {
+		log.Fatalf("error: env variable JWT_KEY is not set")
+	}
+
 	flag.StringVar(&configPath, "config-path", "server/configs/config.json", "path to config")
 }
 
