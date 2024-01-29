@@ -440,6 +440,11 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 		Time  time.Time `json:"page_open_time_stamp"`
 	}
 
+	type responseBody struct {
+		Posts []models.Post `json:"posts"`
+		Categories []models.Category `json:"categories"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get index from body
 		request := &requestBody{}
@@ -448,14 +453,13 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
-		fmt.Println(*request)
-
 		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
+		var categories []models.Category
 		for i, post := range posts {
 			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
 			if err != nil {
@@ -463,11 +467,19 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 				return
 			}
 			posts[i].CommentCount = commentCount
+			cat, err := s.store.Category().Get(post.ID)
+			categories = append(categories, *cat)
 		}
 
-		fmt.Println(posts)
+		response := responseBody{
+			Posts: posts,
+			Categories: categories,
+		}
 
-		s.respond(w, r, http.StatusOK, posts)
+
+		fmt.Println(response)
+
+		s.respond(w, r, http.StatusOK, response)
 	}
 }
 
