@@ -12,13 +12,11 @@ type CommentRepository struct {
 	store *Store
 }
 
-func (c *CommentRepository) Create(comment *models.Comment) error {
+func (c *CommentRepository) Create(comment *models.Comment, userId string) error {
 	//Add other neccessary information for posts
 	comment.ID = uuid.New().String()
 	comment.Timestamp = time.Now()
-	//Get user id from Sessions/Cookeis
-	comment.UserID = "NEEDS IMPLEMENTING!"
-	//TO-DO
+	comment.UserID = userId
 
 	insertQuery := `INSERT INTO comment (id, user_Id, post_id, parent_id, content, timestamp) VALUES (?, ?, ?, ?, ?, ?)`
 	_, err := c.store.Db.Exec(insertQuery, comment.ID, comment.UserID, comment.PostID, comment.ParentID, comment.Content, comment.Timestamp)
@@ -29,7 +27,7 @@ func (c *CommentRepository) Create(comment *models.Comment) error {
 	return nil
 }
 
-func (c *CommentRepository) GetComment(id string) (*[]models.Comment, error) {
+func (c *CommentRepository) Get(id string) (*[]models.Comment, error) {
 	query := `WITH RECURSIVE CommentHierarchy AS (
 		-- Anchor member: Start with the top-level comments for the post
 		SELECT

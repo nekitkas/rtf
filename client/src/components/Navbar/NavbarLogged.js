@@ -7,6 +7,7 @@ import messageButtonImage from "../../assets/img/message.svg";
 import modalProfile from "../../assets/img/modalProfile.svg";
 import logout from "../../assets/img/logout.svg";
 import { RouterFunction } from "../../router/Router";
+import { Logout } from "../../helpers/ServerRequests";
 
 export function NavbarLogged() {
   const currentUrl = window.location.href;
@@ -30,7 +31,7 @@ export function NavbarLogged() {
         <img class="modal-arrow"  src="${arrowSvg}" alt="arrow">
         <div class="userprofile-modal">
         <div class = "modal-div"><p class="UserprofileLink">My profile</p><img src="${modalProfile}" class="modal-icon" alt="profile"></img></div>
-       <div class = "modal-div"><p>Log out</p><img src="${logout}" class="modal-icon"  alt="logout"></img></div>
+       <div class = "modal-div"><p class="logoutBtn">Log out</p><img src="${logout}" class="modal-icon"  alt="logout"></img></div>
       </div>
       </div>
     </div>
@@ -58,7 +59,7 @@ export function NavbarLogged() {
         <img class="modal-arrow"  src="${arrowSvg}" alt="arrow">
         <div class="userprofile-modal">
         <div class = "modal-div"><p class="UserprofileLink">My profile</p><img src="${modalProfile}" class="modal-icon" alt="profile"></img></div>
-       <div class = "modal-div"><p>Log out</p><img src="${logout}" class="modal-icon"  alt="logout"></img></div>
+       <div class = "modal-div"><p class="logoutBtn">Log out</p><img src="${logout}" class="modal-icon"  alt="logout"></img></div>
       </div>
       </div>
     </div>
@@ -85,4 +86,20 @@ export function NavbarLogged() {
       RouterFunction();
     });
   }
+
+
+const logoutBtn = document.querySelector(".logoutBtn");
+logoutBtn.addEventListener("click", () => {
+  Logout()
+
+  window.location.href = "#/login";
+  RouterFunction();
+});
+
+
+
+
+
+
+
 }

@@ -51,7 +51,6 @@ func (r *UserRepository) Create(user *models.User) error {
 func (r *UserRepository) Check(login string) (*models.User, error) {
 	//command to find a user no matter if its email or username
 	query := `SELECT * FROM user u WHERE u.email = ? OR u.username = ?`
-
 	var user models.User
 
 	err := r.store.Db.QueryRow(query, login, login).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Timestamp, &user.DateOfBirth, &user.FirstName, &user.LastName, &user.Gender, &user.ImageURL)

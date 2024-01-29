@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -48,15 +49,17 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
-
+	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
+
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
-	s.router.HandleFunc("GET", "/api/v1/jwt/users/findById", s.handleUsersGetByID())
+	s.router.HandleFunc("GET", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
+	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	// EXAMPLE OF DYNAMIC PATH
 	//s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
@@ -99,6 +102,26 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleLogOut() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		//Replace the cookie with expired cookie
+		deletedCookie := http.Cookie{
+			Name:     sessionName,
+			Value:    "",
+			Expires:  time.Now().Add(-1 * time.Hour),
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteNoneMode,
+		}
+
+		http.SetCookie(w, &deletedCookie)
+		//In the future we can send userID from claims as respond
+		s.respond(w, r, http.StatusOK, nil)
+	}
+}
+
 func (s *server) handleUsersLogin() http.HandlerFunc {
 	type RequestBody struct {
 		Email    string `json:"email"`
@@ -107,14 +130,20 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestBody RequestBody
-
 		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
 		user, err := s.store.User().Check(requestBody.Email)
-		if err != nil && !user.ComparePassword(requestBody.Password) {
+
+		//if there is no user like we got from resp body
+		if err == sql.ErrNoRows {
+			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
+			return
+		}
+
+		if err != nil || !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
@@ -143,18 +172,12 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 }
 
 func (s *server) handleUsersGetByID() http.HandlerFunc {
-	type RequestBody struct {
-		ID string `json:"user_id"`
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		var requestBody RequestBody
-		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
+		//get id from cookie
+		userID := r.Context().Value(ctxUserID).(string)
 
-		user, err := s.store.User().FindByID(requestBody.ID)
+		user, err := s.store.User().FindByID(userID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
@@ -185,7 +208,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 
 func (s *server) handleGetAllCategories() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		categories, err := s.store.Category().GetAllCategories()
+		categories, err := s.store.Category().GetAll()
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
@@ -207,6 +230,8 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
+		//Get the userId who does the request
+		userID := r.Context().Value(ctxUserID).(string)
 		// Create category if needed
 		for _, category := range req.Categories {
 			if err := s.store.Category().Create(&category); err != nil {
@@ -215,17 +240,20 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 			}
 		}
 		// Create post
-		if err := s.store.Post().Create(&req.Post, req.Categories); err != nil {
+		if err := s.store.Post().Create(&req.Post, req.Categories, userID); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfull, post: %v, successfull categories %v`, req.Post, req.Categories))
+		s.respond(w, r, http.StatusCreated, request{
+			Post:       req.Post,
+			Categories: req.Categories,
+		})
 	}
 }
 
 func (s *server) serveSinglePostInformation() http.HandlerFunc {
-	type request struct {
+	type requestBody struct {
 		Post string `json:"post_id"`
 	}
 
@@ -241,22 +269,22 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		//
 		//fmt.Println("USER ID", userID)
 
-		req := &request{}
+		req := &requestBody{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		post, err := s.store.Post().GetPost(req.Post)
+		post, err := s.store.Post().Get(req.Post)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
 
-		comments, err := s.store.Comment().GetComment(post.ID)
+		comments, err := s.store.Comment().Get(post.ID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}
 
-		categories, err := s.store.Category().GetCategoriesForPosts(post.ID)
+		categories, err := s.store.Category().GetForPost(post.ID)
 
 		response := responseBody{
 			PostBody:    *post,
@@ -265,6 +293,39 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, response)
+	}
+}
+
+func (s *server) handleAllPostInformation() http.HandlerFunc {
+	type requestBody struct {
+		Index int       `json:"current_index"`
+		Time  time.Time `json:"page_open_time_stamp"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		//get index from body
+		request := &requestBody{}
+		if err := json.NewDecoder(r.Body).Decode(request); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		for i, post := range posts {
+			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
+			if err != nil {
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+			posts[i].CommentCount = commentCount
+		}
+
+		s.respond(w, r, http.StatusOK, posts)
 	}
 }
 
@@ -277,7 +338,8 @@ func (s *server) handleCommentCreation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		err := s.store.Comment().Create(c)
+		userID := r.Context().Value(ctxUserID).(string)
+		err := s.store.Comment().Create(c, userID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 		}

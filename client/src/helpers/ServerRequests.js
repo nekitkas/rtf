@@ -26,3 +26,31 @@ export const CheckUserLoggedIn = async () => {
     throw error; // Rethrow the error if needed
   }
 };
+
+
+
+export const Logout = async () => {
+  try {
+    const response = await fetch("http://localhost:8080/api/v1/logout", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        return false;
+      } else {
+        // Handle other non-OK responses if necessary
+        return false;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
+  }
+};
