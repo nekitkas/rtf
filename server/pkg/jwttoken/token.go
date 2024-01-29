@@ -1,3 +1,27 @@
+// Package jwttoken provides basic implementation of JWT-token
+//
+// Example of usage
+// Create algorithm
+// alg := jwttoken.HmacSha256(key)
+// Create payload
+// claims := jwttoken.NewClaims(id, exp)
+// encode and sign token
+// token, err := alg.Encode(claims)
+// validate token without returning claims
+// err := alg.Validate(token)
+//
+//	if err != nil {
+//		panic(err)
+//	}
+//
+// decode and validate token
+// claims, err := alg.DecodeAndValidate(token)
+//
+//	if err != nil {
+//		panic(err)
+//	}
+//
+// fmt.Println(claims.UserID)
 package jwttoken
 
 import (
