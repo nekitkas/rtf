@@ -53,6 +53,7 @@
     border: 1px solid var(--border-color);
     background-color: var(--background-color);
     color: var(--text-color);
+    box-shadow: 7px 4px 15px rgba(0, 0, 0, 0.256);
   }
 
   .post-title-container {
@@ -270,20 +271,252 @@
 
 
 
- .intLink { cursor: pointer; }
- img.intLink { border: 0; }
- #toolBar1 select { font-size:10px; }
- #textBox {
-   width: 540px;
-   height: 200px;
-   border: 1px #000000 solid;
-   padding: 12px;
-   overflow: scroll;
- }
- #textBox #sourceText {
-   padding: 0;
-   margin: 0;
-   min-width: 498px;
-   min-height: 200px;
- }
- #editMode label { cursor: pointer; }
+
+
+
+
+
+
+ .editor{
+  box-shadow: 7px 4px 15px rgba(0, 0, 0, 0.256);
+
+  width: clamp(320px, 80%, 500px);
+  height: 335px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  border-radius: 10px;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color)
+}
+
+
+
+.editor .top{
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.082);
+
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+align-items: center;
+
+ transition: none !important;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+
+  background-color: rgba(255, 255, 255, 0);
+
+  z-index: 10;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.editor .top .bar{
+  display: flex;
+  justify-content: center;
+  padding-left: 0;
+  top: 0;
+
+
+  width: 60%;
+  height: 100%;
+
+
+  position: relative;
+}
+
+.editor .top .bar li{
+
+  list-style: none;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  position: relative;
+
+  outline: none;
+  user-select: none;
+
+  padding: 10px 0;
+}
+
+.editor .top .bar li button{
+display: flex;
+justify-content: center;
+align-items: center;
+  width: 30px;
+  height: 30px;
+
+  cursor: pointer;
+
+
+  border: 0;
+
+  text-align: center;
+
+  outline: none;
+
+  position: relative;
+}
+
+.editor .top .bar li button .sp-f{
+  color: rgb(70, 70, 70);
+}
+
+.editor .top .bar li button .sp-d{
+  color: #fff;
+}
+
+.sun{
+  filter: invert(1);
+}
+
+
+.b2{
+  background-color: rgb(46, 48, 63);
+
+  transition: ease 0.3s;
+}
+
+
+.sp{
+  color: #f9f9f9;
+}
+
+.output{
+  color: var(--text-color);
+
+  line-height: 2;
+
+  font-family: 'Lexend', sans-serif;
+
+  position: relative;
+
+  resize: none;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  width: 100%;
+  height: calc(100% - 50px);
+
+  padding: 25px;
+
+  outline: none;
+
+  border: none;
+
+  overflow-y: scroll;
+}
+
+.output a{
+  cursor: pointer;
+  color: rgb(46, 73, 136);
+}
+.output-dark a{
+  cursor: pointer;
+  color: rgb(134, 151, 187);
+}
+
+.output::-webkit-scrollbar, .output-dark::-webkit-scrollbar{
+  width: 2px;
+  background-color: transparent;
+}
+
+.output::-webkit-scrollbar-thumb, .output-dark::-webkit-scrollbar-thumb{
+  background-color: rgba(158, 158, 158, 0.234);
+}
+
+.output-dark{
+  color: rgba(255, 255, 255, 0.541);
+
+  line-height: 2;
+
+  font-family: 'Lexend', sans-serif;
+
+  position: relative;
+
+  resize: none;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  width: 100%;
+  height: calc(100% - 50px);
+
+  padding: 25px;
+
+  outline: none;
+
+  border: none;
+
+  overflow-y: scroll;
+}
+
+.previewButtonDepois{
+  margin-bottom: 40px;
+}
+
+.preview{
+  background-color: transparent;
+
+  color: #464646;
+
+  width: 100%;
+  height: fit-content;
+
+  padding: 15px;
+
+  margin-top: 0px;
+
+  position: relative;
+}
+
+.preview-dark{
+ background-color: transparent;
+
+  color: rgba(255, 255, 255, 0.412);
+
+  width: 100%;
+  height: fit-content;
+
+  padding: 15px;
+
+  margin-top: 0px;
+
+  position: relative;
+}
+
+
+
+
+.tool-btn{
+  margin: 0;
+}
+
+.tool-btn.active-btn {
+  width: 40px;
+  height: 40px;
+  background-color: #cfcfcf; /* Change to your desired highlight color */
+  color: var(--background-color);
+}
+
+
+.clearOutput{
+  width: 70px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+margin: 0 ;
+}

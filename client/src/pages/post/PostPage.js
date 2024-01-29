@@ -30,13 +30,53 @@ export function RenderPostPage() {
 
     <div class="label-container" >
       <label>Post Content</label>
-      <textarea
-        name=""
-        id=""
-        class="post-textarea"
-        cols="20"
-        rows="5"
-      ></textarea>
+      <div class="editor">
+      <div class="top">
+          <ul class="bar">
+              <li>
+                  <button title="Underline" class="tool-btn" type="button" data-command="underline">
+                      <span class="sp-f">
+                          <u>U</u>
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <button title="Negrito" class="tool-btn" type="button" data-command="bold">
+                      <span class="sp-f">
+                          <b style="font-weight: 800;">B</b>
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <button title="Italico" class="tool-btn" type="button" data-command="italic">
+                      <span class="sp-f">
+                          <i style="font-weight: 600;">i</i>
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <button title="Criar Link" class="tool-btn" type="button" data-command="createlink"   >
+                      <span class="sp-f" style="font-weight: 800; font-family: poppins;">
+                          <>
+                      </span>
+                  </button>
+              </li>
+
+              <li>
+                  <button title="Linha" class="tool-btn" type="button" data-command="insertHorizontalRule">
+                      <span class="sp-f">
+                          <p>__</p>
+                      </span>
+                  </button>
+              </li>
+
+          </ul>
+          <div><button class="clearOutput">Clear</button></div>
+      </div>
+      <div class="output" contenteditable="true" spellcheck="false">
+
+      </div>
+  </div>
       <div class="category-container"></div>
     </div>
     <div class="add-category-container">
@@ -172,7 +212,7 @@ const sendPostDataBtn = document.querySelector(".add-post-button");
 sendPostDataBtn.addEventListener("click", (e) => {
   e.preventDefault()
   const postTitleInput = document.querySelector('input[name="title"]');
-  const postContentTextarea = document.querySelector('.post-textarea');
+  const postContentTextarea = document.querySelector('.output');
   const postCategories = Array.from(document.querySelector('.category-container').children).map(category => category.textContent);
   const postImageWrapper = document.querySelector('.image-preview-wrapper img');
 
@@ -184,14 +224,57 @@ sendPostDataBtn.addEventListener("click", (e) => {
   sendPostData(title, content, categories, image);
 })
 
+///////text editor
+for (let btn of document.getElementsByClassName('tool-btn')) {
+  btn.addEventListener('click', () => {
+    console.log(btn.type);
+      if(btn.title === "Underline" || btn.title === "Negrito" || btn.title === "Italico" ){
+        btn.classList.toggle("active-btn");
+      }
+
+      let cmd = btn.dataset['command'];
+      if(cmd === 'createlink') {
+          let url = prompt("Enter the link here: ", "http:\/\/");
+          document.execCommand(cmd, false, url);
+      } else {
+          document.execCommand(cmd, false, null);
+      }
+  })
+}
+
+
+
+
+
+const clearOutputBtn = document.querySelector(".clearOutput");
+clearOutputBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  const output = document.querySelector('.output');
+  output.innerHTML = "";
+});
+
 
 
 }
 
 
-async function sendPostData(title, content, categories, image) {
-  const url = "http://localhost:8080/api/v1/jwt/posts/create";
 
+
+async function sendPostData() {
+  // Get the content from the editable div
+  const postContentDiv = document.querySelector('.output');
+  const content = postContentDiv.innerHTML;
+
+  // Get other input values (title, categories, image) as needed
+  const postTitleInput = document.querySelector('input[name="title"]');
+  const postCategories = Array.from(document.querySelector('.category-container').children).map(category => category.textContent);
+  const postImageWrapper = document.querySelector('.image-preview-wrapper img');
+
+  const title = postTitleInput.value;
+  const categories = postCategories;
+  const image = postImageWrapper ? postImageWrapper.src : null;
+
+  // Prepare the request body
   const requestBody = {
     post: {
       title: title,
@@ -205,8 +288,10 @@ async function sendPostData(title, content, categories, image) {
   };
 
   console.log("Request Body:", requestBody);
+
   try {
-    const response = await fetch(url, {
+    // Make the fetch request
+    const response = await fetch("http://localhost:8080/api/v1/jwt/posts/create", {
       method: "POST",
       credentials: "include",
       headers: {
