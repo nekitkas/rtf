@@ -42,9 +42,13 @@
 
 .post-body {
   padding: 5px;
+  width: 100%;
+
 }
 
 .post-body-text {
   font-size: 14px;
   font-weight: 600;
+  text-wrap: wrap;
+ word-wrap: break-word;
 }

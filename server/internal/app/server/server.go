@@ -325,6 +325,8 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			posts[i].CommentCount = commentCount
 		}
 
+		fmt.Println(posts)
+
 		s.respond(w, r, http.StatusOK, posts)
 	}
 }

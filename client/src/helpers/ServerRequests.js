@@ -58,7 +58,7 @@ export const Logout = async () => {
 
 
 const requestData = {
-  current_index: -2,
+  current_index:0,
   page_open_time_stamp: new Date().toISOString(),
 };
 
@@ -79,17 +79,16 @@ export const GetPosts = async () => {
 
     if (!response.ok) {
       if (response.status === 401) {
-        return false;
+        console.error("Unauthorized: User needs to authenticate");
       } else {
-        // Handle other non-OK responses if necessary
-        return false;
+        console.error(`Non-OK response: ${response.status} - ${response.statusText}`);
+        // Log additional details if available (e.g., response.json())
       }
+      return false;
     }
 
-    // Await the result of response.json()
     const result = await response.json();
-
-    return result
+    return result;
   } catch (error) {
     console.error("Fetch error:", error);
     throw error; // Rethrow the error if needed

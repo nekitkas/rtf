@@ -25,6 +25,7 @@ const postBody = document.createElement('div')
     const postBodyText = document.createElement('div')
     postBodyText.classList.add("post-body-text")
     postBodyText.textContent = content
+    postBody.appendChild(postBodyText)
     if(image_url){
         const postBodyImg = document.createElement('img')
         postBodyImg.src = image_url
@@ -33,7 +34,7 @@ const postBody = document.createElement('div')
         postBody.appendChild(postBodyImg)
     }
 
-    postBody.appendChild(postBodyText)
+
 
 
 
