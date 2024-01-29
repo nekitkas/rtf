@@ -30,4 +30,5 @@ go.work
 
 .DS_Store
 
+database.db
 api
