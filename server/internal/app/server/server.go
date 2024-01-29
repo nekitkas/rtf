@@ -59,7 +59,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
@@ -448,6 +448,8 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
+		fmt.Println(*request)
+
 		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -462,6 +464,8 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			}
 			posts[i].CommentCount = commentCount
 		}
+
+		fmt.Println(posts)
 
 		s.respond(w, r, http.StatusOK, posts)
 	}
