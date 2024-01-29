@@ -7,6 +7,7 @@ import (
 	"forum/server/pkg/jwttoken"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"forum/server/internal/models"
@@ -93,7 +94,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		alg := jwttoken.HmacSha256(jwtKey)
+		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
 		err = alg.Validate(cookie.Value)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
@@ -143,7 +144,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		expiration := time.Now().Add(5 * time.Hour)
-		alg := jwttoken.HmacSha256(jwtKey)
+		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
 		claims := jwttoken.NewClaims(user.ID, expiration.Unix())
 		token, err := alg.Encode(claims)
 		if err != nil {
