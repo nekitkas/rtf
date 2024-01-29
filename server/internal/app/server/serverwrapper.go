@@ -3,13 +3,14 @@ package server
 import (
 	"database/sql"
 	"forum/server/internal/store/sqlstore"
-	"github.com/gorilla/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
 	"net/http"
+	"os"
 )
 
 func Start(config *Config) error {
-	db, err := newDB(config.DatabaseURL)
+	db, err := newDB(config.DatabaseURL, config.DatabaseSchema)
 	if err != nil {
 		return err
 	}
@@ -17,22 +18,31 @@ func Start(config *Config) error {
 	defer db.Close()
 
 	store := sqlstore.New(db)
-	sessionStore := sessions.NewCookieStore([]byte("test_key"))
-	srv := newServer(store, sessionStore)
+	srv := newServer(store)
 
 	srv.logger.Printf("Server started at port %v", config.Port)
 
 	return http.ListenAndServe(config.Port, srv)
 }
 
-func newDB(databaseURL string) (*sql.DB, error) {
+func newDB(databaseURL, dataBaseSchema string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", databaseURL)
 	if err != nil {
 		return nil, err
 	}
 
+	sqlStmt, err := os.ReadFile(dataBaseSchema)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err = db.Ping(); err != nil {
 		return nil, err
+	}
+
+	_, err = db.Exec(string(sqlStmt))
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return db, nil

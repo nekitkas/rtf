@@ -1,4 +1,5 @@
 {
   "port" : ":8080",
-  "database_ulr" : "./server/internal/db/database.db"
+  "database_url" : "./server/internal/db/database.db",
+  "database_schema" : "./server/internal/db/schema.sql"
 }

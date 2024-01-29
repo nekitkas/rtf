@@ -7,20 +7,20 @@ import (
 
 type UserRepository struct {
 	store *Store
-	users map[int]*models.User
+	users map[string]*models.User
 }
 
 func (r *UserRepository) Create(user *models.User) error {
-	if err := user.BeforeCreate(); err != nil {
-		return err
-	}
+	// if err := user.BeforeCreate(); err != nil {
+	// 	return err
+	// }
 
 	r.users[user.ID] = user
 
 	return nil
 }
 
-func (r *UserRepository) FindByID(id int) (*models.User, error) {
+func (r *UserRepository) FindByID(id string) (*models.User, error) {
 	user, ok := r.users[id]
 	if !ok {
 		return nil, errors.New("not found")
@@ -37,4 +37,8 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	}
 
 	return nil, errors.New("not found")
+}
+
+func (r *UserRepository) Check(login string) (*models.User, error) {
+	panic("need implement")
 }
