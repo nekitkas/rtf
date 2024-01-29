@@ -264,6 +264,35 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 // }}}
 // -------------------------REACTION STUFF--------------------------//
 // {{{
+
+func (s *server) handleRemoveReaction() http.HandlerFunc {
+	type requestBody struct {
+		ParentID   string `json:"parent_id"`
+		ReactionID string `json:"reaction_id"`
+	}
+
+	type responseBody struct {
+		Response string `json:"response"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(ctxUserID).(string)
+
+		var req requestBody
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+
+		if err := s.store.Reaction().RemoveFromParent(req.ParentID, req.ReactionID, userID); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+
+		s.respond(w, r, http.StatusAccepted, responseBody{
+			Response: "Successfully removed item from db",
+		})
+	}
+}
+
 func (s *server) handleGetReactionsOptions() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reactions, err := s.store.Reaction().GetAll()
@@ -325,6 +354,11 @@ func (s *server) handleAddReactionsToParent() http.HandlerFunc {
 		ReactionID string `json:"reaction_id"`
 	}
 
+	type responseBody struct {
+		Result     string `json:"response"`
+		ReactionID string `json:"reaction_id"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(ctxUserID).(string)
 
@@ -339,7 +373,10 @@ func (s *server) handleAddReactionsToParent() http.HandlerFunc {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
 
-		s.respond(w, r, http.StatusCreated, nil)
+		s.respond(w, r, http.StatusCreated, responseBody{
+			Result:     "Successfully added to Database",
+			ReactionID: req.ReactionID,
+		})
 	}
 }
 
@@ -387,6 +424,8 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 
 		categories, err := s.store.Category().GetForPost(post.ID)
 
+		reactions, err := s.store.Reaction().GetByParentID(post.ID)
+
 		var commentBody commentsBody
 		var aLotOfCommentBodies []commentsBody
 		for _, comment := range *comments {
@@ -404,6 +443,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 			PostBody:    *post,
 			CommentBody: aLotOfCommentBodies,
 			Category:    *categories,
+			Reactions:   *reactions,
 		}
 
 		s.respond(w, r, http.StatusCreated, response)

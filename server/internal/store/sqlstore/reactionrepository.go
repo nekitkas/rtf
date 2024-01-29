@@ -1,6 +1,8 @@
 package sqlstore
 
 import (
+	"fmt"
+
 	"forum/server/internal/models"
 
 	"github.com/google/uuid"
@@ -28,6 +30,21 @@ func (r *ReactionRepository) AddToParent(parent_id string, reaction_id string, u
 }
 
 func (r *ReactionRepository) RemoveFromParent(post_id string, reaction_id string, user_id string) error {
+	query := `
+DELETE FROM parentReaction
+WHERE user_id = ?
+AND reaction_id = ?
+AND parent_id = ?;
+	`
+	resp, err := r.store.Db.Exec(query, user_id, reaction_id, post_id)
+	if err != nil {
+		return err
+	}
+	num, err := resp.RowsAffected()
+	if num == 0 {
+		return fmt.Errorf("Nothing was removed from database, paramaters don't match a result in DB")
+	}
+
 	return nil
 }
 
