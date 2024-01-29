@@ -468,7 +468,10 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			}
 			posts[i].CommentCount = commentCount
 			cat, err := s.store.Category().Get(post.ID)
-			categories = append(categories, *cat)
+			// fmt.Println("CATEGORY", cat)
+			if cat != nil {
+				categories = append(categories, *cat)
+			}
 		}
 
 		response := responseBody{
@@ -477,7 +480,7 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 		}
 
 
-		fmt.Println(response)
+		// fmt.Println(response)
 
 		s.respond(w, r, http.StatusOK, response)
 	}
