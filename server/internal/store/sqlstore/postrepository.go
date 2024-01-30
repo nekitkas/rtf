@@ -68,11 +68,14 @@ func (r *PostRepository) Delete(id string) error {
 }
 
 func (r *PostRepository) Get(id string) (*models.Post, error) {
-	query := `SELECT * FROM post WHERE id = ?`
+	query := `SELECT p.*, u.username AS user_name
+	FROM post p
+	JOIN user u ON p.user_id = u.id
+	WHERE p.id = ?`
 
 	var post models.Post
 
-	err := r.store.Db.QueryRow(query, id).Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp)
+	err := r.store.Db.QueryRow(query, id).Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp, &post.UserNickname)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf(`Post containing id %v does not exist`, id)
@@ -84,10 +87,12 @@ func (r *PostRepository) Get(id string) (*models.Post, error) {
 }
 
 func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time) ([]models.Post, error) {
-	query := `SELECT * FROM post
-	WHERE timestamp <= ?
-	ORDER BY timestamp DESC
-	LIMIT ? OFFSET ?`
+	query := `SELECT p.*, u.username AS user_name
+FROM post p
+JOIN user u ON p.user_id = u.id
+WHERE p.timestamp <= ?
+ORDER BY p.timestamp DESC
+LIMIT ? OFFSET ?`
 
 	dateTimeParts := strings.Split(timeStamp.String(), " ")
 
@@ -105,7 +110,7 @@ func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time) ([]mode
 	var posts []models.Post
 	for rows.Next() {
 		var post models.Post
-		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp); err != nil {
+		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp, &post.UserNickname); err != nil {
 			return nil, fmt.Errorf("failed to scan post row: %v", err)
 		}
 		fmt.Println(post.Timestamp)
