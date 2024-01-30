@@ -1,19 +1,8 @@
-const root = document.querySelector(".root")
-const container = document.createElement("div")
-const PostFeed = document.createElement("div")
+function RenderPostFeed() {
+  const PostFeed = document.createElement("div")
+  PostFeed.classList.add("post-feed")
 
+  return PostFeed
+}
 
-container.classList.add('container')
-
-PostFeed.classList.add('post-feed')
-
-container.appendChild(PostFeed)
-
-root.appendChild(container)
-
-
-
-
-export {RenderPostFeed}
-
-
+export { RenderPostFeed }

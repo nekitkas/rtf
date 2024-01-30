@@ -26,27 +26,6 @@ export function RenderMessenger() {
 
   // Sample messages
   const messages = [
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "asdasd", class: 'right' },
-    // { text: "Hello world", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello ", class: 'left' },
-    // { text: "How are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'left' },
-    // { text: "Hello world\nHow are YOur dasd asdasd", class: 'right' },
-
     {
       text: "Hey there! Have you delved into the Cyberpunk universe lately?",
       class: "left",

@@ -1,146 +1,167 @@
+import { Auth } from "../../components/Auth/Login.js"
 import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
-import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js";
-import { RouterFunction } from "../../router/Router.js";
+import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
+import { RouterFunction } from "../../router/Router.js"
+
+import { RenderRegisterForm } from "../../components/Auth/Register.js"
+import { CONTAINER, ROOT } from '../../index.js'
 
 export async function RenderRegisterPage() {
   try {
-    const isUserLogged = await CheckUserLoggedIn();
-    console.log(isUserLogged);
+    const isUserLogged = await CheckUserLoggedIn()
+    console.log(isUserLogged)
 
     if (isUserLogged) {
-      window.location.href = '#/home';
-      RouterFunction();
+      window.location.href = "#/home"
+      RouterFunction()
     } else {
-      const mainContainer = document.querySelector(".root");
-      mainContainer.innerHTML = "";
-      NavbarNotLogged();
+      // const mainContainer = document.querySelector(".root")
+      // mainContainer.innerHTML = ""
 
 
-  const main = document.createElement("main")
-  main.className = "main"
-  main.innerHTML = `
-<div class="container">
-  <div class="auth">
-    <form type="submit" action="/register" class="form" method="POST">
-      <h1 class="auth-title">REGISTER</h1>
-      <label>EMAIL</label>
-      <input type="email" placeholder="Email address" name="email" required />
-      <label>USERNAME</label>
-      <input type="text" placeholder="Username" name="username" minlength="3" required />
+      Auth.innerHTML = ""
+      NavbarNotLogged()
 
-      <div class="fullName">
+//       const main = document.createElement("main")
+//       main.className = "main"
+//       main.innerHTML = `
+// <div class="container">
+//   <div class="auth">
+//     <form type="submit" action="/register" class="form" method="POST">
+//       <h1 class="auth-title">REGISTER</h1>
+//       <label>EMAIL</label>
+//       <input type="email" placeholder="Email address" name="email" required />
+//       <label>USERNAME</label>
+//       <input type="text" placeholder="Username" name="username" minlength="3" required />
 
-        <div>
-          <label>FIRST NAME</label>
-          <input type="text" placeholder="First name" name="first_name" minlength="3" required />
+//       <div class="fullName">
 
-        </div>
+//         <div>
+//           <label>FIRST NAME</label>
+//           <input type="text" placeholder="First name" name="first_name" minlength="3" required />
 
-        <div>
-          <label>LAST NAME</label>
-          <input type="text" placeholder="Last name" name="last_name" minlength="3" required />
+//         </div>
 
-        </div>
+//         <div>
+//           <label>LAST NAME</label>
+//           <input type="text" placeholder="Last name" name="last_name" minlength="3" required />
 
-      </div>
+//         </div>
 
-      <label>GENDER</label>
-      <div>
-        <select id="gender" name="gender">
-          <option value="male" selected>MALE</option>
-          <option value="female">FEMALE</option>
-          <option value="diverse">DIVERSE</option>
-        </select>
-      </div>
+//       </div>
 
-      <label>DATE OF BIRTH</label>
-      <input type="date" name="date_of_birth" required />
+//       <label>GENDER</label>
+//       <div>
+//         <select id="gender" name="gender">
+//           <option value="male" selected>MALE</option>
+//           <option value="female">FEMALE</option>
+//           <option value="diverse">DIVERSE</option>
+//         </select>
+//       </div>
 
-      <label>PASSWORD</label>
-      <input type="password" name="password" placeholder="********" minlength="8" maxlength="32" required />
+//       <label>DATE OF BIRTH</label>
+//       <input type="date" name="date_of_birth" required />
 
-      <label>CONFIRM PASSWORD</label>
-      <input type="password" name="confirm_password" placeholder="********" minlength="8" maxlength="32" required />
-      <div class="errorMsg"></div>
-      <button type="submit">REGISTER</button>
-      <p>
-        Already have an account? <a href="/./src/templates/login.html">sign-in</a>
-      </p>
+//       <label>PASSWORD</label>
+//       <input type="password" name="password" placeholder="********" minlength="8" maxlength="32" required />
 
-    </form>
-  </div>
-</div>
-`
+//       <label>CONFIRM PASSWORD</label>
+//       <input type="password" name="confirm_password" placeholder="********" minlength="8" maxlength="32" required />
+//       <div class="errorMsg"></div>
+//       <button type="submit">REGISTER</button>
+//       <p>
+//         Already have an account? <a href="/./src/templates/login.html">sign-in</a>
+//       </p>
 
-  mainContainer.appendChild(main)
+//     </form>
+//   </div>
+// </div>
+// `
 
-const errorMsg = document.querySelector(".errorMsg");
+//       mainContainer.appendChild(main)
 
-  const registerForm = document.querySelector(".form")
-  registerForm.addEventListener("submit", handleFormSubmit)
 
-  function handleFormSubmit(e) {
-    e.preventDefault() // Prevent the default form submission
+      const RegisterForm = RenderRegisterForm()
 
-    const password = document.querySelector('input[name="password"]').value
-    const confirm_password = document.querySelector(
-      'input[name="confirm_password"]'
-    ).value
+      Auth.appendChild(RegisterForm)
 
-    if (password !== confirm_password) {
-      alert("Passwords do not match")
-      return
-    }
 
-    // Get form data
-    const formData = new FormData(registerForm)
 
-    // Create an object from the form data
-    const formDataObject = {}
-    formData.forEach((value, key) => {
-      // Exclude specific fields (e.g., 'confirm_password')
-      if (key !== "confirm_password") {
-        formDataObject[key] = value
-      }
-    })
+      
+      CONTAINER.appendChild(Auth)
 
-    // Log the form data object
-    console.log("Form data:", formDataObject)
+      ROOT.appendChild(CONTAINER)
 
-    // Make a fetch request to the server
-    fetch("http://localhost:8080/api/v1/users/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Request-Method": "POST",
-      },
-      body: JSON.stringify(formDataObject),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          if(response.status === 422) {
-            errorMsg.innerHTML = "User with this email or nickname already exists"
-          }
-          errorMsg.innerHTML = "Error occured please try again later"
-          throw new Error("Network response was not ok",error)
 
+
+
+
+      const errorMsg = document.querySelector(".errorMsg")
+
+      const registerForm = document.querySelector(".form")
+      registerForm.addEventListener("submit", handleFormSubmit)
+
+      function handleFormSubmit(e) {
+        e.preventDefault() // Prevent the default form submission
+
+        const password = document.querySelector('input[name="password"]').value
+        const confirm_password = document.querySelector(
+          'input[name="confirm_password"]'
+        ).value
+
+        if (password !== confirm_password) {
+          alert("Passwords do not match")
+          return
         }
 
-      })
-      .then(() => {
-        // Handle the response from the server
+        // Get form data
+        const formData = new FormData(registerForm)
 
-        window.location.href = "#/login";
-        RouterFunction();
-      })
-      .catch((error) => {
-        // Handle fetch errors
-        console.log("Fetch error:", error)
-      })
+        // Create an object from the form data
+        const formDataObject = {}
+        formData.forEach((value, key) => {
+          // Exclude specific fields (e.g., 'confirm_password')
+          if (key !== "confirm_password") {
+            formDataObject[key] = value
+          }
+        })
+
+        // Log the form data object
+        console.log("Form data:", formDataObject)
+
+        // Make a fetch request to the server
+        fetch("http://localhost:8080/api/v1/users/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Request-Method": "POST",
+          },
+          body: JSON.stringify(formDataObject),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              if (response.status === 422) {
+                errorMsg.innerHTML =
+                  "User with this email or nickname already exists"
+              }
+              errorMsg.innerHTML = "Error occured please try again later"
+              throw new Error("Network response was not ok", error)
+            }
+          })
+          .then(() => {
+            // Handle the response from the server
+
+            window.location.href = "#/login"
+            RouterFunction()
+          })
+          .catch((error) => {
+            // Handle fetch errors
+            console.log("Fetch error:", error)
+          })
+      }
+    }
+  } catch (error) {
+    console.error("Error checking user login:", error)
+    // Handle the error as needed
   }
-}
-} catch (error) {
-  console.error("Error checking user login:", error);
-  // Handle the error as needed
-}
 }
