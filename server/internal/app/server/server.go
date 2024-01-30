@@ -61,6 +61,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/deleteById", s.handleUsersDeleteByID())
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
@@ -95,9 +96,17 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 		}
 
 		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
-		err = alg.Validate(cookie.Value)
+		claims, err := alg.DecodeAndValidate(cookie.Value)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+		//check if user exist
+		_, err = s.store.User().FindByID(claims.UserID)
+		if err != nil {
+			deletedCookie := s.deleteCookie()
+			http.SetCookie(w, &deletedCookie)
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
@@ -108,15 +117,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 func (s *server) handleLogOut() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Replace the cookie with expired cookie
-		deletedCookie := http.Cookie{
-			Name:     sessionName,
-			Value:    "",
-			Expires:  time.Now().Add(-1 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			Secure:   true,
-			SameSite: http.SameSiteNoneMode,
-		}
+		deletedCookie := s.deleteCookie()
 
 		http.SetCookie(w, &deletedCookie)
 
@@ -164,7 +165,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 		http.SetCookie(w, &cookie)
 
-		s.respond(w, r, http.StatusOK, nil)
+		s.respond(w, r, http.StatusOK, user)
 	}
 }
 
@@ -180,6 +181,27 @@ func (s *server) handleUsersGetByID() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, user)
+	}
+}
+
+func (s *server) handleUsersDeleteByID() http.HandlerFunc {
+	type request struct {
+		UserID string `json:"user_id"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := request{}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		err := s.store.User().Delete(req.UserID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
@@ -500,6 +522,19 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
+}
+
+func (s *server) deleteCookie() http.Cookie {
+	deletedCookie := http.Cookie{
+		Name:     sessionName,
+		Value:    "",
+		Expires:  time.Now().Add(-1 * time.Hour),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	return deletedCookie
 }
 
 //}}}
