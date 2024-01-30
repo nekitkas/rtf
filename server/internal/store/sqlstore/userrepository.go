@@ -62,3 +62,12 @@ func (r *UserRepository) Check(login string) (*models.User, error) {
 	//check if passwords match
 	return &user, nil
 }
+
+func (r *UserRepository) Delete(id string) error {
+	query := `DELETE FROM user WHERE id = ?`
+	if _, err := r.store.Db.Exec(query, id); err != nil {
+		return err
+	}
+
+	return nil
+}

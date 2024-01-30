@@ -9,10 +9,9 @@ import (
 	"os"
 	"time"
 
-	"forum/server/pkg/jwttoken"
-
 	"forum/server/internal/models"
 	"forum/server/internal/store"
+	"forum/server/pkg/jwttoken"
 	"forum/server/pkg/router"
 	"forum/server/pkg/websocket"
 )
@@ -50,8 +49,6 @@ func (s *server) configureRouter() {
 	s.router.Use(s.logRequest)
 	s.router.Use(s.CORSMiddleware)
 
-	// s.router.UseWithPrefix("/private", s.authenticateUser)
-	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
@@ -62,6 +59,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	// -------------------- USER PATHS ------------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
@@ -89,9 +87,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) wsHandler() http.HandlerFunc {
-	type responseBody struct {
-		Resp string `json:"response"`
-	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
 		user_id := router.Param(r.Context(), "user_id")
@@ -122,9 +117,17 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 		}
 
 		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
-		err = alg.Validate(cookie.Value)
+		claims, err := alg.DecodeAndValidate(cookie.Value)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+		//check if user exist
+		_, err = s.store.User().FindByID(claims.UserID)
+		if err != nil {
+			deletedCookie := s.deleteCookie()
+			http.SetCookie(w, &deletedCookie)
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
@@ -135,15 +138,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 func (s *server) handleLogOut() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Replace the cookie with expired cookie
-		deletedCookie := http.Cookie{
-			Name:     sessionName,
-			Value:    "",
-			Expires:  time.Now().Add(-1 * time.Hour),
-			Path:     "/",
-			HttpOnly: true,
-			Secure:   true,
-			SameSite: http.SameSiteNoneMode,
-		}
+		deletedCookie := s.deleteCookie()
 
 		http.SetCookie(w, &deletedCookie)
 
@@ -207,6 +202,27 @@ func (s *server) handleUsersGetByID() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, user)
+	}
+}
+
+func (s *server) handleUsersDelete() http.HandlerFunc {
+	type request struct {
+		UserID string `json:"user_id"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := request{}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		err := s.store.User().Delete(req.UserID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
@@ -510,8 +526,6 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
-		fmt.Println(*request)
-
 		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -526,8 +540,6 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			}
 			posts[i].CommentCount = commentCount
 		}
-
-		fmt.Println(posts)
 
 		s.respond(w, r, http.StatusOK, posts)
 	}
@@ -588,6 +600,19 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
+}
+
+func (s *server) deleteCookie() http.Cookie {
+	deletedCookie := http.Cookie{
+		Name:     sessionName,
+		Value:    "",
+		Expires:  time.Now().Add(-1 * time.Hour),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	return deletedCookie
 }
 
 //}}}
