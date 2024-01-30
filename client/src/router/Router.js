@@ -21,36 +21,26 @@ export const RouterFunction = async () => {
       switch (path) {
         case "/":
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page")
             RenderLoginPage()
             return
           }
-          console.log("Rendering Home Page")
           RenderHomePage()
           break
         case "/login":
-          console.log("Rendering Login Page")
           RenderLoginPage()
           break
         case "/register":
-          console.log("Rendering Register Page")
           RenderRegisterPage()
           break
         case "/create-post":
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page")
             RenderLoginPage()
             return
           }
-          console.log("Rendering Post Page")
           RenderPostPage()
           break
         case "/profile":
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page")
             RenderLoginPage()
             return
           }
@@ -59,12 +49,9 @@ export const RouterFunction = async () => {
           break
         default:
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page")
             RenderLoginPage()
             return
           }
-          console.log("Unknown Path, Rendering Home Page")
           RenderHomePage()
       }
     } catch (error) {

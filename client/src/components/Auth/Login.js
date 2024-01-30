@@ -39,7 +39,7 @@ function RenderLoginForm() {
   // Create paragraph for registration link
   const registrationParagraph = document.createElement("p")
   registrationParagraph.innerHTML =
-    'Don\'t have an account? <a href="#/register">register</a>'
+    'Don\'t have an account? <a href="/register">Register</a>'
 
   // Append elements to form
   form.appendChild(heading)

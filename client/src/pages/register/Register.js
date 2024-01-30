@@ -81,7 +81,7 @@ export async function RenderRegisterPage() {
           .then(() => {
             // Handle the response from the server
 
-            window.location.href = "#/login"
+            window.location.href = "/login"
             RouterFunction()
           })
           .catch((error) => {

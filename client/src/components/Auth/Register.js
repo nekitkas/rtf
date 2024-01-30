@@ -1,4 +1,3 @@
-import { Auth } from "./Login"
 
 function RenderRegisterForm() {
   // Create form element
@@ -102,14 +101,16 @@ function RenderRegisterForm() {
   // Create paragraph for sign-in link
   const signInParagraph = document.createElement("p")
   signInParagraph.innerHTML =
-    'Already have an account? <a href="/./src/templates/login.html">sign-in</a>'
+    'Already have an account? <a href="/login">sign-in</a>'
 
   // Append elements to form
   form.appendChild(heading)
-  form.appendChild(document.createElement("label")).textContent = "Email"
+  form.appendChild(document.createElement("label")).textContent = "EMAIL"
   form.appendChild(emailInput)
-  form.appendChild(document.createElement("label")).textContent = "Username"
+  form.appendChild(document.createElement("label")).textContent = "USERNAME"
   form.appendChild(usernameInput)
+  form.appendChild(document.createElement("label")).textContent = "FULL NAME"
+
   form.appendChild(fullNameDiv)
   form.appendChild(genderSelect)
   form.appendChild(document.createElement("label")).textContent =
