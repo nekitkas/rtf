@@ -41,6 +41,21 @@ export function RenderHomePage() {
       selectArrow.classList.toggle("select-arrow-rotate")
     }
   }
+ // Пример использования:
+const apiUrl = 'http://localhost:8080/api/v1/jwt/posts/findById';
+const requestData = {
+  post_id: 'c7a545fa-66d5-42be-b881-7c9e7985f1a7',
+};
+
+sendRequest(apiUrl, 'POST', requestData)
+  .then(data => {
+    // Обработка данных, полученных от сервера
+    console.log(data);
+  })
+  .catch(error => {
+    // Обработка ошибок
+    console.error('Error in fetch operation:', error);
+  });
 }
 
 async function fetchData(PostFeed) {
@@ -67,3 +82,31 @@ async function fetchData(PostFeed) {
     console.error("Error during fetch:", error)
   }
 }
+
+
+//////////////////////////////
+//check later
+// function sendRequest(url, method, body = null, headers = {}) {
+//   const options = {
+//     method,
+//     headers: {
+//       'Content-Type': 'application/json',
+//       ...headers,
+//     },
+//     body: body ? JSON.stringify(body) : null,
+//     credentials:"include"
+//   };
+
+//   return fetch(url, options)
+//     .then(response => {
+//       if (!response.ok) {
+//         throw new Error(`Network response was not ok: ${response.status}`);
+//       }
+//       return response.json();
+//     })
+//     .catch(error => {
+//       console.error('Error during fetch operation:', error);
+//       throw error;
+//     });
+// }
+
