@@ -72,14 +72,22 @@ export function RenderHomePage() {
 async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts();
-
+// console.log(postsData.posts[0]);
     if (postsData) {
       // Do something with the data
+postsData.posts.forEach(post => {
+console.log(post.post);
+if(post.categories){
 
-      postsData.forEach(post => {
+PostFeed.appendChild(RenderPost(post.post,post.categories));
+}
 
-        PostFeed.appendChild(RenderPost(post))
-      });
+
+})
+      // postsData.forEach(post => {
+
+
+      // });
     } else {
       // Handle case when response is not OK
       console.log("Error: Response not OK");
