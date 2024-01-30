@@ -15,64 +15,59 @@ type responseWriter struct {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	//Allow all connections
+	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-// upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
 type WebSocket struct {
-	Upgrader   websocket.Upgrader
-	connection *websocket.Conn
+	Upgrader           websocket.Upgrader
+	connections map[*websocket.Conn]bool
 }
 
 func NewWebSocket() *WebSocket {
-	return &WebSocket{Upgrader: upgrader}
+	return &WebSocket{
+		Upgrader:           upgrader,
+		connections: make(map[*websocket.Conn]bool),
+	}
 }
 
 // Takes in a custom responsewriter that has to have a hijack function
 func (ws *WebSocket) HandleWebSocket(rw http.ResponseWriter, r *http.Request) error {
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	if conn, err := upgrader.Upgrade(rw, r, nil); err != nil {
 		return err
 	} else {
-		ws.connection = conn
-	}
-
-	if err := ws.socketLoop(); err != nil {
-		return err
+		ws.connections[conn] = true
+		go ws.handleWebSocketConnection(conn)
 	}
 
 	return nil
 }
 
-func (ws *WebSocket) CloseHandler(code int, text string) error {
-	if err := ws.connection.CloseHandler()(code, text); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (ws *WebSocket) socketLoop() error {
-	defer ws.CloseHandler(1001, "Client left the connection")
+func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
+	defer func(){
+		conn.Close()
+		delete(ws.connections, conn)
+	}()
 	for {
-		messageType, message, err := ws.connection.ReadMessage()
+		messageType, p, err := conn.ReadMessage()
 		if err != nil {
-			return err
+			fmt.Println("WebSocket Read Error:", err)
+			delete(ws.connections, conn)
+			break
 		}
 
-		if string(message) == "CLOSE" {
-			ws.CloseHandler(1000, `Recieved "CLOSE" message from client`)
-			return nil
-		}
-		fmt.Println(messageType)
-
-		fmt.Println("Received message:", string(message))
-
-		err = ws.connection.WriteMessage(messageType, message)
-		if err != nil {
-			return err
-		}
+		fmt.Println(ws.connections)
+		// Process the received message (e.g., broadcast to other users)
+		ws.broadcast(messageType, p)
 	}
 }
 
-func (ws *WebSocket) readJson()
+func (ws *WebSocket) broadcast(messType int, b []byte) {
+	for ws := range ws.connections {
+		go func(ws *websocket.Conn) {
+			if err := ws.WriteMessage(messType, b); err != nil {
+				fmt.Println("SOMETING ERROR", err)
+			}
+		}(ws)
+	}
+}
