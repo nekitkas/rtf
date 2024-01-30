@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"forum/server/internal/app/server"
 	"log"
+	"forum/server/internal/app/server"
 	"os"
 )
 

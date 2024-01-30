@@ -27,6 +27,7 @@ type ReactionRepository interface {
 
 type PostRepository interface {
 	Create(*models.Post, []models.Category, string) error
+	Delete(id string) error
 	Get(string) (*models.Post, error)
 	GetFeed(offset, limit int, timeStamp time.Time) ([]models.Post, error)
 	GetCommentNumber(postId string) (int, error)
@@ -42,4 +43,6 @@ type CategoryRepository interface {
 type CommentRepository interface {
 	Create(*models.Comment, string) error
 	Get(id string) (*[]models.Comment, error)
+	Delete(id string) error
+	DeleteAllUnderPost(post_id string) error
 }
