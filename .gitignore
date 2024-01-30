@@ -28,12 +28,8 @@ node_modules
 # Go workspace file
 go.work
 
-.DS_Store
-
-<<<<<<< HEAD
 database.db
-=======
->>>>>>> dev
+
 .api
 
 /idea
