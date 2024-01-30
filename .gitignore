@@ -30,10 +30,7 @@ go.work
 
 .DS_Store
 
-<<<<<<< HEAD
-database.db
-=======
->>>>>>> dev
+server/internal/db/database.db
 api
 
 .idea
