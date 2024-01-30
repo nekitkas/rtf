@@ -6,10 +6,8 @@ import (
 	"strings"
 )
 
-type (
-	paramContextKey string
-	MiddlewareFunc  func(http.Handler) http.Handler
-)
+type paramContextKey string
+type MiddlewareFunc func(http.Handler) http.Handler
 
 type Router struct {
 	routes      []*route
@@ -27,10 +25,11 @@ func (r *Router) pathSegments(p string) []string {
 
 func (r *Router) Handle(method, pattern string, handler http.Handler) {
 	route := &route{
-		method:  strings.ToLower(method),
-		handler: handler,
-		segs:    r.pathSegments(pattern),
-		prefix:  strings.HasSuffix(pattern, "/") || strings.HasSuffix(pattern, "..."),
+		method:      strings.ToLower(method),
+		handler:     handler,
+		segs:        r.pathSegments(pattern),
+		prefix:      strings.HasSuffix(pattern, "/") || strings.HasSuffix(pattern, "..."),
+		queryParams: make(map[string]string),
 	}
 	r.routes = append(r.routes, route)
 }
@@ -79,12 +78,11 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for i := len(r.middlewares) - 1; i >= 0; i-- {
 		notFoundWithMiddleware = r.middlewares[i].Middleware(notFoundWithMiddleware)
 	}
-
 	for _, route := range r.routes {
 		if route.method != method && route.method != "*" {
 			continue
 		}
-		if ctx, ok := route.match(req.Context(), r, segs); ok {
+		if ctx, ok := route.match(req.Context(), segs, req); ok {
 			handlerWithMiddleware := route.handler
 			for i := len(r.middlewares) - 1; i >= 0; i-- {
 				handlerWithMiddleware = r.middlewares[i].Middleware(handlerWithMiddleware)
@@ -97,7 +95,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func Param(ctx context.Context, param string) string {
-	// chcekcs if its string
+	// checks if its string
 	vStr, ok := ctx.Value(paramContextKey(param)).(string)
 	if !ok {
 		return ""
@@ -107,13 +105,21 @@ func Param(ctx context.Context, param string) string {
 }
 
 type route struct {
-	method  string
-	handler http.Handler
-	prefix  bool
-	segs    []string
+	method      string
+	handler     http.Handler
+	prefix      bool
+	segs        []string
+	queryParams map[string]string
 }
 
-func (r *route) match(ctx context.Context, router *Router, segs []string) (context.Context, bool) {
+func (r *route) match(ctx context.Context, segs []string, req *http.Request) (context.Context, bool) {
+	query := req.URL.Query()
+	for key, value := range r.queryParams {
+		if query.Get(key) != value {
+			return nil, false
+		}
+	}
+
 	if len(segs) > len(r.segs) && !r.prefix {
 		return nil, false
 	}
@@ -132,7 +138,7 @@ func (r *route) match(ctx context.Context, router *Router, segs []string) (conte
 					return ctx, true
 				}
 			}
-			if seg != segs[i] {
+			if !strings.HasPrefix(segs[i], seg) {
 				return nil, false
 			}
 		}
@@ -140,5 +146,6 @@ func (r *route) match(ctx context.Context, router *Router, segs []string) (conte
 			ctx = context.WithValue(ctx, paramContextKey(seg), segs[i])
 		}
 	}
+
 	return ctx, true
 }
