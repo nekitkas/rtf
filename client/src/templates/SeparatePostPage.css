@@ -25,7 +25,7 @@
     margin: 0 auto;
     padding: 20px;
     top: 65px;
-    height: 100vh;
+
     overflow-y: scroll;
   }
 
@@ -222,7 +222,7 @@
   color: rgba(255, 255, 255, 0.745);
   margin-bottom: 20px;
   border: 1px solid var(--border-color);
- 
+
 }
 
 .post-body-img {
@@ -266,3 +266,95 @@
   text-wrap: wrap;
  word-wrap: break-word;
 }
+
+.postPagePostHeader h5{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.postPagePostHeader h2{
+color: #638c47;
+font-size: 28px;
+margin-bottom: 5px;
+}
+
+.postPagePostBody{
+  padding: 10px;
+}
+
+.postPageBodyText{
+  margin-bottom: 40px;
+  font-size: 18px;
+
+}
+
+.postPageBodyImg{
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.postPageBodyImg img{
+  width: 80%;
+  object-fit:contain ;
+  height: 400px;
+}
+
+.postPagePostFooter{
+
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.time{
+  font-size: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+.container{
+  display: flex;
+  flex-direction: column;
+}
+.createCommentContainer{
+  width: 100%;
+  max-width: 800px;
+  border-radius: 10px;
+  background-color: var(--background-secondory);
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.745);
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 5rem;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.createCommentContainer textarea{
+  resize: none;
+  background-color: var(--background-color);
+  border-radius: 10px;
+  padding: 10px;
+  width: 70%;
+  color: var(--text-color);
+}
+
+
+.createCommentContainer textarea{
+  outline: none;
+}
+
+
+.createCommentContainer button{
+  width: 100px;
+  height: 40px;
+  cursor: pointer;
+  background-color: var(--primary-color);
+  border: transparent;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+
