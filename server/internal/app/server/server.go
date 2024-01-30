@@ -55,7 +55,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
-	// s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
+	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
@@ -71,7 +71,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 
-	s.router.HandleFunc("GET", "/chat/:user_id", s.wsHandler())
+	s.router.HandleFunc("GET", "jwt/chat/:user_id", s.wsHandler())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
