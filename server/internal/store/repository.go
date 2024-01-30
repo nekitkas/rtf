@@ -14,6 +14,7 @@ type UserRepository interface {
 	// Check can be used to get user data not meant to go the client
 	// (password from db has NOT BEEN SANITIZED)
 	Check(string) (*models.User, error)
+	Delete(string) error
 }
 
 type ReactionRepository interface {

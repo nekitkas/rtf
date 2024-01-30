@@ -99,7 +99,6 @@ LIMIT ? OFFSET ?`
 	timeParts := strings.Split(dateTimeParts[1], ".")
 
 	nearestSecond := dateTimeParts[0] + "T" + timeParts[0]
-	fmt.Println(nearestSecond)
 
 	rows, err := r.store.Db.Query(query, nearestSecond, limit, offset*limit)
 	if err != nil {
@@ -113,7 +112,6 @@ LIMIT ? OFFSET ?`
 		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp, &post.UserNickname); err != nil {
 			return nil, fmt.Errorf("failed to scan post row: %v", err)
 		}
-		fmt.Println(post.Timestamp)
 		posts = append(posts, post)
 	}
 
