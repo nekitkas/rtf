@@ -53,6 +53,20 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category,
 	return nil
 }
 
+func (r *PostRepository) Delete(id string) error {
+	query := `DELETE FROM post WHERE id = ?`
+
+	if _, err := r.store.Db.Exec(query, id); err != nil {
+		return err
+	}
+
+	if err := r.store.commentRepository.DeleteAllUnderPost(id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *PostRepository) Get(id string) (*models.Post, error) {
 	query := `SELECT * FROM post WHERE id = ?`
 
