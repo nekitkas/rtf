@@ -61,18 +61,20 @@ export async function RenderRegisterPage() {
 
       <label>CONFIRM PASSWORD</label>
       <input type="password" name="confirm_password" placeholder="********" minlength="8" maxlength="32" required />
-
+      <div class="errorMsg"></div>
       <button type="submit">REGISTER</button>
       <p>
         Already have an account? <a href="/./src/templates/login.html">sign-in</a>
       </p>
-      <div class="errorMsg"></div>
+
     </form>
   </div>
 </div>
 `
 
   mainContainer.appendChild(main)
+
+const errorMsg = document.querySelector(".errorMsg");
 
   const registerForm = document.querySelector(".form")
   registerForm.addEventListener("submit", handleFormSubmit)
@@ -116,10 +118,14 @@ export async function RenderRegisterPage() {
     })
       .then((response) => {
         if (!response.ok) {
+          if(response.status === 422) {
+            errorMsg.innerHTML = "User with this email or nickname already exists"
+          }
+          errorMsg.innerHTML = "Error occured please try again later"
           throw new Error("Network response was not ok",error)
 
         }
-      
+
       })
       .then(() => {
         // Handle the response from the server

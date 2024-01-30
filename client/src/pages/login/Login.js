@@ -29,7 +29,7 @@ export async function RenderLoginPage() {
 
                     <label>PASSWORD</label>
                     <input type="password" name="password" placeholder="********" />
-
+                    <div class="errorMsg"></div>
                     <button type="submit">SIGN-IN</button>
 
                     <p>
@@ -37,13 +37,16 @@ export async function RenderLoginPage() {
                         <a href="#/register">register</a>
                     </p>
 
-                    <div class="errorMsg"></div>
+
                 </form>
             </div>
         </div>
     `;
 
       mainContainer.appendChild(main);
+
+
+      const errorMsg = document.querySelector(".errorMsg");
 
       const registerForm = document.querySelector(".form");
       registerForm.addEventListener("submit", handleFormSubmit);
@@ -78,6 +81,9 @@ export async function RenderLoginPage() {
         })
           .then((response) => {
             if (!response.ok) {
+              if (response.status === 401) {
+                errorMsg.innerHTML=`Invalid Email/Nickname or password`;
+              }
               throw new Error("Network response was not ok");
             }
 

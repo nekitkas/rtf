@@ -3,6 +3,7 @@ import "../../styles/createPostPage.css";
 import addCategory from "../../assets/img/addCategory.svg";
 import postImgIcon from "../../assets/img/postImgIcon.svg";
 import closeIcon from "../../assets/img/close.svg";
+import { RouterFunction } from "../../router/Router";
 
 export function RenderPostPage() {
   const rootContainer = document.querySelector(".root");
@@ -218,6 +219,8 @@ async function sendPostData(title, content, categories, image) {
     if (response.ok) {
       const data = await response.json();
       console.log("Server response:", data);
+      window.location.href = "#/home";
+      RouterFunction();
     } else {
       console.error("Server error:", response.statusText);
     }

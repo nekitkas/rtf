@@ -2,9 +2,10 @@ package server
 
 import (
 	"context"
-	"fmt"
+	"forum/server/pkg/jwttoken"
 	"github.com/google/uuid"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -72,15 +73,10 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Parse the token
-		claims, err := parseToken(cookie.Value)
+		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
+		claims, err := alg.DecodeAndValidate(cookie.Value)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
-			return
-		}
-
-		// Check if the token is expired
-		if time.Now().Unix() > claims.Exp {
-			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("expired token"))
 			return
 		}
 

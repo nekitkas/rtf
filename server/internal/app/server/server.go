@@ -1,12 +1,13 @@
 package server
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"forum/server/pkg/jwttoken"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"forum/server/internal/models"
@@ -17,11 +18,10 @@ import (
 
 const (
 	sessionName     = "session"
+	jwtKey          = "JWT_KEY"
 	ctxKeyRequestID = iota
 	ctxUserID
 )
-
-type ctxKey int8
 
 type server struct {
 	websocket *websocket.WebSocket
@@ -55,6 +55,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
+
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
@@ -63,7 +64,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
@@ -113,19 +114,13 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		claims, err := parseToken(cookie.Value)
+		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
+		err = alg.Validate(cookie.Value)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
 
-		// Check if the token is expired
-		if time.Now().Unix() > claims.Exp {
-			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("expired token"))
-			return
-		}
-
-		// In the future we can send userID from claims as respond
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }
@@ -144,7 +139,6 @@ func (s *server) handleLogOut() http.HandlerFunc {
 		}
 
 		http.SetCookie(w, &deletedCookie)
-		// In the future we can send userID from claims as respond
 
 		s.respond(w, r, http.StatusOK, nil)
 	}
@@ -164,20 +158,15 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 		}
 
 		user, err := s.store.User().Check(requestBody.Email)
-
-		// if there is no user like we got from resp body
-		if err == sql.ErrNoRows {
-			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
-			return
-		}
-
 		if err != nil || !user.ComparePassword(requestBody.Password) {
 			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
 			return
 		}
 
 		expiration := time.Now().Add(5 * time.Hour)
-		token, err := s.generateToken(user.ID, expiration)
+		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
+		claims := jwttoken.NewClaims(user.ID, expiration.Unix())
+		token, err := alg.Encode(claims)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
@@ -422,11 +411,6 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		//EXAMPLE OF USAGE
-		// userID := r.Context().Value(ctxUserID).(string)
-		//
-		//fmt.Println("USER ID", userID)
-
 		req := &requestBody{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -484,6 +468,8 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
+		fmt.Println(*request)
+
 		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -498,6 +484,8 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			}
 			posts[i].CommentCount = commentCount
 		}
+
+		fmt.Println(posts)
 
 		s.respond(w, r, http.StatusOK, posts)
 	}

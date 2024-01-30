@@ -97,9 +97,4 @@ logoutBtn.addEventListener("click", () => {
 });
 
 
-
-
-
-
-
 }
