@@ -4,7 +4,7 @@ import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
 import { RouterFunction } from "../../router/Router.js"
 
 import { RenderRegisterForm } from "../../components/Auth/Register.js"
-import { CONTAINER, ROOT } from '../../index.js'
+import { CONTAINER, ROOT } from "../../index.js"
 
 export async function RenderRegisterPage() {
   try {
@@ -12,89 +12,19 @@ export async function RenderRegisterPage() {
     console.log(isUserLogged)
 
     if (isUserLogged) {
-      window.location.href = "#/home"
+      window.location.href = "/"
       RouterFunction()
     } else {
-      // const mainContainer = document.querySelector(".root")
-      // mainContainer.innerHTML = ""
-
-
+      CONTAINER.innerHTML = ""
       Auth.innerHTML = ""
       NavbarNotLogged()
-
-//       const main = document.createElement("main")
-//       main.className = "main"
-//       main.innerHTML = `
-// <div class="container">
-//   <div class="auth">
-//     <form type="submit" action="/register" class="form" method="POST">
-//       <h1 class="auth-title">REGISTER</h1>
-//       <label>EMAIL</label>
-//       <input type="email" placeholder="Email address" name="email" required />
-//       <label>USERNAME</label>
-//       <input type="text" placeholder="Username" name="username" minlength="3" required />
-
-//       <div class="fullName">
-
-//         <div>
-//           <label>FIRST NAME</label>
-//           <input type="text" placeholder="First name" name="first_name" minlength="3" required />
-
-//         </div>
-
-//         <div>
-//           <label>LAST NAME</label>
-//           <input type="text" placeholder="Last name" name="last_name" minlength="3" required />
-
-//         </div>
-
-//       </div>
-
-//       <label>GENDER</label>
-//       <div>
-//         <select id="gender" name="gender">
-//           <option value="male" selected>MALE</option>
-//           <option value="female">FEMALE</option>
-//           <option value="diverse">DIVERSE</option>
-//         </select>
-//       </div>
-
-//       <label>DATE OF BIRTH</label>
-//       <input type="date" name="date_of_birth" required />
-
-//       <label>PASSWORD</label>
-//       <input type="password" name="password" placeholder="********" minlength="8" maxlength="32" required />
-
-//       <label>CONFIRM PASSWORD</label>
-//       <input type="password" name="confirm_password" placeholder="********" minlength="8" maxlength="32" required />
-//       <div class="errorMsg"></div>
-//       <button type="submit">REGISTER</button>
-//       <p>
-//         Already have an account? <a href="/./src/templates/login.html">sign-in</a>
-//       </p>
-
-//     </form>
-//   </div>
-// </div>
-// `
-
-//       mainContainer.appendChild(main)
-
-
       const RegisterForm = RenderRegisterForm()
 
       Auth.appendChild(RegisterForm)
 
-
-
-      
       CONTAINER.appendChild(Auth)
 
       ROOT.appendChild(CONTAINER)
-
-
-
-
 
       const errorMsg = document.querySelector(".errorMsg")
 

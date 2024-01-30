@@ -12,10 +12,10 @@ window.addEventListener("DOMContentLoaded", () => {
   RouterFunction()
 })
 
-window.addEventListener("hashchange", () => {
-  console.log("hashchange")
-  RouterFunction()
-})
+// window.addEventListener("hashchange", () => {
+//   console.log("hashchange")
+//   RouterFunction()
+// })
 
 // Handle link clicks to prevent default navigation
 document.addEventListener("click", (e) => {

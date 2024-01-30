@@ -1,23 +1,23 @@
-import "../../styles/navbar.css";
+import "../../styles/navbar.css"
 
-import plusSvg from "../../assets/img/plus.svg";
-import avatar from "../../assets/img/avatar.svg.png";
-import arrowSvg from "../../assets/img/arrow.svg";
-import messageButtonImage from "../../assets/img/message.svg";
-import modalProfile from "../../assets/img/modalProfile.svg";
-import logout from "../../assets/img/logout.svg";
-import { RouterFunction } from "../../router/Router";
-import { Logout } from "../../helpers/ServerRequests";
+import plusSvg from "../../assets/img/plus.svg"
+import avatar from "../../assets/img/avatar.svg.png"
+import arrowSvg from "../../assets/img/arrow.svg"
+import messageButtonImage from "../../assets/img/message.svg"
+import modalProfile from "../../assets/img/modalProfile.svg"
+import logout from "../../assets/img/logout.svg"
+import { RouterFunction } from "../../router/Router"
+import { Logout } from "../../helpers/ServerRequests"
 
 export function NavbarLogged() {
-  const currentUrl = window.location.href;
+  const currentUrl = window.location.href
 
-  const mainContainer = document.querySelector(".root");
+  const mainContainer = document.querySelector(".root")
   if (currentUrl.includes("create-post")) {
     mainContainer.innerHTML = `
     <nav class="navbar-post">
     <div class="nav-start">
-      <a href="#/home"><h1 class="logo">VOYAGE</h1></a>
+      <a href="/"><h1 class="logo">VOYAGE</h1></a>
     </div>
     <div class="user-block">
     <div class="message-button">
@@ -35,12 +35,12 @@ export function NavbarLogged() {
       </div>
       </div>
     </div>
-  </nav>`;
+  </nav>`
   } else {
     mainContainer.innerHTML = `
     <nav class="navbar-post">
     <div class="nav-start">
-      <a href="#/home"><h1 class="logo">VOYAGE</h1></a>
+      <a href="/"><h1 class="logo">VOYAGE</h1></a>
     </div>
     <div class="user-block">
     <div class="message-button">
@@ -63,38 +63,32 @@ export function NavbarLogged() {
       </div>
       </div>
     </div>
-  </nav>`;
+  </nav>`
   }
 
-  const userProfile = document.querySelector(".userprofile-modal");
-  const userBlock = document.querySelector(".user-profile");
-  userBlock.addEventListener("click", displayUserModal);
-  const modalArrow = document.querySelector(".modal-arrow");
+  const userProfile = document.querySelector(".userprofile-modal")
+  const userBlock = document.querySelector(".user-profile")
+  userBlock.addEventListener("click", displayUserModal)
+  const modalArrow = document.querySelector(".modal-arrow")
 
   function displayUserModal() {
-
-    userProfile.classList.toggle("showModal");
-    modalArrow.classList.toggle("show-modal-arrow");
+    userProfile.classList.toggle("showModal")
+    modalArrow.classList.toggle("show-modal-arrow")
   }
 
-
-  const UserprofileLink = document.querySelector(".UserprofileLink");
-  if(UserprofileLink) {
+  const UserprofileLink = document.querySelector(".UserprofileLink")
+  if (UserprofileLink) {
     UserprofileLink.addEventListener("click", () => {
-
-      window.location.href = "#/profile";
-      RouterFunction();
-    });
+      window.location.href = "/profile"
+      RouterFunction()
+    })
   }
 
+  const logoutBtn = document.querySelector(".logoutBtn")
+  logoutBtn.addEventListener("click", () => {
+    Logout()
 
-const logoutBtn = document.querySelector(".logoutBtn");
-logoutBtn.addEventListener("click", () => {
-  Logout()
-
-  window.location.href = "#/login";
-  RouterFunction();
-});
-
-
+    window.location.href = "/login"
+    RouterFunction()
+  })
 }

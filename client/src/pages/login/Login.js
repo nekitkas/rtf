@@ -12,7 +12,7 @@ export async function RenderLoginPage() {
     console.log(isUserLogged)
 
     if (isUserLogged) {
-      window.location.href = "#/home"
+      window.location.href = "/"
       RouterFunction()
     } else {
       ROOT.innerHTML = ""
