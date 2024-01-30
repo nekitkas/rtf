@@ -12,8 +12,7 @@ import (
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
-
-	"github.com/gorilla/websocket"
+	"forum/server/pkg/websocket"
 )
 
 const (
@@ -22,24 +21,21 @@ const (
 	ctxUserID
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
 type ctxKey int8
 
 type server struct {
-	router *router.Router
-	logger *log.Logger
-	store  store.Store
+	websocket *websocket.WebSocket
+	router    *router.Router
+	logger    *log.Logger
+	store     store.Store
 }
 
 func newServer(store store.Store) *server {
 	s := &server{
-		router: router.NewRouter(),
-		logger: log.Default(),
-		store:  store,
+		websocket: websocket.NewWebSocket(),
+		router:    router.NewRouter(),
+		logger:    log.Default(),
+		store:     store,
 	}
 
 	s.configureRouter()
@@ -59,7 +55,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
 	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
-	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
+	// s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
@@ -74,10 +70,10 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
+
+	s.router.HandleFunc("*", "/chat", s.wsHandler())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
-
-	s.router.HandleFunc("*", "/ws", s.wsHandler())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -85,31 +81,13 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) wsHandler() http.HandlerFunc {
+	type responseBody struct {
+		Resp string `json:"response"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Println("PARY")
 		rw := &responseWriter{w, http.StatusOK}
-		conn, err := upgrader.Upgrade(rw, r, nil)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		fmt.Println("Client connected")
-		defer conn.Close()
-
-		for {
-			messageType, message, err := conn.ReadMessage()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-
-			fmt.Println("Received message:", string(message))
-
-			err = conn.WriteMessage(messageType, message)
-			if err != nil {
-				log.Println(err)
-				return
-			}
+		if err := s.websocket.HandleWebSocket(rw, r); err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
 		}
 	}
 }

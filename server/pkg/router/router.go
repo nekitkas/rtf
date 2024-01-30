@@ -79,6 +79,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for i := len(r.middlewares) - 1; i >= 0; i-- {
 		notFoundWithMiddleware = r.middlewares[i].Middleware(notFoundWithMiddleware)
 	}
+
 	for _, route := range r.routes {
 		if route.method != method && route.method != "*" {
 			continue
