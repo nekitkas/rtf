@@ -2,8 +2,9 @@ package sqlstore
 
 import (
 	"fmt"
-	"forum/server/internal/models"
 	"time"
+
+	"forum/server/internal/models"
 
 	"github.com/google/uuid"
 )
@@ -13,7 +14,7 @@ type CommentRepository struct {
 }
 
 func (c *CommentRepository) Create(comment *models.Comment, userId string) error {
-	//Add other neccessary information for posts
+	// Add other neccessary information for posts
 	comment.ID = uuid.New().String()
 	comment.Timestamp = time.Now()
 	comment.UserID = userId
@@ -22,6 +23,42 @@ func (c *CommentRepository) Create(comment *models.Comment, userId string) error
 	_, err := c.store.Db.Exec(insertQuery, comment.ID, comment.UserID, comment.PostID, comment.ParentID, comment.Content, comment.Timestamp)
 	if err != nil {
 		return fmt.Errorf("Database SQL query error: %v", err)
+	}
+
+	return nil
+}
+
+func (c *CommentRepository) Delete(id string) error {
+	query := `WITH RECURSIVE CommentHierarchy AS (
+    -- Anchor member: Start with the comments to be deleted
+    SELECT id
+    FROM comment
+    WHERE id = ?
+    
+    UNION ALL
+    
+    -- Recursive member: Join with sub-comments
+    SELECT c.id
+    FROM comment c
+    JOIN CommentHierarchy ch ON c.parent_id = ch.id
+)
+DELETE FROM comment
+WHERE id IN (SELECT id FROM CommentHierarchy);
+`
+
+	if _, err := c.store.Db.Exec(query, id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *CommentRepository) DeleteAllUnderPost(post_id string) error {
+	query := `DELETE FROM comment WHERE post_id = ?;
+`
+
+	if _, err := c.store.Db.Exec(query, post_id); err != nil {
+		return err
 	}
 
 	return nil

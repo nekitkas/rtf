@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"forum/server/pkg/jwttoken"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"forum/server/pkg/jwttoken"
+
 	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/router"
+	"forum/server/pkg/websocket"
 )
 
 const (
@@ -23,16 +25,18 @@ const (
 )
 
 type server struct {
-	router *router.Router
-	logger *log.Logger
-	store  store.Store
+	websocket *websocket.WebSocket
+	router    *router.Router
+	logger    *log.Logger
+	store     store.Store
 }
 
 func newServer(store store.Store) *server {
 	s := &server{
-		router: router.NewRouter(),
-		logger: log.Default(),
-		store:  store,
+		websocket: websocket.NewWebSocket(),
+		router:    router.NewRouter(),
+		logger:    log.Default(),
+		store:     store,
 	}
 
 	s.configureRouter()
@@ -46,6 +50,8 @@ func (s *server) configureRouter() {
 	s.router.Use(s.logRequest)
 	s.router.Use(s.CORSMiddleware)
 
+	// s.router.UseWithPrefix("/private", s.authenticateUser)
+	// s.router.HandleFunc("GET", "/private/profile", s.handleProfile())
 	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
 	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
 	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
@@ -53,25 +59,46 @@ func (s *server) configureRouter() {
 
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
-
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
-	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
+	// -------------------- USER PATHS ------------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	// -------------------- CATEGORY PATHS --------------------------- //
+	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
+	// -------------------- POST PATHS ------------------------------- //
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/delete", s.handleRemovePost())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
+	// -------------------- COMMENT PATHS ---------------------------- //
+	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/comments/delete", s.handleRemoveComment())
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
+	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/remove", s.handleRemoveReaction())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
+
+	s.router.HandleFunc("GET", "jwt/chat/:user_id", s.wsHandler())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
+}
+
+func (s *server) wsHandler() http.HandlerFunc {
+	type responseBody struct {
+		Resp string `json:"response"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		rw := &responseWriter{w, http.StatusOK}
+		user_id := router.Param(r.Context(), "user_id")
+		if err := s.websocket.HandleWebSocket(rw, r, user_id); err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
+	}
 }
 
 // EXAMPLE OF DYNAMIC PATH
@@ -208,6 +235,7 @@ func (s *server) handleGetAllCategories() http.HandlerFunc {
 		categories, err := s.store.Category().GetAll()
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 		s.respond(w, r, http.StatusOK, categories)
 	}
@@ -250,6 +278,31 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleRemovePost() http.HandlerFunc {
+	type requestBody struct {
+		ID string `json:"post_id"`
+	}
+
+	type responseBody struct {
+		Response string `json:"response"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req requestBody
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		if err := s.store.Post().Delete(req.ID); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, responseBody{Response: "Successfully deleted"})
+	}
+}
+
 // }}}
 // -------------------------REACTION STUFF--------------------------//
 // {{{
@@ -270,10 +323,12 @@ func (s *server) handleRemoveReaction() http.HandlerFunc {
 		var req requestBody
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			return
 		}
 
 		if err := s.store.Reaction().RemoveFromParent(req.ParentID, req.ReactionID, userID); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			return
 		}
 
 		s.respond(w, r, http.StatusAccepted, responseBody{
@@ -287,6 +342,7 @@ func (s *server) handleGetReactionsOptions() http.HandlerFunc {
 		reactions, err := s.store.Reaction().GetAll()
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
+			return
 		}
 
 		s.respond(w, r, http.StatusFound, reactions)
@@ -308,6 +364,7 @@ func (s *server) handleGetReactionsByParentID() http.HandlerFunc {
 		reactions, err := s.store.Reaction().GetByParentID(req.ParentID)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
+			return
 		}
 
 		s.respond(w, r, http.StatusFound, reactions)
@@ -331,6 +388,7 @@ func (s *server) handleGetUserReactions() http.HandlerFunc {
 		reactions, err := s.store.Reaction().GetByUserParentID(req.ParentID, userID)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
+			return
 		}
 
 		s.respond(w, r, http.StatusFound, reactions)
@@ -360,6 +418,7 @@ func (s *server) handleAddReactionsToParent() http.HandlerFunc {
 		err := s.store.Reaction().AddToParent(req.ParentID, req.ReactionID, userID)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
+			return
 		}
 
 		s.respond(w, r, http.StatusCreated, responseBody{
@@ -399,11 +458,13 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 		post, err := s.store.Post().Get(req.Post)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			return
 		}
 
 		comments, err := s.store.Comment().Get(post.ID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			return
 		}
 
 		categories, err := s.store.Category().GetForPost(post.ID)
@@ -416,6 +477,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 			reaction, err := s.store.Reaction().GetByParentID(comment.ID)
 			if err != nil {
 				s.error(w, r, http.StatusBadRequest, err)
+				return
 			}
 
 			commentBody.Comment = comment
@@ -502,8 +564,34 @@ func (s *server) handleCommentCreation() http.HandlerFunc {
 		err := s.store.Comment().Create(c, userID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			return
 		}
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfully created comment`))
+	}
+}
+
+func (s *server) handleRemoveComment() http.HandlerFunc {
+	type RequestBody struct {
+		ID string `json:"id"`
+	}
+
+	type responseBody struct {
+		Response string `json:"response"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RequestBody
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		if err := s.store.Comment().Delete(req.ID); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, responseBody{Response: "Successfully deleted"})
 	}
 }
 
