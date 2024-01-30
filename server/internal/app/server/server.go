@@ -4,16 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"forum/server/pkg/jwttoken"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"forum/server/pkg/jwttoken"
-
 	"forum/server/internal/models"
 	"forum/server/internal/store"
+	"forum/server/pkg/jwttoken"
 	"forum/server/pkg/router"
 	"forum/server/pkg/websocket"
 )
@@ -61,6 +59,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	// -------------------- USER PATHS ------------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
@@ -88,9 +87,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) wsHandler() http.HandlerFunc {
-	type responseBody struct {
-		Resp string `json:"response"`
-	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
 		user_id := router.Param(r.Context(), "user_id")
@@ -209,7 +205,7 @@ func (s *server) handleUsersGetByID() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleUsersDeleteByID() http.HandlerFunc {
+func (s *server) handleUsersDelete() http.HandlerFunc {
 	type request struct {
 		UserID string `json:"user_id"`
 	}
@@ -530,8 +526,6 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
-		fmt.Println(*request)
-
 		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
@@ -546,8 +540,6 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			}
 			posts[i].CommentCount = commentCount
 		}
-
-		fmt.Println(posts)
 
 		s.respond(w, r, http.StatusOK, posts)
 	}
