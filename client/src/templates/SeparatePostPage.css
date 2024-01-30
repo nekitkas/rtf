@@ -213,7 +213,7 @@
 /* .post-feed {post
 } */
 
-.post {
+.pagePost {
   width: 100%;
   max-width: 800px;
   border-radius: 10px;
@@ -318,16 +318,15 @@ margin-bottom: 5px;
   width: 100%;
   max-width: 800px;
   border-radius: 10px;
-  background-color: var(--background-secondory);
+  background-color: transparent;
   padding: 20px;
   color: rgba(255, 255, 255, 0.745);
   margin-bottom: 20px;
-  border: 1px solid var(--border-color);
   margin-bottom: 5rem;
   padding: 10px;
   display: flex;
-  align-items: center;
-  justify-content: space-around;
+  justify-content:flex-start;
+  flex-direction: column;
 }
 
 .createCommentContainer textarea{
@@ -337,6 +336,7 @@ margin-bottom: 5px;
   padding: 10px;
   width: 70%;
   color: var(--text-color);
+  margin-bottom: 20px;
 }
 
 
@@ -354,7 +354,79 @@ margin-bottom: 5px;
   border-radius: 20px;
   font-size: 16px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out ;
+  padding: 0;
+}
+
+
+.createCommentContainer button:hover{
+  background-color: #7fb55a;
+}
+
+
+.commentsContainer{
+  width: 100%;
+  max-width: 800px;
+  border-radius: 10px;
+  background-color: transparent;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.745);
+
+  margin-bottom: 5rem;
+
+  display: flex;
+
+  justify-content:flex-start;
+  flex-direction: column;
+  padding-right: 60px;
+}
+
+.comment {
+  position: relative;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background-color: #242424;
+  margin-bottom: 2rem;
 }
 
 
 
+.commentCreateTime{
+  display: flex;
+  justify-content: flex-end;
+  font-size: 12px;
+  margin-bottom: 4px;
+
+}
+.commentTextBlock{
+  padding:7px;
+}
+
+.comment-author{
+  display: flex;
+  justify-content: flex-end;
+  font-size: 13px;
+  color: var(--primary-color);
+}
+.message {
+  position: relative;
+  display: inline-block; /* Ensure it behaves like an inline block */
+  cursor: pointer;
+
+}
+
+.message::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 51px solid transparent;
+	border-top-color: #00aabb;
+	border-bottom: 0;
+	border-left: 0;
+	margin-left: -25.5px;
+	margin-bottom: -51px;
+}
