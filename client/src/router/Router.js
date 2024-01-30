@@ -6,7 +6,6 @@ import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
 import { RenderRegisterPage } from "../pages/register/Register.js"
 
 export const RouterFunction = async () => {
-  const path2 = window.location.hash.slice(1)
   const path = location.pathname
 
   console.log("Current Path:", path)

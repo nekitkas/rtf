@@ -14,7 +14,6 @@ module.exports = {
     compress: true,
     hot: true,
     historyApiFallback: true,
-
     static: {
       directory: path.join(__dirname, "dist"),
     },

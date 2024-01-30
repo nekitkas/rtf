@@ -5,9 +5,12 @@ export function RenderMessenger() {
   const chatHeader = document.createElement("div")
   chatHeader.classList.add("chat-header")
 
+  const userChatInfo = document.createElement("div")
+  userChatInfo.classList.add("user-chat-info")
+
   const userImage = document.createElement("img")
   userImage.src =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwme89cM8YZvHcybGrZl_Obd9U9p5QabozJQ&usqp=CAU"
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwme89cM8YZvHcybGrZl_Obd9U9p5QabozJQ&usqp=CAU"
   userImage.alt = "chat-user"
 
   const userName = document.createElement("p")
@@ -17,8 +20,11 @@ export function RenderMessenger() {
   closeIcon.src = "/assets/close.svg"
   closeIcon.alt = "close"
 
-  chatHeader.appendChild(userImage)
-  chatHeader.appendChild(userName)
+  userChatInfo.appendChild(userImage)
+  userChatInfo.appendChild(userName)
+
+  chatHeader.appendChild(userChatInfo)
+
   chatHeader.appendChild(closeIcon)
 
   const chatBody = document.createElement("div")
@@ -101,19 +107,30 @@ export function RenderMessenger() {
     chatBody.appendChild(msgDiv)
   })
 
-  const chatFooter = document.createElement("div")
-  chatFooter.classList.add("chat-footer")
+  const chatFooter = document.createElement("div");
+  chatFooter.className = "chat-footer";
 
-  const inputField = document.createElement("input")
-  inputField.type = "text"
-  inputField.placeholder = "Aa"
+// Create form for message input
+  const messageForm = document.createElement("form");
 
-  const sendIcon = document.createElement("img")
-  sendIcon.src = "./assets/send.svg"
-  sendIcon.alt = "send"
+// Create message input
+  const messageInput = document.createElement("input");
+  messageInput.type = "text";
+  messageInput.placeholder = "Aa";
+  messageInput.id = "message";
 
-  chatFooter.appendChild(inputField)
-  chatFooter.appendChild(sendIcon)
+// Create send button
+  const sendButton = document.createElement("input");
+  sendButton.type = "image";
+  sendButton.src = "/assets/send.svg";
+  sendButton.name = "submit";
+  sendButton.alt = "submit";
+  sendButton.className = "form-img-submit";
+
+  messageForm.appendChild(messageInput);
+  messageForm.appendChild(sendButton);
+
+  chatFooter.appendChild(messageForm);
 
   messenger.appendChild(chatHeader)
   messenger.appendChild(chatBody)

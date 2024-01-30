@@ -46,7 +46,7 @@ export function NavbarLogged() {
     <div class="message-button">
       <img src="${messageButtonImage}" alt="message-button">
     </div>
-    <a href="#/create-post">
+    <a href="/create-post">
     <div class="create-post-button">
        <img src="${plusSvg}" alt="create-post-button"></img>
     </div>
