@@ -67,7 +67,7 @@ const  RenderNavbar =  async (userInfo) => {
       <img class="user-avatar" src=${avatar} alt="profile">
 
       <div class="user-profile-selector">
-        <p>${userInfo.first_name} ${userInfo.last_name}</p>
+        <p>${userInfo.username}</p>
         <img class="modal-arrow"  src="${arrowSvg}" alt="arrow">
         <div class="userprofile-modal">
         <div class = "modal-div"><p class="UserprofileLink">My profile</p><img src="${modalProfile}" class="modal-icon" alt="profile"></img></div>

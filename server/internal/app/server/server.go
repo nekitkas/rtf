@@ -58,7 +58,7 @@ func (s *server) configureRouter() {
 
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	// -------------------- USER PATHS ------------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("POST", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
