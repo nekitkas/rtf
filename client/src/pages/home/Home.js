@@ -3,26 +3,42 @@ import "../../styles/style.css"
 import "../../styles/post.css"
 import "../../styles/messenger.css"
 import "../../styles/chat.css"
+import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
 import { RenderMessenger } from "../../components/Messenger"
-import { GetPosts, SinglePostRequest } from "../../helpers/ServerRequests.js"
+import {GetAllUsers, GetPosts, SinglePostRequest} from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
 import { RouterFunction } from "../../router/Router.js"
+import {UserList} from "../../components/UserList";
 
 const Messenger = RenderMessenger({id: "user1"})
+
+const usersContainer = document.createElement("div")
+usersContainer.className = "users-container"
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
+
+  usersContainer.innerHTML = ""
   await NavbarLogged()
 
   const PostFeed = RenderPostFeed()
   console.log(Socket)
   ROOT.append(CONTAINER)
 
+
+
+
   fetchData(PostFeed)
+
+  fetchUsers(usersContainer)
+
+
+
+
 
   const Filter = RenderFilter()
 
@@ -74,6 +90,22 @@ async function fetchData(PostFeed) {
     }
   } catch (error) {
     // Handle errors that occurred during the fetch
+    console.error("Error during fetch:", error)
+  }
+}
+
+
+
+async function fetchUsers(usersContainer){
+  try{
+    const usersData = await GetAllUsers()
+    if(usersData){
+      usersContainer.appendChild(UserList(usersData))
+
+
+      CONTAINER.appendChild(usersContainer)
+    }
+  }catch(error){
     console.error("Error during fetch:", error)
   }
 }
