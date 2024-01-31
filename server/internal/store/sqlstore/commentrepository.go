@@ -34,9 +34,9 @@ func (c *CommentRepository) Delete(id string) error {
     SELECT id
     FROM comment
     WHERE id = ?
-    
+
     UNION ALL
-    
+
     -- Recursive member: Join with sub-comments
     SELECT c.id
     FROM comment c
@@ -78,10 +78,10 @@ func (c *CommentRepository) Get(id string) (*[]models.Comment, error) {
 		FROM
 			comment c
 		WHERE
-			c.post_id = ? AND c.parent_id IS NULL OR c.parent_id = ''
-	
+			c.post_id = ? AND (c.parent_id IS NULL OR c.parent_id = '')
+
 		UNION ALL
-	
+
 		-- Recursive member: Join with sub-comments
 		SELECT
 			c.id,

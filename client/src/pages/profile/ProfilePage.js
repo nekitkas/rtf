@@ -1,59 +1,29 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged";
-import "../../styles/profile.css";
+import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
+import "../../styles/profile.css"
 
+import { RenderProfile, profileContainer } from "../../components/Profile.js"
 
-export function RenderProfilePage(){
-    const rootContainer = document.querySelector(".root");
-    rootContainer.innerHTML= ""
-    NavbarLogged()
+import { ROOT, CONTAINER } from "../../index.js"
 
+const userInfo = [
+  "John",
+  "Doe",
+  "test1",
+  "test1@gmail.com",
+  "Male",
+  "01.10.2001",
+]
 
-    const Container = document.createElement("div")
-    const PostFeed = document.createElement("div")
-   PostFeed.classList.add("post-feed")
+export async function RenderProfilePage() {
+  ROOT.innerHTML = ""
+  CONTAINER.innerHTML = ""
+  profileContainer.innerHTML = ""
 
-   Container.classList.add("container")
-   rootContainer.append(Container)
+  await NavbarLogged()
 
-   const ProfileContainer = document.createElement("div")
-   ProfileContainer.classList.add("profile-container")
-   Container.appendChild(ProfileContainer)
-   ProfileContainer.innerHTML = `
-   <div class="avatarBlock">
-   <div class="imgBlock">
-       <img class="userAvatar" src="assets/avatar.svg.png" alt="">
+  const Profile = RenderProfile(userInfo)
 
+  CONTAINER.appendChild(Profile)
 
-   </div>
-   <div class="changeAvatarDiv">
-       <button class="changeAvatarBtn">Change Avatar</button>
-   </div>
-</div>
-   <div class="infoBlock">
-       <div class="userTextBlock">
-           <div class="name">
-               <h2>John</h2>
-           </div>
-           <div class="name">
-               <h2>Doe</h2>
-           </div>
-           <div class="name">
-               <h2>test1</h2>
-           </div>
-           <div class="name">
-               <h2>test1@gmail.com</h2>
-           </div>
-           <div class="name">
-               <h2>Male</h2>
-           </div>
-           <div class="name">
-               <h2>01.10.2001</h2>
-           </div>
-       </div>
-
-       <div class="emailBlock">
-
-       </div>
-   </div>
-   `
+  ROOT.appendChild(CONTAINER)
 }

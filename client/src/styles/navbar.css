@@ -122,7 +122,7 @@
   margin-left: 20px;
   border-radius: 10px;
   position: relative;
-
+  justify-content: space-between;
 }
 
 .user-profile:hover{
@@ -184,12 +184,15 @@
   display: flex;
   font-size: 14px;
   color: white;
+  justify-content: space-between;
+  align-items: center;
 }
 .user-profile-selector p {
   text-wrap: nowrap;
   color: rgba(255, 255, 255, 0.772);
   margin-left: 10px;
   font-weight: 700;
+  margin-right: 10px;
 }
 
 .user-profile-selector img {

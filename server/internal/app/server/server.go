@@ -58,15 +58,15 @@ func (s *server) configureRouter() {
 
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	// -------------------- USER PATHS ------------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("POST", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/delete", s.handleRemovePost())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete", s.handleRemovePost())
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
 	// -------------------- COMMENT PATHS ---------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/delete", s.handleRemoveComment())
@@ -518,6 +518,15 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 		Time  time.Time `json:"page_open_time_stamp"`
 	}
 
+	type PostAndCategories struct {
+		Post models.Post `json:"post"`
+		Categories []models.Category `json:"categories"`
+	}
+
+	type responseBody struct {
+		Posts []PostAndCategories `json:"posts"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get index from body
 		request := &requestBody{}
@@ -531,7 +540,7 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-
+		var postArray []PostAndCategories
 		for i, post := range posts {
 			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
 			if err != nil {
@@ -539,9 +548,21 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 				return
 			}
 			posts[i].CommentCount = commentCount
+			cat, err := s.store.Category().GetForPost(post.ID)
+			postArray = append(postArray, PostAndCategories{
+				Post: post,
+				Categories: *cat,
+			})
 		}
 
-		s.respond(w, r, http.StatusOK, posts)
+		response := responseBody{
+			Posts: postArray,
+		}
+
+
+		// fmt.Println(response)
+
+		s.respond(w, r, http.StatusOK, response)
 	}
 }
 

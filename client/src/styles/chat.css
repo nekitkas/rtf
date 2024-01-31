@@ -1,5 +1,5 @@
 .messenger {
-  width: 300px;
+  width: 330px;
   position: fixed;
   bottom: 0;
   right: 15%;
@@ -12,7 +12,6 @@
   color: rgba(255, 255, 255, 0.745);
   border: 1px solid var(--border-color);
 }
-
 .chat-header {
   display: flex;
   justify-content: space-between;
@@ -22,7 +21,7 @@
   padding: 4px;
 }
 
-.chat-header img {
+.chat-header img{
   width: 36px;
   height: 36px;
   border-radius: 100%;
@@ -30,8 +29,20 @@
   cursor: pointer;
 }
 
+.chat-header img:first-child{
+  margin-right: 10px;
+}
+
+.chat-header p {
+  font-size: 14px;
+}
+
 .chat-header img:hover {
   background-color: #303030;
+}
+
+.user-chat-info {
+  display: flex;
 }
 
 .chat-body {
@@ -47,22 +58,31 @@
   display: none;
 }
 
-.chat-footer {
+
+
+
+
+.chat-footer form {
   padding: 10px;
   display: flex;
   align-items: center;
+  width: 100%;
+  flex-direction: row;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+
 }
 
-.chat-footer input {
+.chat-footer form input {
   padding: 6px;
   width: 100%;
   border-radius: 10px;
   background-color: #303030;
   color: white;
-  border: 1px solid var(--border-color);
 }
 
-.chat-footer img {
+.chat-footer form .form-img-submit {
   width: 32px;
   height: 32px;
   padding: 4px;
@@ -88,7 +108,7 @@
   padding: 8px 12px;
   max-width: 240px;
   border-radius: 10px;
-  background-color: #648228;
+  background-color: var(--primary-color);
   margin-left: auto; /* This will push it to the right */
   height: auto;
   text-wrap: wrap;

@@ -1,76 +1,65 @@
-import { CheckUserLoggedIn } from "../helpers/ServerRequests.js";
-import { RenderHomePage } from "../pages/home/Home.js";
-import { RenderLoginPage } from "../pages/login/Login.js";
-import { RenderPostPage } from "../pages/post/PostPage.js";
-import { RenderProfilePage } from "../pages/profile/ProfilePage.js";
-import { RenderRegisterPage } from "../pages/register/Register.js";
+import { CheckUserLoggedIn } from "../helpers/ServerRequests.js"
+import { RenderHomePage } from "../pages/home/Home.js"
+import { RenderLoginPage } from "../pages/login/Login.js"
+import { RenderPostPage } from "../pages/cratePost/CreatePostPage.js"
+import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
+import { RenderRegisterPage } from "../pages/register/Register.js"
+import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
 
 export const RouterFunction = async () => {
-  const path = window.location.hash.slice(1);
-  console.log("Current Path:", path);
+  const path = location.pathname
+
+  console.log("Current Path:", path)
 
   if (path.startsWith("/post/")) {
-    const postId = path.split("/")[2];
-    console.log("Rendering Post Page for Post ID:", postId);
-    RenderPostPage(postId);
+    const postId = path.split("/")[2]
+    console.log("Rendering Post Page for Post ID:", postId)
+    RenderSeparatePostPage(postId)
   } else {
     try {
-      const userLoggedIn = await CheckUserLoggedIn();
+      const userLoggedIn = await CheckUserLoggedIn()
 
       switch (path) {
-        case "/home":
+        case "/":
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page");
-            RenderLoginPage();
-            return;
+            RenderLoginPage()
+            return
           }
-          console.log("Rendering Home Page");
-          RenderHomePage();
-          break;
+          RenderHomePage()
+          break
         case "/login":
-          console.log("Rendering Login Page");
-          RenderLoginPage();
-          break;
+          RenderLoginPage()
+          break
         case "/register":
-          console.log("Rendering Register Page");
-          RenderRegisterPage();
-          break;
+          RenderRegisterPage()
+          break
         case "/create-post":
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page");
-            RenderLoginPage();
-            return;
+            RenderLoginPage()
+            return
           }
-          console.log("Rendering Post Page");
-          RenderPostPage();
-          break;
+          RenderPostPage()
+          break
         case "/profile":
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page");
-            RenderLoginPage();
-            return;
+            RenderLoginPage()
+            return
           }
 
-          RenderProfilePage();
-          break;
+          RenderProfilePage()
+          break
         default:
           if (!userLoggedIn) {
-            // If the user is not authenticated, redirect to the Login Page
-            console.log("User not logged in, redirecting to Login Page");
-            RenderLoginPage();
-            return;
+            RenderLoginPage()
+            return
           }
-          console.log("Unknown Path, Rendering Home Page");
-          RenderHomePage();
+          RenderHomePage()
       }
     } catch (error) {
-      console.error("Error checking user login:", error);
+      console.error("Error checking user login:", error)
     }
   }
-};
+}
 
 // try {
 //   const userCookie = getCookie("session");
