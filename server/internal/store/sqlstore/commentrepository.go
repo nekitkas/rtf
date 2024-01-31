@@ -2,8 +2,9 @@ package sqlstore
 
 import (
 	"fmt"
-	"forum/server/internal/models"
 	"time"
+
+	"forum/server/internal/models"
 
 	"github.com/google/uuid"
 )
@@ -13,7 +14,7 @@ type CommentRepository struct {
 }
 
 func (c *CommentRepository) Create(comment *models.Comment, userId string) error {
-	//Add other neccessary information for posts
+	// Add other neccessary information for posts
 	comment.ID = uuid.New().String()
 	comment.Timestamp = time.Now()
 	comment.UserID = userId
@@ -41,7 +42,7 @@ func (c *CommentRepository) Get(id string) (*[]models.Comment, error) {
 		FROM
 			comment c
 		WHERE
-			c.post_id = ? AND c.parent_id IS NULL OR c.parent_id = ''
+			c.post_id = ? AND (c.parent_id IS NULL OR c.parent_id = '')
 	
 		UNION ALL
 	
