@@ -34,7 +34,6 @@ usersContainer.className = "users-container"
 
 // const Messenger = RenderMessenger("user1")
 
-const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl")
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
@@ -42,7 +41,8 @@ export async function RenderHomePage() {
 
   usersContainer.innerHTML = ""
   await NavbarLogged()
-
+  
+  const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()
   console.log(Socket)
   ROOT.append(CONTAINER)
@@ -55,7 +55,7 @@ export async function RenderHomePage() {
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
-  ROOT.appendChild(Chats.Create())
+  Chats.Create()
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
