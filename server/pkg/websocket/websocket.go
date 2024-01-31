@@ -62,7 +62,7 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 			Message string `json:"message"`
 			ToUser  string `json:"to_user"`
 		}
-		// fmt.Println(ws.clients)
+
 		// Process the received message (e.g., broadcast to other users)
 		var data ClientMessage
 		err = json.Unmarshal(p, &data)
@@ -70,11 +70,20 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 			fmt.Println("JSON ERROR:", err)
 		}
 
+		type response struct{
+			Message string `json:"message"`
+			FromUser string `json:"from_user"`
+		}
+
 		toUserConn := getKeyByValue(ws.clients, data.ToUser)
 		if toUserConn == nil {
 			fmt.Println("That user is not connected with WS")
 		} else{
-			ws.sendToUser(messageType, []byte(data.Message), toUserConn)
+			jsonBytes, err := json.Marshal(response{Message: data.Message, FromUser: ws.clients[conn]})
+			if err != nil {
+				fmt.Println("JSON Marshal error!", err)
+			}
+			ws.sendToUser(messageType, []byte(jsonBytes), toUserConn)
 		}
 	}
 }

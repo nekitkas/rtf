@@ -1,4 +1,6 @@
-export function RenderMessenger() {
+import { Socket } from ".."
+
+export function RenderMessenger(user) {
   const messenger = document.createElement("div")
   messenger.classList.add("messenger")
 
@@ -113,6 +115,7 @@ export function RenderMessenger() {
 // Create form for message input
   const messageForm = document.createElement("form");
 
+
 // Create message input
   const messageInput = document.createElement("input");
   messageInput.type = "text";
@@ -126,6 +129,14 @@ export function RenderMessenger() {
   sendButton.name = "submit";
   sendButton.alt = "submit";
   sendButton.className = "form-img-submit";
+  sendButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    let messageToSend = {
+      "message": messageInput.value,
+      "to_user": user.id,
+    }
+    sendMessage(JSON.stringify(messageToSend))
+  })
 
   messageForm.appendChild(messageInput);
   messageForm.appendChild(sendButton);
@@ -140,3 +151,11 @@ export function RenderMessenger() {
 }
 
 // Append the 'messenger' element to the document or any other container element in your HTML
+function sendMessage(message) {
+  if (Socket.readyState === WebSocket.OPEN) {
+    Socket.send(message);
+    // console.log('Message sent:', message);
+  } else {
+    console.error('WebSocket connection not open. Cannot send message.');
+  }
+}

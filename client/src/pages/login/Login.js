@@ -2,7 +2,7 @@ import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import "../../styles/auth.css"
 import { RouterFunction } from "../../router/Router.js"
 import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
-
+import { initializeWebSocket } from "../../index.js"
 import { ROOT, CONTAINER } from "../../index.js"
 import { Auth, RenderLoginForm } from "../../components/Auth/Login.js"
 
@@ -66,10 +66,12 @@ export async function RenderLoginPage() {
               }
               throw new Error("Network response was not ok")
             }
+            return response.json()
           })
-          .then(() => {
+          .then((data) => {
+            console.log(data)
             // window.location.href = "/"
-
+            initializeWebSocket(data.id)
             window.history.pushState({}, "", "/")
             RouterFunction()
           })

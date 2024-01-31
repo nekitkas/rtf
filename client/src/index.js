@@ -6,6 +6,30 @@ const ROOT = document.querySelector(".root")
 const CONTAINER = document.createElement("div")
 CONTAINER.className = "container"
 
+let Socket
+
+export function initializeWebSocket(id) {
+  // Replace 'ws://example.com/socket' with your WebSocket server URL
+  Socket = new WebSocket('ws://localhost:8080/chat/'+id);
+
+  // WebSocket event listeners
+  Socket.addEventListener('open', (event) => {
+    console.log('WebSocket connection opened:', event);
+  });
+
+  Socket.addEventListener('message', (event) => {
+    console.log('Received message:', event.data);
+  });
+
+  Socket.addEventListener('close', (event) => {
+    console.log('WebSocket connection closed:', event);
+  });
+
+  Socket.addEventListener('error', (event) => {
+    console.error('WebSocket error:', event);
+  });
+}
+
 // Call the router initially and on every navigation
 window.addEventListener("DOMContentLoaded", async (e) => {
   e.preventDefault()
@@ -34,4 +58,4 @@ document.addEventListener("click", async (e) => {
   }
 })
 
-export { ROOT, CONTAINER }
+export { ROOT, CONTAINER, Socket }

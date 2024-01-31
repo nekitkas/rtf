@@ -77,7 +77,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 
-	s.router.HandleFunc("GET", "jwt/chat/:user_id", s.wsHandler())
+	s.router.HandleFunc("GET", "chat/:user_id", s.wsHandler())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
@@ -186,7 +186,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 		http.SetCookie(w, &cookie)
 
-		s.respond(w, r, http.StatusOK, nil)
+		s.respond(w, r, http.StatusOK, user)
 	}
 }
 

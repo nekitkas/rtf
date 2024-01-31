@@ -6,12 +6,12 @@ import "../../styles/chat.css"
 import { RenderPost } from "../../components/Post"
 import { RenderMessenger } from "../../components/Messenger"
 import { GetPosts, SinglePostRequest } from "../../helpers/ServerRequests.js"
-import { CONTAINER, ROOT } from "../../index.js"
+import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
 import { RouterFunction } from "../../router/Router.js"
 
-const Messenger = RenderMessenger()
+const Messenger = RenderMessenger({id: "user1"})
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
@@ -19,7 +19,7 @@ export async function RenderHomePage() {
   await NavbarLogged()
 
   const PostFeed = RenderPostFeed()
-
+  console.log(Socket)
   ROOT.append(CONTAINER)
 
   fetchData(PostFeed)
