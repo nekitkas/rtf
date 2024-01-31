@@ -43,7 +43,6 @@ export async function RenderHomePage() {
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
   ROOT.appendChild(Messenger)
-  ROOT.appendChild(Messenger3)
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
