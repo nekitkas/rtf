@@ -5,6 +5,7 @@ import { RenderPostPage } from "../pages/cratePost/CreatePostPage.js"
 import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
 import { RenderRegisterPage } from "../pages/register/Register.js"
 import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
+import { RenderNotFound } from "../pages/notfound/NotFound.js"
 
 export const RouterFunction = async () => {
   const path = location.pathname
@@ -53,7 +54,7 @@ export const RouterFunction = async () => {
             RenderLoginPage()
             return
           }
-          RenderHomePage()
+          RenderNotFound(path)
       }
     } catch (error) {
       console.error("Error checking user login:", error)

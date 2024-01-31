@@ -21,7 +21,7 @@ export async function RenderHomePage() {
 
   ROOT.append(CONTAINER)
 
-  // Call the fetchData function
+
   fetchData(PostFeed)
 
   const Filter = RenderFilter()
@@ -41,9 +41,9 @@ export async function RenderHomePage() {
       selectArrow.classList.toggle("select-arrow-rotate")
     }
   }
-
-
 }
+
+
 
 async function fetchData(PostFeed) {
   try {
