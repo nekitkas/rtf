@@ -1,3 +1,6 @@
+import { ROOT } from ".."
+import { Messenger } from "./Messenger"
+
 export function UserCard(data) {
   const { id, username, image_url } = data
 
@@ -13,6 +16,10 @@ export function UserCard(data) {
   const userName = document.createElement("p")
   userName.textContent = username
 
+  userComponent.addEventListener('click', () => {
+    const Chats = new Messenger("CURRUSERID", id, username, image_url, ROOT)
+    Chats.Create()
+  })
   // Append elements to the User component
   userComponent.appendChild(userImage)
   userComponent.appendChild(userName)

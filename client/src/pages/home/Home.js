@@ -42,7 +42,7 @@ export async function RenderHomePage() {
   usersContainer.innerHTML = ""
   await NavbarLogged()
   
-  const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
+  // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()
   console.log(Socket)
   ROOT.append(CONTAINER)
@@ -55,7 +55,6 @@ export async function RenderHomePage() {
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
-  Chats.Create()
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
