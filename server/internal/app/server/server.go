@@ -60,6 +60,7 @@ func (s *server) configureRouter() {
 	// -------------------- USER PATHS ------------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
+	s.router.HandleFunc("GET", "/api/v1/jwt/users/getAll", s.handleUsersGetAll())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
@@ -122,7 +123,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
-		//check if user exist
+		// check if user exist
 		_, err = s.store.User().FindByID(claims.UserID)
 		if err != nil {
 			deletedCookie := s.deleteCookie()
@@ -143,6 +144,20 @@ func (s *server) handleLogOut() http.HandlerFunc {
 		http.SetCookie(w, &deletedCookie)
 
 		s.respond(w, r, http.StatusOK, nil)
+	}
+}
+
+func (s *server) handleUsersGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(ctxUserID).(string)
+
+		data, err := s.store.User().GetAllOtherUsers(userID)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, data)
 	}
 }
 
@@ -519,7 +534,7 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 	}
 
 	type PostAndCategories struct {
-		Post models.Post `json:"post"`
+		Post       models.Post       `json:"post"`
 		Categories []models.Category `json:"categories"`
 	}
 
@@ -550,7 +565,7 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			posts[i].CommentCount = commentCount
 			cat, err := s.store.Category().GetForPost(post.ID)
 			postArray = append(postArray, PostAndCategories{
-				Post: post,
+				Post:       post,
 				Categories: *cat,
 			})
 		}
@@ -558,7 +573,6 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 		response := responseBody{
 			Posts: postArray,
 		}
-
 
 		// fmt.Println(response)
 

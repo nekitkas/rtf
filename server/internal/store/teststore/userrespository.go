@@ -2,6 +2,7 @@ package teststore
 
 import (
 	"errors"
+
 	"forum/server/internal/models"
 )
 
@@ -44,3 +45,4 @@ func (r *UserRepository) Check(login string) (*models.User, error) {
 }
 
 func (r *UserRepository) Delete(str string) error
+func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.User, error)
