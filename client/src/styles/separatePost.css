@@ -229,3 +229,17 @@
       margin-left: -25.5px;
       margin-bottom: -51px;
   }
+
+  .PostDeleteBtn{
+    background: darkred;
+    border: transparent;
+    width: 100px;
+    height: 30px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .PostDeleteBtn:hover{
+    background: rgb(192, 2, 2);
+  }

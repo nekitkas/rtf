@@ -64,7 +64,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/delete", s.handleRemovePost())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete", s.handleRemovePost())
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
 	// -------------------- COMMENT PATHS ---------------------------- //

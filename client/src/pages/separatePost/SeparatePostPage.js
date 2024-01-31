@@ -1,6 +1,7 @@
 import { CONTAINER, ROOT } from "../..";
 import { NavbarLogged } from "../../components/Navbar/NavbarLogged";
 import { SinglePostRequest } from "../../helpers/ServerRequests";
+import { RouterFunction } from "../../router/Router";
 import "../../styles/separatePost.css";
 
 export function RenderSeparatePostPage(postId) {
@@ -94,8 +95,40 @@ export function RenderSeparatePostPage(postId) {
       pagePost.appendChild(postPagePostBody);
       pagePost.appendChild(postPagePostFooter);
 
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete post";
+      deleteBtn.className = "PostDeleteBtn";
+      pagePost.appendChild(deleteBtn);
       // Append the post details to the CONTAINER
       CONTAINER.appendChild(pagePost);
+
+
+      deleteBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log(postId);
+
+        const requestData = {
+          post_id: postId
+        };
+
+        SinglePostRequest("http://localhost:8080/api/v1/jwt/posts/delete", "DELETE", requestData, {
+          "Content-Type": "application/json"
+        })
+        .then(() => {
+            window.location.href = "/home";
+            RouterFunction();
+        })
+        .catch((error) => {
+          console.error("Error in fetch operation:", error);
+        });
+      });
+
+
+
+
+
+
+
     })
     .catch((error) => {
       console.error("Error in fetch operation:", error);

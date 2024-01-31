@@ -56,13 +56,15 @@ async function fetchData(PostFeed) {
         postLink.href = `post/${post.post.id}`;
         postLink.classList.add("post-link");
         if (post.categories) {
-      
+
           postLink.appendChild((RenderPost(post.post, post.categories)))
           PostFeed.appendChild(postLink);
 
+        }else{
+          postLink.appendChild((RenderPost(post.post)))
+          PostFeed.appendChild(postLink);
         }
-        postLink.appendChild((RenderPost(post.post)))
-        PostFeed.appendChild(postLink);
+
       })
       // postsData.forEach(post => {
 
