@@ -1,9 +1,10 @@
 import { CheckUserLoggedIn } from "../helpers/ServerRequests.js"
 import { RenderHomePage } from "../pages/home/Home.js"
 import { RenderLoginPage } from "../pages/login/Login.js"
-import { RenderPostPage } from "../pages/post/PostPage.js"
+import { RenderPostPage } from "../pages/cratePost/CreatePostPage.js"
 import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
 import { RenderRegisterPage } from "../pages/register/Register.js"
+import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
 
 export const RouterFunction = async () => {
   const path = location.pathname
@@ -13,7 +14,7 @@ export const RouterFunction = async () => {
   if (path.startsWith("/post/")) {
     const postId = path.split("/")[2]
     console.log("Rendering Post Page for Post ID:", postId)
-    RenderPostPage(postId)
+    RenderSeparatePostPage(postId)
   } else {
     try {
       const userLoggedIn = await CheckUserLoggedIn()

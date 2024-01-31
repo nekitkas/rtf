@@ -5,7 +5,7 @@ import "../../styles/messenger.css"
 import "../../styles/chat.css"
 import { RenderPost } from "../../components/Post"
 import { RenderMessenger } from "../../components/Messenger"
-import { GetPosts } from "../../helpers/ServerRequests.js"
+import { GetPosts, SinglePostRequest } from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
@@ -41,21 +41,8 @@ export function RenderHomePage() {
       selectArrow.classList.toggle("select-arrow-rotate")
     }
   }
- // Пример использования:
-const apiUrl = 'http://localhost:8080/api/v1/jwt/posts/findById';
-const requestData = {
-  post_id: 'c7a545fa-66d5-42be-b881-7c9e7985f1a7',
-};
 
-sendRequest(apiUrl, 'POST', requestData)
-  .then(data => {
-    // Обработка данных, полученных от сервера
-    console.log(data);
-  })
-  .catch(error => {
-    // Обработка ошибок
-    console.error('Error in fetch operation:', error);
-  });
+
 }
 
 async function fetchData(PostFeed) {
@@ -65,9 +52,14 @@ async function fetchData(PostFeed) {
     if (postsData) {
       // Do something with the data
       postsData.posts.forEach((post) => {
-        console.log(post.post)
+
         if (post.categories) {
-          PostFeed.appendChild(RenderPost(post.post, post.categories))
+          const postLink = document.createElement("a");
+          postLink.href = `post/${post.post.id}`;
+          postLink.classList.add("post-link");
+          postLink.appendChild((RenderPost(post.post, post.categories)))
+          PostFeed.appendChild(postLink);
+
         }
       })
       // postsData.forEach(post => {
@@ -83,30 +75,4 @@ async function fetchData(PostFeed) {
   }
 }
 
-
-//////////////////////////////
-//check later
-// function sendRequest(url, method, body = null, headers = {}) {
-//   const options = {
-//     method,
-//     headers: {
-//       'Content-Type': 'application/json',
-//       ...headers,
-//     },
-//     body: body ? JSON.stringify(body) : null,
-//     credentials:"include"
-//   };
-
-//   return fetch(url, options)
-//     .then(response => {
-//       if (!response.ok) {
-//         throw new Error(`Network response was not ok: ${response.status}`);
-//       }
-//       return response.json();
-//     })
-//     .catch(error => {
-//       console.error('Error during fetch operation:', error);
-//       throw error;
-//     });
-// }
 

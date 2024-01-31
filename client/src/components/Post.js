@@ -1,12 +1,13 @@
 export function RenderPost(data, categories) {
-  const { title, content, image_url, comment_count } = data;
+  console.log(data);
+  const { id,title, content, image_url, comment_count } = data;
   const post = document.createElement("div");
   post.classList.add("post");
 
   const postHeader = document.createElement("div");
   postHeader.classList.add("post-header");
 
-  console.log(data);
+
 
   const postHeaderTitle = document.createElement("div");
   postHeaderTitle.classList.add("post-header-title");
@@ -47,6 +48,7 @@ export function RenderPost(data, categories) {
   post.appendChild(postHeader);
   post.appendChild(postBody);
   post.appendChild(postFooter);
-  console.log(post);
+  post.id = id;
+
   return post;
 }
