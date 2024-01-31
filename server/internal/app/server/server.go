@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -59,7 +58,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	// -------------------- USER PATHS ------------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
-	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete/:id", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
@@ -89,8 +88,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) wsHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
-		user_id := router.Param(r.Context(), "user_id")
-		if err := s.websocket.HandleWebSocket(rw, r, user_id); err != nil {
+		userId := router.Param(r.Context(), "user_id")
+		if err := s.websocket.HandleWebSocket(rw, r, userId); err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
 	}
@@ -132,114 +131,6 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusOK, nil)
-	}
-}
-
-func (s *server) handleLogOut() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Replace the cookie with expired cookie
-		deletedCookie := s.deleteCookie()
-
-		http.SetCookie(w, &deletedCookie)
-
-		s.respond(w, r, http.StatusOK, nil)
-	}
-}
-
-func (s *server) handleUsersLogin() http.HandlerFunc {
-	type RequestBody struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		var requestBody RequestBody
-		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		user, err := s.store.User().Check(requestBody.Email)
-		if err != nil || !user.ComparePassword(requestBody.Password) {
-			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
-			return
-		}
-
-		expiration := time.Now().Add(5 * time.Hour)
-		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
-		claims := jwttoken.NewClaims(user.ID, expiration.Unix())
-		token, err := alg.Encode(claims)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		cookie := http.Cookie{
-			Name:     sessionName,
-			Value:    token,
-			Expires:  expiration,
-			Path:     "/",
-			HttpOnly: true,
-			Secure:   true,
-			SameSite: http.SameSiteNoneMode,
-		}
-
-		http.SetCookie(w, &cookie)
-
-		s.respond(w, r, http.StatusOK, nil)
-	}
-}
-
-func (s *server) handleUsersGetByID() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// get id from cookie
-		userID := r.Context().Value(ctxUserID).(string)
-
-		user, err := s.store.User().FindByID(userID)
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusCreated, user)
-	}
-}
-
-func (s *server) handleUsersDelete() http.HandlerFunc {
-	type request struct {
-		UserID string `json:"user_id"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := request{}
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		err := s.store.User().Delete(req.UserID)
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, nil)
-	}
-}
-
-func (s *server) handleUsersCreate() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		user := &models.User{}
-		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		if err := s.store.User().Create(user); err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusCreated, nil)
 	}
 }
 
