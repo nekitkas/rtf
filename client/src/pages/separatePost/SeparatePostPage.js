@@ -53,11 +53,12 @@ export function RenderSeparatePostPage(postId) {
       postPageBodyImg.className = "postPageBodyImg";
 
       // Assuming your API returns an image URL
-      const img = document.createElement("img");
-      img.src = postData.image_url;
-      img.alt = "";
-
-      postPageBodyImg.appendChild(img);
+   if(postData.image_url){
+    const img = document.createElement("img");
+    img.src = postData.image_url;
+    img.alt = "";
+    postPageBodyImg.appendChild(img);
+   }
 
       postPagePostBody.appendChild(postPageBodyText);
       postPagePostBody.appendChild(postPageBodyImg);
@@ -65,15 +66,18 @@ export function RenderSeparatePostPage(postId) {
       const postPagePostFooter = document.createElement("div");
       postPagePostFooter.className = "postPagePostFooter";
 
-      const categoriesDiv = document.createElement("div");
-      data.categories.forEach(category =>  categoriesDiv.textContent += category.name + " ")
+  if(postData.categories){
+    const categoriesDiv = document.createElement("div");
+    data.categories.forEach(category =>  categoriesDiv.textContent += category.name + " ")
+    postPagePostFooter.appendChild(categoriesDiv);
+  }
 
       const timeDiv = document.createElement("div");
       timeDiv.className = "time";
 
       const dateObject = new Date(timestamp);
 
- 
+
       const formattedDate = dateObject.toLocaleString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
@@ -84,7 +88,6 @@ export function RenderSeparatePostPage(postId) {
 
       timeDiv.textContent = formattedDate;
 
-      postPagePostFooter.appendChild(categoriesDiv);
       postPagePostFooter.appendChild(timeDiv);
 
       pagePost.appendChild(postPagePostHeader);

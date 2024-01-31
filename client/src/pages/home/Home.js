@@ -52,15 +52,17 @@ async function fetchData(PostFeed) {
     if (postsData) {
       // Do something with the data
       postsData.posts.forEach((post) => {
-
+        const postLink = document.createElement("a");
+        postLink.href = `post/${post.post.id}`;
+        postLink.classList.add("post-link");
         if (post.categories) {
-          const postLink = document.createElement("a");
-          postLink.href = `post/${post.post.id}`;
-          postLink.classList.add("post-link");
+      
           postLink.appendChild((RenderPost(post.post, post.categories)))
           PostFeed.appendChild(postLink);
 
         }
+        postLink.appendChild((RenderPost(post.post)))
+        PostFeed.appendChild(postLink);
       })
       // postsData.forEach(post => {
 
