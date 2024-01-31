@@ -42,3 +42,5 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 func (r *UserRepository) Check(login string) (*models.User, error) {
 	panic("need implement")
 }
+
+func (r *UserRepository) Delete(str string) error

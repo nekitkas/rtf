@@ -48,7 +48,6 @@ export async function RenderHomePage() {
 async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts()
-    // console.log(postsData.posts[0]);
     if (postsData) {
       // Do something with the data
       postsData.posts.forEach((post) => {
