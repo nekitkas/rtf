@@ -84,6 +84,7 @@
   .postPageBodyText{
     margin-bottom: 40px;
     font-size: 18px;
+    word-wrap: break-word;
 
   }
 

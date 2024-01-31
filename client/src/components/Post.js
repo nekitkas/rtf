@@ -20,7 +20,18 @@ export function RenderPost(data, categories) {
   const postBodyText = document.createElement("div");
   postBodyText.classList.add("post-body-text");
   postBodyText.textContent = content;
+
+  const truncatedText = content.length > 250 ? content.slice(0, 250) + "..." : content;
+
+  // Создаем элемент для текста
+
+  postBodyText.className = "postBodyText";
+  postBodyText.textContent = truncatedText;
+
+  // Добавляем элемент в контейнер
   postBody.appendChild(postBodyText);
+
+
   if (image_url) {
     const postBodyImg = document.createElement("img");
     postBodyImg.src = image_url;
