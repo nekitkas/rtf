@@ -15,3 +15,5 @@ func (c *ChatRepository) Create(model *models.Chat) error {
 
 	return nil
 }
+
+func (c *ChatRepository) Get(id string)
