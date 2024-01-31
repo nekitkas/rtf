@@ -5,7 +5,11 @@ import "../../styles/messenger.css"
 import "../../styles/chat.css"
 import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
-import { Messenger, OpenMessengers, RenderMessenger } from "../../components/Messenger"
+import {
+  Messenger,
+  OpenMessengers,
+  RenderMessenger,
+} from "../../components/Messenger"
 import {
   GetAllUsers,
   GetPosts,
@@ -17,9 +21,11 @@ import { RenderFilter } from "../../components/Filter.js"
 import { RouterFunction } from "../../router/Router.js"
 import { UserList } from "../../components/UserList"
 
-const Messenger = RenderMessenger({ id: "user1" })
+const usersContainer = document.createElement("div")
 
+usersContainer.className = "users-container"
 
+// const Messenger = RenderMessenger({ id: "user1" })
 
 //Get all the messages for the messenger
 //right now sample data, later fix that
