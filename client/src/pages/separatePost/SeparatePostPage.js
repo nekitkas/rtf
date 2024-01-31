@@ -11,9 +11,7 @@ export async function RenderSeparatePostPage(postId) {
   await NavbarLogged();
   ROOT.append(CONTAINER);
 
-  console.log("this is post page");
-  console.log(postId);
-
+ 
   const apiUrl = "http://localhost:8080/api/v1/jwt/posts/findById";
   const requestData = {
     post_id: postId,
@@ -123,7 +121,6 @@ export async function RenderSeparatePostPage(postId) {
 
 
 
-      console.log("One post:", data.comments[0]);
 
 
 
@@ -137,15 +134,19 @@ export async function RenderSeparatePostPage(postId) {
 
       // Append the post details to the CONTAINER
       CONTAINER.appendChild(pagePost);
+
+      const commentsContainer = document.createElement("div");
+      commentsContainer.className = "commentsContainer";
+
       if(data.comments){
         const commentDiv = document.createElement("div");
         commentDiv.className = "comment";
         data.comments.forEach(
-          (comment) => commentDiv.appendChild(CreateCommentComponent(comment.comment.datetime, comment.comment.content, comment.comment.user_id))
+          (comment) => commentsContainer.appendChild(CreateCommentComponent(comment.comment.datetime, comment.comment.content, comment.comment.user_id,commentDiv))
         );
 
+        CONTAINER.appendChild(commentsContainer)
 
-        CONTAINER.appendChild(commentDiv);
       }
       CONTAINER.appendChild(commentContainer);
 
