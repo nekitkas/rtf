@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-type Response struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
 func (s *server) handleLogOut() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		deletedCookie := s.deleteCookie()

@@ -63,9 +63,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/delete", s.handleRemovePost())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts/findById", s.serveSinglePostInformation())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete/:id", s.handleRemovePost())
+	s.router.HandleFunc("GET", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
+	s.router.HandleFunc("GET", "/api/v1/jwt/posts/:id", s.serveSinglePostInformation())
 	// -------------------- COMMENT PATHS ---------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/delete", s.handleRemoveComment())
@@ -147,72 +147,6 @@ func (s *server) handleGetAllCategories() http.HandlerFunc {
 		s.respond(w, r, http.StatusOK, categories)
 	}
 }
-
-// }}}
-// -------------------------POST STUFF--------------------------//
-// {{{
-func (s *server) handlePostCreation() http.HandlerFunc {
-	type request struct {
-		Post       models.Post       `json:"post"`
-		Categories []models.Category `json:"categories"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		// Get the userId who does the request
-		userID := r.Context().Value(ctxUserID).(string)
-		// Create category if needed
-		for _, category := range req.Categories {
-			if err := s.store.Category().Create(&category); err != nil {
-				s.error(w, r, http.StatusUnprocessableEntity, err)
-				return
-			}
-		}
-		// Create post
-		if err := s.store.Post().Create(&req.Post, req.Categories, userID); err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusCreated, request{
-			Post:       req.Post,
-			Categories: req.Categories,
-		})
-	}
-}
-
-func (s *server) handleRemovePost() http.HandlerFunc {
-	type requestBody struct {
-		ID string `json:"post_id"`
-	}
-
-	type responseBody struct {
-		Response string `json:"response"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req requestBody
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		if err := s.store.Post().Delete(req.ID); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, responseBody{Response: "Successfully deleted"})
-	}
-}
-
-// }}}
-// -------------------------REACTION STUFF--------------------------//
-// {{{
 
 func (s *server) handleRemoveReaction() http.HandlerFunc {
 	type requestBody struct {
@@ -335,110 +269,6 @@ func (s *server) handleAddReactionsToParent() http.HandlerFunc {
 	}
 }
 
-// }}}
-//-------------------------SERVER STUFF--------------------------//
-// {{{
-
-func (s *server) serveSinglePostInformation() http.HandlerFunc {
-	type requestBody struct {
-		Post string `json:"post_id"`
-	}
-
-	type commentsBody struct {
-		Comment  models.Comment    `json:"comment"`
-		Reaction []models.Reaction `json:"reactions"`
-	}
-
-	type responseBody struct {
-		PostBody    models.Post       `json:"post"`
-		CommentBody []commentsBody    `json:"comments"`
-		Category    []models.Category `json:"categories"`
-		Reactions   []models.Reaction `json:"reactions"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &requestBody{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		post, err := s.store.Post().Get(req.Post)
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		comments, err := s.store.Comment().Get(post.ID)
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		categories, err := s.store.Category().GetForPost(post.ID)
-
-		reactions, err := s.store.Reaction().GetByParentID(post.ID)
-
-		var commentBody commentsBody
-		var aLotOfCommentBodies []commentsBody
-		for _, comment := range *comments {
-			reaction, err := s.store.Reaction().GetByParentID(comment.ID)
-			if err != nil {
-				s.error(w, r, http.StatusBadRequest, err)
-				return
-			}
-
-			commentBody.Comment = comment
-			commentBody.Reaction = *reaction
-			aLotOfCommentBodies = append(aLotOfCommentBodies, commentBody)
-		}
-
-		response := responseBody{
-			PostBody:    *post,
-			CommentBody: aLotOfCommentBodies,
-			Category:    *categories,
-			Reactions:   *reactions,
-		}
-
-		s.respond(w, r, http.StatusCreated, response)
-	}
-}
-
-func (s *server) handleAllPostInformation() http.HandlerFunc {
-	type requestBody struct {
-		Index int       `json:"current_index"`
-		Time  time.Time `json:"page_open_time_stamp"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		// get index from body
-		request := &requestBody{}
-		if err := json.NewDecoder(r.Body).Decode(request); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		for i, post := range posts {
-			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
-			if err != nil {
-				s.error(w, r, http.StatusBadRequest, err)
-				return
-			}
-			posts[i].CommentCount = commentCount
-		}
-
-		s.respond(w, r, http.StatusOK, posts)
-	}
-}
-
-// }}}
-// -------------------------COMMENT STUFF--------------------------//
-// {{{
 func (s *server) handleCommentCreation() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := &models.Comment{}

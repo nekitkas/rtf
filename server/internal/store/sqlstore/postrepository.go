@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -16,7 +17,7 @@ type PostRepository struct {
 }
 
 func (r *PostRepository) Create(post *models.Post, categories []models.Category, userId string) error {
-	// Add other neccessary information for posts
+	// Add other necessary information for posts
 	post.ID = uuid.New().String()
 	post.Timestamp = time.Now()
 	// Get user id from Sessions/Cookeis
@@ -26,7 +27,7 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category,
 
 	_, err := r.store.Db.Exec(insertQuery, post.ID, post.Title, post.Content, post.UserID, post.ImageURL, post.Timestamp)
 	if err != nil {
-		return fmt.Errorf("Database SQL query error: %v", err)
+		return fmt.Errorf("database SQL query error: %v", err)
 	}
 
 	// Insert info to join tabel
@@ -34,10 +35,10 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category,
 	for _, category := range categories {
 		categoryToCheck, err1 := r.store.Category().Get(category.Name)
 		// If there is not added category to db, then add
-		if err1 == sql.ErrNoRows {
+		if errors.Is(err1, sql.ErrNoRows) {
 			_, err = r.store.Db.Exec(insertQuery, uuid.New().String(), post.ID, category.ID)
 			if err != nil {
-				return fmt.Errorf("Database SQL query error: %v", err)
+				return fmt.Errorf("database SQL query error: %v", err)
 			}
 		} else if err1 != nil {
 			return fmt.Errorf(err.Error())
@@ -45,7 +46,7 @@ func (r *PostRepository) Create(post *models.Post, categories []models.Category,
 		} else {
 			_, err1 = r.store.Db.Exec(insertQuery, uuid.New().String(), post.ID, &categoryToCheck.ID)
 			if err != nil {
-				return fmt.Errorf("Database SQL query error: %v", err)
+				return fmt.Errorf("database SQL query error: %v", err)
 			}
 		}
 	}
@@ -77,11 +78,7 @@ func (r *PostRepository) Get(id string) (*models.Post, error) {
 
 	err := r.store.Db.QueryRow(query, id).Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp, &post.UserNickname)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf(`Post containing id %v does not exist`, id)
-		} else {
-			return nil, fmt.Errorf(`Error occured while checking posts: %v`, err)
-		}
+		return nil, fmt.Errorf(`error occured while checking posts: %v`, err)
 	}
 	return &post, nil
 }
