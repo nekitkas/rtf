@@ -31,7 +31,8 @@ export async function NavbarLogged() {
   const UserprofileLink = document.querySelector(".UserprofileLink")
   if (UserprofileLink) {
     UserprofileLink.addEventListener("click", () => {
-      window.location.href = "/profile"
+    
+      window.history.pushState({}, "", "/profile")
       RouterFunction()
     })
   }
@@ -40,7 +41,8 @@ export async function NavbarLogged() {
   logoutBtn.addEventListener("click", () => {
     Logout()
 
-    window.location.href = "/login"
+
+    window.history.pushState({}, "", "/login")
     RouterFunction()
   })
 
@@ -52,12 +54,12 @@ const  RenderNavbar =  async (userInfo) => {
   const currentUrl = window.location.href
   let navbarHTML = '';
 
-  const mainContainer = document.querySelector(".root")
+  // const mainContainer = document.querySelector(".root")
   if (currentUrl.includes("create-post")) {
     navbarHTML = `
     <nav class="navbar-post">
     <div class="nav-start">
-      <a href="/"><h1 class="logo">VOYAGE</h1></a>
+      <a href="#" ><h1 class="logo">VOYAGE</h1></a>
     </div>
     <div class="user-block">
     <div class="message-button">

@@ -221,7 +221,7 @@ async function sendPostData(title, content, categories, image) {
     if (response.ok) {
       const data = await response.json();
       console.log("Server response:", data);
-      window.location.href = "/home";
+      window.location.href = "/";
       RouterFunction();
     } else {
       console.error("Server error:", response.statusText);

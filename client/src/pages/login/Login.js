@@ -12,7 +12,7 @@ export async function RenderLoginPage() {
     console.log(isUserLogged)
 
     if (isUserLogged) {
-      window.location.href = "/"
+      window.history.pushState({}, "", "/")
       RouterFunction()
     } else {
       ROOT.innerHTML = ""
@@ -23,21 +23,19 @@ export async function RenderLoginPage() {
       const LoginForm = RenderLoginForm()
 
       Auth.appendChild(LoginForm)
-
       CONTAINER.appendChild(Auth)
-
       ROOT.appendChild(CONTAINER)
 
       const errorMsg = document.querySelector(".errorMsg")
 
-      const registerForm = document.querySelector(".form")
-      registerForm.addEventListener("submit", handleFormSubmit)
+      const loginForm = document.querySelector(".form")
+      loginForm.addEventListener("submit", handleFormSubmit)
 
       function handleFormSubmit(e) {
         e.preventDefault() // Prevent the default form submission
 
         // Get form data
-        const formData = new FormData(registerForm)
+        const formData = new FormData(loginForm)
 
         // Create an object from the form data
         const formDataObject = {}
@@ -70,7 +68,9 @@ export async function RenderLoginPage() {
             }
           })
           .then(() => {
-            window.location.href = "#/home"
+            // window.location.href = "/"
+
+            window.history.pushState({}, "", "/")
             RouterFunction()
           })
           .catch((error) => {

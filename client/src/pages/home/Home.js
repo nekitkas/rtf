@@ -9,18 +9,18 @@ import { GetPosts, SinglePostRequest } from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
+import { RouterFunction } from "../../router/Router.js"
 
 const Messenger = RenderMessenger()
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
- await NavbarLogged()
+  await NavbarLogged()
 
   const PostFeed = RenderPostFeed()
 
   ROOT.append(CONTAINER)
-
 
   fetchData(PostFeed)
 
@@ -43,27 +43,27 @@ export async function RenderHomePage() {
   }
 }
 
-
-
 async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts()
     if (postsData) {
       // Do something with the data
       postsData.posts.forEach((post) => {
-        const postLink = document.createElement("a");
-        postLink.href = `post/${post.post.id}`;
-        postLink.classList.add("post-link");
+        const postLink = document.createElement("div")
+        // postLink.href = `post/${post.post.id}`
+        postLink.addEventListener("click", () => {
+          history.pushState({}, "", `post/${post.post.id}`)
+          RouterFunction()
+        })
+
+        postLink.classList.add("post-link")
         if (post.categories) {
-
-          postLink.appendChild((RenderPost(post.post, post.categories)))
-          PostFeed.appendChild(postLink);
-
-        }else{
-          postLink.appendChild((RenderPost(post.post)))
-          PostFeed.appendChild(postLink);
+          postLink.appendChild(RenderPost(post.post, post.categories))
+          PostFeed.appendChild(postLink)
+        } else {
+          postLink.appendChild(RenderPost(post.post))
+          PostFeed.appendChild(postLink)
         }
-
       })
       // postsData.forEach(post => {
 
@@ -77,5 +77,3 @@ async function fetchData(PostFeed) {
     console.error("Error during fetch:", error)
   }
 }
-
-
