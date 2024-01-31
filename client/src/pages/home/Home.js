@@ -6,14 +6,19 @@ import "../../styles/chat.css"
 import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
 import { RenderMessenger } from "../../components/Messenger"
-import {GetAllUsers, GetPosts, SinglePostRequest} from "../../helpers/ServerRequests.js"
+import {
+  GetAllUsers,
+  GetPosts,
+  SinglePostRequest,
+} from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
 import { RouterFunction } from "../../router/Router.js"
-import {UserList} from "../../components/UserList";
+import { UserList } from "../../components/UserList"
 
-const Messenger = RenderMessenger({id: "user1"})
+const Messenger = RenderMessenger({ id: "user1" })
+
 
 const usersContainer = document.createElement("div")
 usersContainer.className = "users-container"
@@ -29,22 +34,16 @@ export async function RenderHomePage() {
   console.log(Socket)
   ROOT.append(CONTAINER)
 
-
-
-
   fetchData(PostFeed)
 
   fetchUsers(usersContainer)
-
-
-
-
 
   const Filter = RenderFilter()
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
   ROOT.appendChild(Messenger)
+  ROOT.appendChild(Messenger3)
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
@@ -94,18 +93,15 @@ async function fetchData(PostFeed) {
   }
 }
 
-
-
-async function fetchUsers(usersContainer){
-  try{
+async function fetchUsers(usersContainer) {
+  try {
     const usersData = await GetAllUsers()
-    if(usersData){
+    if (usersData) {
       usersContainer.appendChild(UserList(usersData))
-
 
       CONTAINER.appendChild(usersContainer)
     }
-  }catch(error){
+  } catch (error) {
     console.error("Error during fetch:", error)
   }
 }
