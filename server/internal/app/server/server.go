@@ -53,30 +53,27 @@ func (s *server) configureRouter() {
 
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
-	// s.router.HandleFunc("GET", "/api/v1/comments/findById", s.handleCommentGetById())
 	// -------------------- USER PATHS ------------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("GET", "/api/v1/jwt/users/:id", s.handleUsersGetByID())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete/:id", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/categories/getAll", s.handleGetAllCategories())
+	s.router.HandleFunc("GET", "/api/v1/jwt/categories", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
+	s.router.HandleFunc("GET", "/api/v1/jwt/posts", s.handleAllPostInformation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete/:id", s.handleRemovePost())
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts/getFeed", s.handleAllPostInformation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/:id", s.serveSinglePostInformation())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete/:id", s.handleRemovePost())
 	// -------------------- COMMENT PATHS ---------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/comments/delete/:id", s.handleRemoveComment())
 	// -------------------- REACTION PATHS --------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
+	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactions())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/remove", s.handleRemoveReaction())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
-
+	// -------------------- CHAT --------------------------- //
 	s.router.HandleFunc("GET", "jwt/chat/:user_id", s.wsHandler())
-	// EXAMPLE OF DYNAMIC PATH
-	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -93,18 +90,6 @@ func (s *server) wsHandler() http.HandlerFunc {
 	}
 }
 
-// EXAMPLE OF DYNAMIC PATH
-//
-//	func (s *server) handleTest() http.HandlerFunc {
-//		return func(w http.ResponseWriter, r *http.Request) {
-//			value := router.Param(r.Context(), "test")
-//			fmt.Println("RETRIED VALUE", value)
-//			s.respond(w, r, http.StatusOK, nil)
-//		}
-//	}
-//
-
-// {{{
 func (s *server) handleCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
@@ -132,141 +117,6 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 	}
 }
 
-// }}}
-// -------------------------CATEGORY STUFF--------------------------//
-// {{{
-func (s *server) handleGetAllCategories() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		categories, err := s.store.Category().GetAll()
-		if err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-			return
-		}
-		s.respond(w, r, http.StatusOK, categories)
-	}
-}
-
-func (s *server) handleRemoveReaction() http.HandlerFunc {
-	type requestBody struct {
-		ParentID   string `json:"parent_id"`
-		ReactionID string `json:"reaction_id"`
-	}
-
-	type responseBody struct {
-		Response string `json:"response"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(ctxUserID).(string)
-
-		var req requestBody
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		if err := s.store.Reaction().RemoveFromParent(req.ParentID, req.ReactionID, userID); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusAccepted, responseBody{
-			Response: "Successfully removed item from db",
-		})
-	}
-}
-
-func (s *server) handleGetReactionsOptions() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		reactions, err := s.store.Reaction().GetAll()
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusFound, reactions)
-	}
-}
-
-func (s *server) handleGetReactionsByParentID() http.HandlerFunc {
-	type requestBody struct {
-		ParentID string `json:"parent_id"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req requestBody
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		reactions, err := s.store.Reaction().GetByParentID(req.ParentID)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusFound, reactions)
-	}
-}
-
-func (s *server) handleGetUserReactions() http.HandlerFunc {
-	type requestBody struct {
-		ParentID string `json:"parent_id"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(ctxUserID).(string)
-
-		var req requestBody
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		reactions, err := s.store.Reaction().GetByUserParentID(req.ParentID, userID)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusFound, reactions)
-	}
-}
-
-func (s *server) handleAddReactionsToParent() http.HandlerFunc {
-	type requestBody struct {
-		ParentID   string `json:"parent_id"`
-		ReactionID string `json:"reaction_id"`
-	}
-
-	type responseBody struct {
-		Result     string `json:"response"`
-		ReactionID string `json:"reaction_id"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(ctxUserID).(string)
-
-		var req requestBody
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		err := s.store.Reaction().AddToParent(req.ParentID, req.ReactionID, userID)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusCreated, responseBody{
-			Result:     "Successfully added to Database",
-			ReactionID: req.ReactionID,
-		})
-	}
-}
-
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.respond(w, r, code, map[string]string{"error": err.Error()})
 }
@@ -291,5 +141,3 @@ func (s *server) deleteCookie() http.Cookie {
 	}
 	return deletedCookie
 }
-
-//}}}

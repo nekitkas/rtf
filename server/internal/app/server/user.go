@@ -69,9 +69,12 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 func (s *server) handleUsersGetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get id from cookie
-		userID := r.Context().Value(ctxUserID).(string)
+		id := router.Param(r.Context(), "id")
 
-		user, err := s.store.User().FindByID(userID)
+		if id == "" {
+			id = r.Context().Value(ctxUserID).(string)
+		}
+		user, err := s.store.User().FindByID(id)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return

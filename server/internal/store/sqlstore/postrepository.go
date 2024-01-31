@@ -106,13 +106,13 @@ LIMIT ? OFFSET ?`
 	var posts []models.Post
 	for rows.Next() {
 		var post models.Post
-		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp, &post.UserNickname); err != nil {
+		if err = rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.ImageURL, &post.Timestamp, &post.UserNickname); err != nil {
 			return nil, fmt.Errorf("failed to scan post row: %v", err)
 		}
 		posts = append(posts, post)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("error reading posts rows: %v", err)
 	}
 

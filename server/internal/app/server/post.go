@@ -121,7 +121,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 			Category:    *categories,
 			Reactions:   *reactions,
 		}
-
+		fmt.Println("we are here")
 		s.respond(w, r, http.StatusOK, Response{
 			Message: "Successful",
 			Data:    response,
@@ -148,6 +148,8 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
+
+		fmt.Println(posts)
 
 		for i, post := range posts {
 			commentCount, err := s.store.Post().GetCommentNumber(post.ID)

@@ -19,10 +19,10 @@ type UserRepository interface {
 
 type ReactionRepository interface {
 	Create(*models.Reaction) error
-	AddToParent(post_id string, reaction_id string, user_id string) error
-	RemoveFromParent(post_id string, reaction_id string, user_id string) error
-	GetByUserParentID(parent_id string, user_id string) (*[]models.Reaction, error)
-	GetByParentID(parent_id string) (*[]models.Reaction, error)
+	AddToParent(postId string, reactionId string, userId string) error
+	RemoveFromParent(postId string, reactionId string, userId string) error
+	GetByUserParentID(parentId string, userId string) (*[]models.Reaction, error)
+	GetByParentID(parentId string) (*[]models.Reaction, error)
 	GetAll() (*[]models.Reaction, error)
 }
 
