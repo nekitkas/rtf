@@ -5,7 +5,7 @@ import "../../styles/messenger.css"
 import "../../styles/chat.css"
 import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
-import { RenderMessenger } from "../../components/Messenger"
+import { Messenger, OpenMessengers, RenderMessenger } from "../../components/Messenger"
 import {
   GetAllUsers,
   GetPosts,
@@ -20,8 +20,15 @@ import { UserList } from "../../components/UserList"
 const Messenger = RenderMessenger({ id: "user1" })
 
 
-const usersContainer = document.createElement("div")
-usersContainer.className = "users-container"
+
+//Get all the messages for the messenger
+//right now sample data, later fix that
+
+//Later change after request to userid
+
+// const Messenger = RenderMessenger("user1")
+
+const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl")
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
@@ -42,7 +49,7 @@ export async function RenderHomePage() {
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
-  ROOT.appendChild(Messenger)
+  ROOT.appendChild(Chats.Create())
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
