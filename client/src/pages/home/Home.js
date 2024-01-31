@@ -12,10 +12,10 @@ import { RenderFilter } from "../../components/Filter.js"
 
 const Messenger = RenderMessenger()
 
-export function RenderHomePage() {
+export async function RenderHomePage() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
-  NavbarLogged()
+ await NavbarLogged()
 
   const PostFeed = RenderPostFeed()
 

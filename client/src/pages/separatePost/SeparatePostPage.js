@@ -4,10 +4,10 @@ import { SinglePostRequest } from "../../helpers/ServerRequests";
 import { RouterFunction } from "../../router/Router";
 import "../../styles/separatePost.css";
 
-export function RenderSeparatePostPage(postId) {
+export async function RenderSeparatePostPage(postId) {
   ROOT.innerHTML = "";
   CONTAINER.innerHTML = "";
-  NavbarLogged();
+  await NavbarLogged()
   ROOT.append(CONTAINER);
 
   console.log("this is post page");

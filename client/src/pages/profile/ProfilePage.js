@@ -14,12 +14,12 @@ const userInfo = [
   "01.10.2001",
 ]
 
-export function RenderProfilePage() {
+export async function RenderProfilePage() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
   profileContainer.innerHTML = ""
 
-  NavbarLogged()
+  await NavbarLogged()
 
   const Profile = RenderProfile(userInfo)
 
