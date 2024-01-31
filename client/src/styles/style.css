@@ -28,33 +28,31 @@ body {
   padding: 20px;
   top: 65px;
   height: 100vh;
-  /* overflow-y: scroll; */
 
+  display: flex;
+  /* overflow-y: scroll; */
 }
 
 .container::-webkit-scrollbar {
   display: none;
 }
 
-
-.root{
+.root {
   position: relative;
 }
 
-.info-div{
+.filter {
   width: 300px;
-  height: 150px;
+  /* height: 150px; */
   border: 1px solid var(--border-color);
   position: fixed;
-  top:90px;
-  left: 40px;
+  top: 85px;
+  left: 20px;
   background-color: var(--background-secondory);
   border-radius: 10px;
   padding: 20px;
-
 }
 
-.post-link{
+.post-link {
   text-decoration: none;
- 
 }

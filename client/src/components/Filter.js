@@ -4,7 +4,7 @@ import arrowSvg from "../assets/img/arrow.svg"
 export function RenderFilter() {
   // Create info-div container
   const infoDiv = document.createElement("div")
-  infoDiv.classList.add("info-div")
+  infoDiv.classList.add("filter")
 
   // Create input-select-block
   const inputSelectBlock = document.createElement("div")

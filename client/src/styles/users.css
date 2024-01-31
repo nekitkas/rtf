@@ -17,6 +17,7 @@
   margin-bottom: 10px;
   padding: 5px;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .user img {
@@ -30,4 +31,8 @@
   display: flex;
   text-align: center;
   margin: auto 0;
+}
+
+.user:hover {
+  background-color: rgba(240, 248, 255, 0.296);
 }

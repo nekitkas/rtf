@@ -1,5 +1,6 @@
-/* .post-feed {post
-} */
+.post-feed {
+  margin: 0 auto;
+}
 
 .post {
   width: 600px;
@@ -43,12 +44,11 @@
 .post-body {
   padding: 5px;
   width: 100%;
-
 }
 
 .post-body-text {
   font-size: 14px;
   font-weight: 600;
   text-wrap: wrap;
- word-wrap: break-word;
+  word-wrap: break-word;
 }
