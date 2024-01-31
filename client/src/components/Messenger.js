@@ -2,12 +2,14 @@ import { Socket } from ".."
 
 export const OpenMessengers = [];
 export class Messenger {
-  constructor(currentUserId, userToId, username, imageUrl){
+  constructor(currentUserId, userToId, username, imageUrl, RootElement){
     this.currentUserId = currentUserId;
     this.userToId = userToId;
     this.username = username;
     this.imageUrl = imageUrl;
+    this.RootElement = RootElement;
     this.chatBody = document.createElement("div");
+    this.messenger = document.createElement("div")
     this.messages = new ObservableArray([
       {
         text: "Hey there! Have you delved into the Cyberpunk universe lately?",
@@ -78,10 +80,12 @@ export class Messenger {
 
   //Get messages from the back-end
 
+  Close(){
+    this.RootElement.removeChild(this.messenger);
+  }
 
   Create(){
-    const messenger = document.createElement("div")
-    messenger.classList.add("messenger")
+    this.messenger.classList.add("messenger")
     
     const chatHeader = document.createElement("div")
     chatHeader.classList.add("chat-header")
@@ -98,6 +102,9 @@ export class Messenger {
     const closeIcon = document.createElement("img")
     closeIcon.src = "/assets/close.svg"
     closeIcon.alt = "close"
+    closeIcon.addEventListener("click", () => {
+      this.Close()
+    })
     
     userChatInfo.appendChild(userImage)
     userChatInfo.appendChild(userName)
@@ -150,10 +157,11 @@ export class Messenger {
   
     chatFooter.appendChild(messageForm);
   
-    messenger.appendChild(chatHeader)
-    messenger.appendChild(this.chatBody)
-    messenger.appendChild(chatFooter)
-    return messenger
+    this.messenger.appendChild(chatHeader)
+    this.messenger.appendChild(this.chatBody)
+    this.messenger.appendChild(chatFooter)
+    //appendToRoot
+    this.RootElement.appendChild(this.messenger)
   }
 
   RefreshChats(){
