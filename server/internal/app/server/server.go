@@ -2,13 +2,11 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/jwttoken"
 	"forum/server/pkg/router"
@@ -68,7 +66,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/:id", s.serveSinglePostInformation())
 	// -------------------- COMMENT PATHS ---------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/comments/delete", s.handleRemoveComment())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/comments/delete/:id", s.handleRemoveComment())
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/remove", s.handleRemoveReaction())
@@ -266,48 +264,6 @@ func (s *server) handleAddReactionsToParent() http.HandlerFunc {
 			Result:     "Successfully added to Database",
 			ReactionID: req.ReactionID,
 		})
-	}
-}
-
-func (s *server) handleCommentCreation() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		c := &models.Comment{}
-		if err := json.NewDecoder(r.Body).Decode(c); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		userID := r.Context().Value(ctxUserID).(string)
-		err := s.store.Comment().Create(c, userID)
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf(`Successfully created comment`))
-	}
-}
-
-func (s *server) handleRemoveComment() http.HandlerFunc {
-	type RequestBody struct {
-		ID string `json:"id"`
-	}
-
-	type responseBody struct {
-		Response string `json:"response"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req RequestBody
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		if err := s.store.Comment().Delete(req.ID); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, responseBody{Response: "Successfully deleted"})
 	}
 }
 
