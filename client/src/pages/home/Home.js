@@ -4,14 +4,22 @@ import "../../styles/post.css"
 import "../../styles/messenger.css"
 import "../../styles/chat.css"
 import { RenderPost } from "../../components/Post"
-import { RenderMessenger } from "../../components/Messenger"
+import { Messenger, OpenMessengers, RenderMessenger } from "../../components/Messenger"
 import { GetPosts, SinglePostRequest } from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
 import { RouterFunction } from "../../router/Router.js"
 
-const Messenger = RenderMessenger({id: "user1"})
+
+//Get all the messages for the messenger
+//right now sample data, later fix that
+
+//Later change after request to userid
+
+// const Messenger = RenderMessenger("user1")
+
+const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl")
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
@@ -28,7 +36,7 @@ export async function RenderHomePage() {
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
-  ROOT.appendChild(Messenger)
+  ROOT.appendChild(Chats.Create())
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {

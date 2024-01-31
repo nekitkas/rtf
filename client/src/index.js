@@ -1,3 +1,4 @@
+import { OpenMessengers } from "./components/Messenger.js"
 import { RouterFunction } from "./router/Router.js"
 
 export const Page = document.querySelector(".root")
@@ -18,6 +19,15 @@ export function initializeWebSocket(id) {
   });
 
   Socket.addEventListener('message', (event) => {
+    // console.log(event.data.json())
+    const parsedData = JSON.parse(event.data)
+
+    for(let i = 0; i < OpenMessengers.length; i++){
+      if (OpenMessengers[i].userToId == parsedData.from_user){
+        OpenMessengers[i].messages.push({text: parsedData.message, class: "left"});
+        OpenMessengers[i].RefreshChats();
+      } 
+    }
     console.log('Received message:', event.data);
   });
 
