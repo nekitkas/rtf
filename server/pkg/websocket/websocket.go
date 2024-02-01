@@ -25,6 +25,12 @@ type WebSocket struct {
 	clients  map[*websocket.Conn]string
 }
 
+type Response struct {
+	MessageType string `json:"type"`
+	Message     string `json:"message"`
+	FromUser    string `json:"from_user"`
+}
+
 func NewWebSocket() *WebSocket {
 	return &WebSocket{
 		Upgrader: upgrader,
@@ -49,7 +55,11 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 	defer func() {
 		conn.Close()
 		delete(ws.clients, conn)
+		ws.broadcastStatusUpdate("offline", ws.clients[conn])
 	}()
+
+	ws.broadcastStatusUpdate("online", ws.clients[conn])
+
 	for {
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
@@ -70,16 +80,11 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 			fmt.Println("JSON ERROR:", err)
 		}
 
-		type response struct{
-			Message string `json:"message"`
-			FromUser string `json:"from_user"`
-		}
-
 		toUserConn := getKeyByValue(ws.clients, data.ToUser)
 		if toUserConn == nil {
 			fmt.Println("That user is not connected with WS")
-		} else{
-			jsonBytes, err := json.Marshal(response{Message: data.Message, FromUser: ws.clients[conn]})
+		} else {
+			jsonBytes, err := json.Marshal(Response{MessageType:"chat", Message: data.Message, FromUser: ws.clients[conn]})
 			if err != nil {
 				fmt.Println("JSON Marshal error!", err)
 			}
@@ -90,13 +95,32 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 
 func (ws *WebSocket) sendToUser(messType int, b []byte, userConn *websocket.Conn) {
 	for ws := range ws.clients {
-		if (ws == userConn){
+		if ws == userConn {
 			go func(ws *websocket.Conn) {
 				if err := ws.WriteMessage(messType, b); err != nil {
 					fmt.Println("SOMETING ERROR", err)
 				}
 			}(ws)
 		}
+	}
+}
+
+func (ws *WebSocket) broadcastStatusUpdate(status, username string) {
+	jsonBytes, err := json.Marshal(Response{MessageType:"status", Message: status, FromUser: username})
+	if err != nil {
+		fmt.Println("JSON Marshal error!", err)
+		return
+	}
+	ws.broadCastToAll(websocket.TextMessage, jsonBytes)
+}
+
+func (ws *WebSocket) broadCastToAll(messType int, b []byte) {
+	for ws := range ws.clients {
+		go func(ws *websocket.Conn) {
+			if err := ws.WriteMessage(messType, b); err != nil {
+				fmt.Println("SOMETING ERROR", err)
+			}
+		}(ws)
 	}
 }
 

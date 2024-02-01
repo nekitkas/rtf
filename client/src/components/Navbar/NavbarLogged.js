@@ -8,6 +8,7 @@ import modalProfile from "../../assets/img/modalProfile.svg"
 import logout from "../../assets/img/logout.svg"
 import { RouterFunction } from "../../router/Router"
 import { GetUserInfo, Logout } from "../../helpers/ServerRequests"
+import { Socket } from "../.."
 
 export async function NavbarLogged() {
   const userInfo = await GetUserInfo()
@@ -39,6 +40,7 @@ export async function NavbarLogged() {
 
   const logoutBtn = document.querySelector(".logoutBtn")
   logoutBtn.addEventListener("click", () => {
+    Socket.close(1000, "Connection closed by the client")
     Logout()
 
 

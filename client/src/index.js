@@ -8,6 +8,7 @@ const CONTAINER = document.createElement("div")
 CONTAINER.className = "container"
 
 let Socket
+const onlineUsers = [];
 
 export function initializeWebSocket(id) {
   // Replace 'ws://example.com/socket' with your WebSocket server URL
@@ -18,12 +19,16 @@ export function initializeWebSocket(id) {
     console.log('WebSocket connection opened:', event);
   });
 
-  Socket.addEventListener('message', (event) => {add c
+  Socket.addEventListener('message', (event) => {
     // console.log(event.data.json())
     const parsedData = JSON.parse(event.data)
-
+    if(parsedData.message == "online" && parsedData.type == "status" || parsedData.message == "offline" && parsedData.type == "status"){
+      //fire a get all function
+      console.log(parsedData.from_user, "is", parsedData.message)
+    }
+    
     for(let i = 0; i < OpenMessengers.length; i++){
-      if (OpenMessengers[i].userToId == parsedData.from_user){
+      if (OpenMessengers[i].userToId == parsedData.from_user && parsedData.type == "chat"){
         OpenMessengers[i].messages.push({text: parsedData.message, class: "left"});
         OpenMessengers[i].RefreshChats();
       } 
