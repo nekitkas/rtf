@@ -1,6 +1,7 @@
 import { CONTAINER, ROOT } from "../..";
 import { CreateCommentComponent } from "../../components/Comment";
 import { NavbarLogged } from "../../components/Navbar/NavbarLogged";
+import { GLOBAL_URL } from "../../config";
 import { SinglePostRequest } from "../../helpers/ServerRequests";
 import { RouterFunction } from "../../router/Router";
 import "../../styles/separatePost.css";
@@ -11,17 +12,15 @@ export async function RenderSeparatePostPage(postId) {
   await NavbarLogged();
   ROOT.append(CONTAINER);
 
- 
-  const apiUrl = "http://localhost:8080/api/v1/jwt/posts/findById";
-  const requestData = {
-    post_id: postId,
-  };
 
-  SinglePostRequest(apiUrl, "POST", requestData)
+  const apiUrl = GLOBAL_URL + `/api/v1/jwt/posts/${postId}`;
+
+
+  SinglePostRequest(apiUrl, "GET")
     .then((data) => {
 
-
-      const postData = data.post;
+      console.log(data);
+      const postData = data.data.post;
 
       const { title, content, timestamp, nickname } = postData;
 
@@ -138,10 +137,11 @@ export async function RenderSeparatePostPage(postId) {
       const commentsContainer = document.createElement("div");
       commentsContainer.className = "commentsContainer";
 
-      if(data.comments){
+
+      if(data.data.comments){
         const commentDiv = document.createElement("div");
         commentDiv.className = "comment";
-        data.comments.forEach(
+        data.data.comments.forEach(
           (comment) => commentsContainer.appendChild(CreateCommentComponent(comment.comment.datetime, comment.comment.content, comment.comment.user_id,commentDiv))
         );
 
