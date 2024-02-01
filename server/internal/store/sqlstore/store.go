@@ -10,6 +10,7 @@ import (
 
 type Store struct {
 	Db                 *sql.DB
+	chatRepository     *ChatRepository
 	userRepository     *UserRepository
 	postRepository     *PostRepository
 	categoryRepository *CategoryRepository
@@ -21,6 +22,18 @@ func New(db *sql.DB) *Store {
 	return &Store{
 		Db: db,
 	}
+}
+
+func (s *Store) Chat() store.ChatRepository {
+	if s.chatRepository != nil {
+		return s.chatRepository
+	}
+
+	s.chatRepository = &ChatRepository{
+		store: s,
+	}
+
+	return s.chatRepository
 }
 
 func (s *Store) User() store.UserRepository {
