@@ -7,6 +7,8 @@ import (
 )
 
 type ChatRepository interface {
+	WriteLine(line models.Line) error
+	GetLinesInit(chat_id string, time time.Time, limit int, offset int) ([]models.Line, error)
 	CheckChatExists(user1 string, user2 string) ([]string, error)
 	Create(user1 string, user2 string) (models.Chat, error)
 	Get(id string) (models.Chat, error)

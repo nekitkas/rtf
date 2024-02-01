@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"fmt"
+	"time"
 
 	"forum/server/internal/models"
 
@@ -47,11 +48,11 @@ func (c *ChatRepository) Create(user1 string, user2 string) (models.Chat, error)
 		return models.Chat{}, err
 	}
 
-	if err := c.createChatUser(user1, id); err != nil {
+	if err := c.CreateChatUser(user1, id); err != nil {
 		return models.Chat{}, err
 	}
 
-	if err := c.createChatUser(user2, id); err != nil {
+	if err := c.CreateChatUser(user2, id); err != nil {
 		return models.Chat{}, err
 	}
 
@@ -60,7 +61,7 @@ func (c *ChatRepository) Create(user1 string, user2 string) (models.Chat, error)
 	}, nil
 }
 
-func (c *ChatRepository) createChatUser(user_id string, chat_id string) error {
+func (c *ChatRepository) CreateChatUser(user_id string, chat_id string) error {
 	id := uuid.New().String()
 	query := `INSERT INTO chatUser (id, user_id, chat_id) VALUES (?, ?, ?)`
 
@@ -69,6 +70,41 @@ func (c *ChatRepository) createChatUser(user_id string, chat_id string) error {
 	}
 
 	return nil
+}
+
+func (c *ChatRepository) WriteLine(line models.Line) error {
+	query := `INSERT INTO textLines (id, chat_id, user_id, content, timestamp) VALUES (?, ?, ?, ?, ?)`
+	id := uuid.New().String()
+
+	if _, err := c.store.Db.Exec(query, id, line.ChatID, line.UserID, line.Content, line.TimeStamp); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *ChatRepository) GetLinesInit(chat_id string, time time.Time, limit int, offset int) ([]models.Line, error) {
+	query := `SELECT * FROM textLines
+	WHERE chat_id = ? AND timestamp <= ?
+	ORDER BY timestamp DESC
+	LIMIT ? OFFSET ?;
+	`
+
+	rows, err := c.store.Db.Query(query, chat_id, time, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	var lines []models.Line
+	for rows.Next() {
+		var line models.Line
+		if err := rows.Scan(&line.ID, &line.ChatID, &line.UserID, &line.Content, &line.TimeStamp); err != nil {
+			return nil, err
+		}
+		lines = append(lines, line)
+	}
+
+	return lines, nil
 }
 
 func (c *ChatRepository) Get(id string) (models.Chat, error) {
