@@ -7,7 +7,8 @@ import (
 )
 
 type ChatRepository interface {
-	Create(*models.Chat) error
+	CheckChatExists(user1 string, user2 string) (string, error)
+	Create(id string, user1 string, user2 string) error
 	Get(id string) (models.Chat, error)
 }
 
@@ -19,7 +20,7 @@ type UserRepository interface {
 	// Check can be used to get user data not meant to go the client
 	// (password from db has NOT BEEN SANITIZED)
 	Check(string) (*models.User, error)
-	GetAllOtherUsers(user_id string) ([]models.User, error)
+	GetAllOtherUsers(user_id string) ([]models.UserWithChat, error)
 	Delete(string) error
 }
 

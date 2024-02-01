@@ -4,16 +4,61 @@ import (
 	"fmt"
 
 	"forum/server/internal/models"
+
+	"github.com/google/uuid"
 )
 
 type ChatRepository struct {
 	store *Store
 }
 
-func (c *ChatRepository) Create(model *models.Chat) error {
+func (c *ChatRepository) CheckChatExists(user1 string, user2 string) (string, error) {
+	query := `SELECT chat_id
+FROM chatUser
+WHERE user_id IN (?, ?)
+GROUP BY chat_id
+HAVING COUNT(DISTINCT user_id) = 2;
+`
+
+	row, err := c.store.Db.Query(query, user1, user2)
+	if err != nil {
+		return "", err
+	}
+
+	var str string
+	for row.Next() {
+		if err := row.Scan(&str); err != nil {
+			return "", err
+		}
+		fmt.Println(str)
+	}
+
+	return str, nil
+}
+
+func (c *ChatRepository) Create(id string, user1 string, user2 string) error {
 	query := `INSERT INTO chat (id) VALUES (?)`
 
-	if _, err := c.store.Db.Exec(query, model.ID); err != nil {
+	if _, err := c.store.Db.Exec(query, id); err != nil {
+		return err
+	}
+
+	if err := c.createChatUser(user1, id); err != nil {
+		return err
+	}
+
+	if err := c.createChatUser(user2, id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *ChatRepository) createChatUser(user_id string, chat_id string) error {
+	id := uuid.New().String()
+	query := `INSERT INTO chatUser (id, user_id, chat_id) VALUES (?, ?, ?)`
+
+	if _, err := c.store.Db.Exec(query, id, user_id, chat_id); err != nil {
 		return err
 	}
 
@@ -51,4 +96,4 @@ func (c *ChatRepository) Get(id string) (models.Chat, error) {
 	return models.Chat{}, nil
 }
 
-func getLinesOfChat(chat_id string) ([]models.Line, error)
+// func getLinesOfChat(chat_id string) ([]models.Line, error)

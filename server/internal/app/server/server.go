@@ -71,6 +71,8 @@ func (s *server) configureRouter() {
 	// -------------------- COMMENT PATHS ---------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/delete", s.handleRemoveComment())
+	// -------------------- CHAT PATHS ------------------------------- //
+	s.router.HandleFunc("POST", "/api/v1/jwt/chat/create", s.handleCreateChat())
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactionsOptions())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/remove", s.handleRemoveReaction())
@@ -273,6 +275,12 @@ func (s *server) handleGetAllCategories() http.HandlerFunc {
 }
 
 // }}}
+// -------------------------CHAT STUFF---------------------------//
+func (s *server) handleCreateChat() http.HandlerFunc {
+	type requestBody struct{}
+	return func(w http.ResponseWriter, r *http.Request) {}
+}
+
 // -------------------------POST STUFF--------------------------//
 // {{{
 func (s *server) handlePostCreation() http.HandlerFunc {

@@ -30,7 +30,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.User, error) {
+func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.UserWithChat, error) {
 	query := `SELECT id, username, image_url, first_name, last_name FROM user WHERE id != ?`
 
 	var users []models.User
@@ -38,19 +38,33 @@ func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.User, error)
 	if err != nil {
 		return nil, err
 	}
+
 	for rows.Next() {
 		var user models.User
 		if err := rows.Scan(&user.ID, &user.Username, &user.ImageURL, &user.FirstName, &user.LastName); err != nil {
-			return make([]models.User, 1), fmt.Errorf("failed to scan post row: %v", err)
+			return make([]models.UserWithChat, 1), fmt.Errorf("failed to scan post row: %v", err)
 		}
 		users = append(users, user)
+	}
+
+	var usersWithChat []models.UserWithChat
+	for i := range users {
+		// uuid := uuid.New().String()
+		chatId, err := r.store.Chat().CheckChatExists(user_id, users[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		usersWithChat = append(usersWithChat, models.UserWithChat{
+			User:   users[i],
+			ChatID: chatId,
+		})
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error reading posts rows: %v", err)
 	}
 
-	return users, nil
+	return usersWithChat, nil
 }
 
 func (r *UserRepository) Create(user *models.User) error {
