@@ -138,9 +138,12 @@ func (r *route) match(ctx context.Context, segs []string, req *http.Request) (co
 					return ctx, true
 				}
 			}
-			if !strings.HasPrefix(segs[i], seg) {
+			if seg != segs[i] {
 				return nil, false
 			}
+			//if !strings.HasPrefix(segs[i], seg) {
+			//	return nil, false
+			//}
 		}
 		if isParam {
 			ctx = context.WithValue(ctx, paramContextKey(seg), segs[i])

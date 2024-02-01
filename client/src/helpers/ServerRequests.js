@@ -96,6 +96,35 @@ export const GetPosts = async () => {
 };
 
 
+
+export const GetAllUsers = async () => {
+  try{
+
+
+    const response = await fetch("http://localhost:8080/api/v1/jwt/users/getAll",{
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Request-Method": "GET",
+      },
+      credentials: "include",
+
+    });
+
+    const result = await response.json()
+
+    return result
+
+  }catch (error) {
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
+  }
+}
+
+
+
+
+
 export function SinglePostRequest(url, method, body = null, headers = {}) {
   const options = {
     method,

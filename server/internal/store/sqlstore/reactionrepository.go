@@ -13,15 +13,15 @@ type ReactionRepository struct {
 }
 
 func (r *ReactionRepository) Create(reaction *models.Reaction) error {
-	return nil
+	panic("implement me")
 }
 
-func (r *ReactionRepository) AddToParent(parent_id string, reaction_id string, user_id string) error {
+func (r *ReactionRepository) AddToParent(parentId string, reactionId string, userId string) error {
 	id := uuid.New().String()
 
 	query := `
 	INSERT INTO parentReaction (id, user_id, reaction_id, parent_id, parent_type) VALUES (?, ?, ?, ?, ?);`
-	_, err := r.store.Db.Exec(query, id, user_id, reaction_id, parent_id, "")
+	_, err := r.store.Db.Exec(query, id, userId, reactionId, parentId, "")
 	if err != nil {
 		return err
 	}
@@ -29,26 +29,26 @@ func (r *ReactionRepository) AddToParent(parent_id string, reaction_id string, u
 	return nil
 }
 
-func (r *ReactionRepository) RemoveFromParent(post_id string, reaction_id string, user_id string) error {
+func (r *ReactionRepository) RemoveFromParent(postId string, reactionId string, userId string) error {
 	query := `
 DELETE FROM parentReaction
 WHERE user_id = ?
 AND reaction_id = ?
 AND parent_id = ?;
 	`
-	resp, err := r.store.Db.Exec(query, user_id, reaction_id, post_id)
+	resp, err := r.store.Db.Exec(query, userId, reactionId, postId)
 	if err != nil {
 		return err
 	}
 	num, err := resp.RowsAffected()
 	if num == 0 {
-		return fmt.Errorf("Nothing was removed from database, paramaters don't match a result in DB")
+		return fmt.Errorf("nothing was removed from database, paramaters don't match a result in DB")
 	}
 
 	return nil
 }
 
-func (r *ReactionRepository) GetByParentID(parent_id string) (*[]models.Reaction, error) {
+func (r *ReactionRepository) GetByParentID(parentId string) (*[]models.Reaction, error) {
 	query := ` 
 SELECT r.id, r.emoji, r.description
 FROM parentReaction pr
@@ -58,7 +58,7 @@ WHERE pr.parent_id = ?;
 
 	var reactions []models.Reaction
 
-	resp, err := r.store.Db.Query(query, parent_id)
+	resp, err := r.store.Db.Query(query, parentId)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ WHERE pr.parent_id = ?;
 	return &reactions, nil
 }
 
-func (r *ReactionRepository) GetByUserParentID(parent_id string, user_id string) (*[]models.Reaction, error) {
+func (r *ReactionRepository) GetByUserParentID(parentId string, userId string) (*[]models.Reaction, error) {
 	query := ` 
 SELECT r.id, r.emoji, r.description
 FROM parentReaction pr
@@ -85,7 +85,7 @@ WHERE pr.user_id = ? AND pr.parent_id = ?;
 
 	var reactions []models.Reaction
 
-	resp, err := r.store.Db.Query(query, user_id, parent_id)
+	resp, err := r.store.Db.Query(query, userId, parentId)
 	if err != nil {
 		return nil, err
 	}

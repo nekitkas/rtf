@@ -2,7 +2,7 @@ import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import "../../styles/auth.css"
 import { RouterFunction } from "../../router/Router.js"
 import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
-
+import { initializeWebSocket } from "../../index.js"
 import { ROOT, CONTAINER } from "../../index.js"
 import { Auth, RenderLoginForm } from "../../components/Auth/Login.js"
 
@@ -12,7 +12,7 @@ export async function RenderLoginPage() {
     console.log(isUserLogged)
 
     if (isUserLogged) {
-      window.location.href = "/"
+      window.history.pushState({}, "", "/")
       RouterFunction()
     } else {
       ROOT.innerHTML = ""
@@ -23,21 +23,19 @@ export async function RenderLoginPage() {
       const LoginForm = RenderLoginForm()
 
       Auth.appendChild(LoginForm)
-
       CONTAINER.appendChild(Auth)
-
       ROOT.appendChild(CONTAINER)
 
       const errorMsg = document.querySelector(".errorMsg")
 
-      const registerForm = document.querySelector(".form")
-      registerForm.addEventListener("submit", handleFormSubmit)
+      const loginForm = document.querySelector(".form")
+      loginForm.addEventListener("submit", handleFormSubmit)
 
       function handleFormSubmit(e) {
         e.preventDefault() // Prevent the default form submission
 
         // Get form data
-        const formData = new FormData(registerForm)
+        const formData = new FormData(loginForm)
 
         // Create an object from the form data
         const formDataObject = {}
@@ -68,9 +66,13 @@ export async function RenderLoginPage() {
               }
               throw new Error("Network response was not ok")
             }
+            return response.json()
           })
-          .then(() => {
-            window.location.href = "#/home"
+          .then((data) => {
+            console.log(data)
+            // window.location.href = "/"
+            initializeWebSocket(data.id)
+            window.history.pushState({}, "", "/")
             RouterFunction()
           })
           .catch((error) => {

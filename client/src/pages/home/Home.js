@@ -3,32 +3,58 @@ import "../../styles/style.css"
 import "../../styles/post.css"
 import "../../styles/messenger.css"
 import "../../styles/chat.css"
+import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
-import { RenderMessenger } from "../../components/Messenger"
-import { GetPosts, SinglePostRequest } from "../../helpers/ServerRequests.js"
-import { CONTAINER, ROOT } from "../../index.js"
+import {
+  Messenger,
+  OpenMessengers,
+  RenderMessenger,
+} from "../../components/Messenger"
+import {
+  GetAllUsers,
+  GetPosts,
+  SinglePostRequest,
+} from "../../helpers/ServerRequests.js"
+import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
+import { RouterFunction } from "../../router/Router.js"
+import { UserList } from "../../components/UserList"
 
-const Messenger = RenderMessenger()
+const usersContainer = document.createElement("div")
+
+usersContainer.className = "users-container"
+
+// const Messenger = RenderMessenger({ id: "user1" })
+
+//Get all the messages for the messenger
+//right now sample data, later fix that
+
+//Later change after request to userid
+
+// const Messenger = RenderMessenger("user1")
+
 
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
- await NavbarLogged()
 
+  usersContainer.innerHTML = ""
+  await NavbarLogged()
+  
+  // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()
-
+  console.log(Socket)
   ROOT.append(CONTAINER)
 
-  // Call the fetchData function
   fetchData(PostFeed)
+
+  fetchUsers(usersContainer)
 
   const Filter = RenderFilter()
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
-  ROOT.appendChild(Messenger)
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
@@ -41,8 +67,6 @@ export async function RenderHomePage() {
       selectArrow.classList.toggle("select-arrow-rotate")
     }
   }
-
-
 }
 
 async function fetchData(PostFeed) {
@@ -51,19 +75,21 @@ async function fetchData(PostFeed) {
     if (postsData) {
       // Do something with the data
       postsData.posts.forEach((post) => {
-        const postLink = document.createElement("a");
-        postLink.href = `post/${post.post.id}`;
-        postLink.classList.add("post-link");
+        const postLink = document.createElement("div")
+        // postLink.href = `post/${post.post.id}`
+        postLink.addEventListener("click", () => {
+          history.pushState({}, "", `post/${post.post.id}`)
+          RouterFunction()
+        })
+
+        postLink.classList.add("post-link")
         if (post.categories) {
-
-          postLink.appendChild((RenderPost(post.post, post.categories)))
-          PostFeed.appendChild(postLink);
-
-        }else{
-          postLink.appendChild((RenderPost(post.post)))
-          PostFeed.appendChild(postLink);
+          postLink.appendChild(RenderPost(post.post, post.categories))
+          PostFeed.appendChild(postLink)
+        } else {
+          postLink.appendChild(RenderPost(post.post))
+          PostFeed.appendChild(postLink)
         }
-
       })
       // postsData.forEach(post => {
 
@@ -78,4 +104,15 @@ async function fetchData(PostFeed) {
   }
 }
 
+async function fetchUsers(usersContainer) {
+  try {
+    const usersData = await GetAllUsers()
+    if (usersData) {
+      usersContainer.appendChild(UserList(usersData))
 
+      CONTAINER.appendChild(usersContainer)
+    }
+  } catch (error) {
+    console.error("Error during fetch:", error)
+  }
+}
