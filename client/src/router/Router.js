@@ -1,102 +1,98 @@
-import { CheckUserLoggedIn } from "../helpers/ServerRequests.js"
-import { RenderHomePage } from "../pages/home/Home.js"
-import { RenderLoginPage } from "../pages/login/Login.js"
-import { RenderPostPage } from "../pages/createPost/CreatePostPage.js"
-import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
-import { RenderRegisterPage } from "../pages/register/Register.js"
-import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
-import { RenderNotFound } from "../pages/notfound/NotFound.js"
+import { isLoggedIn } from "../helpers/ServerRequests.js"
+import { Home } from "../pages/Home.js"
+import { Login } from "../pages/Login.js"
+import { CreatePost } from "../pages/CreatePost.js"
+import { Profile } from "../pages/Profile.js"
+import { Register } from "../pages/Register.js"
+import { Post } from "../pages/Post.js"
+import { NotFound } from "../pages/NotFound";
 
+const authMiddleware = async (params) => {
+    const isUserLogged = await isLoggedIn();
 
-document.addEventListener("click", async (e) => {
-  const target = e.target
-
-  // Check if the clicked element is an anchor element and has the same origin
-  if (target.tagName === "A" && target.origin === location.origin) {
-    e.preventDefault() // Prevent the default behavior of anchor links
-
-
-    window.history.pushState({}, "", e.target.href)
-
-    // Call RouterFunction asynchronously
-    await RouterFunction()
-  }
-})
-
-
-export const RouterFunction = async () => {
-  const path = location.pathname
-
-  console.log("Current Path:", path)
-
-  if (path.startsWith("/post/")) {
-    const postId = path.split("/")[2]
-    console.log("Rendering Post Page for Post ID:", postId)
-    RenderSeparatePostPage(postId)
-  } else {
-    try {
-      const userLoggedIn = await CheckUserLoggedIn()
-
-      switch (path) {
-        case "/":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderHomePage()
-          break
-        case "/login":
-          RenderLoginPage()
-          break
-        case "/register":
-          RenderRegisterPage()
-          break
-        case "/create-post":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderPostPage()
-          break
-        case "/profile":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-
-          RenderProfilePage()
-          break
-        default:
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderNotFound(path)
-      }
-    } catch (error) {
-      console.error("Error checking user login:", error)
+    if (!isUserLogged) {
+        console.log('User not logged in. Redirect or handle accordingly.');
+        window.location.href = '/login';
     }
-  }
+
+    // Continue to the next middleware or route handler
+    return params;
+};
+
+const routes = [
+    { path: '/', view: Home, middleware: [authMiddleware] },
+    { path: '/login', view: Login },
+    { path: '/register', view: Register },
+    { path: '/create-post', view: CreatePost, middleware: [authMiddleware] },
+    { path: '/profile', view: Profile, middleware: [authMiddleware] },
+    { path: '/post/:id', view: Post, middleware: [authMiddleware] },
+    { path: '.*', view: NotFound },
+];
+
+const matchRoute = (path, route) => {
+    const routePathSegments = route.path.split('/');
+    const urlPathSegments = path.split('/');
+
+    if (routePathSegments.length !== urlPathSegments.length) {
+        return false;
+    }
+
+    const params = {};
+
+    for (let i = 0; i < routePathSegments.length; i++) {
+        if (routePathSegments[i].startsWith(':')) {
+            const paramName = routePathSegments[i].slice(1);
+            params[paramName] = urlPathSegments[i];
+        } else if (routePathSegments[i] !== urlPathSegments[i]) {
+            return false;
+        }
+    }
+
+    return params;
+};
+
+const findMatchingRoute = async (path, routes) => {
+    for (const route of routes) {
+        const params = matchRoute(path, route);
+        if (params) {
+            // Execute middleware before rendering the view
+            const updatedParams = route.middleware
+                ? await route.middleware.reduce(async (prev, middleware) => {
+                    return await middleware(await prev);
+                }, Promise.resolve(params))
+                : params;
+
+            return { route, params: updatedParams };
+        }
+    }
+
+    // No matching route found, render the "not found" view
+    return { route: { view: NotFound }, params: {} };
+};
+
+export const router = async () => {
+    const { route, params } = await findMatchingRoute(location.pathname, routes) || {
+        route: routes[0],
+        params: {},
+    };
+
+    await route.view(params);
+};
+
+window.addEventListener('popstate', router);
+
+document.addEventListener('DOMContentLoaded', () => {
+    router();
+});
+
+document.addEventListener('click', e => {
+    if (e.target.className === 'link') {
+        e.preventDefault();
+        navigateTo(e.target.href);
+    }
+});
+
+const navigateTo = url => {
+    history.pushState(null, null, url);
+    router();
 }
-
-// try {
-//   const userCookie = getCookie("session");
-
-//   console.log("User Cookie:", userCookie);
-//   return userCookie ? true : false;
-// } catch (error) {
-//   console.error("Error checking user login:", error);
-//   return false;
-// }
-
-// Function to retrieve the value of a cookie by name
-// const getCookie = (cookieName) => {
-//   const cookies = document.cookie.split("; ");
-//   for (const cookie of cookies) {
-//     const [name, value] = cookie.split("=");
-//     if (name.trim() === cookieName) {
-//       return value;
-//     }
-//   }
-//   return null;
-// };

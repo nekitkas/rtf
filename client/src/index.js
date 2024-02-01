@@ -1,5 +1,5 @@
 import { OpenMessengers } from "./components/Messenger.js"
-import { RouterFunction } from "./router/Router.js"
+import { router } from "./router/Router.js"
 
 export const Page = document.querySelector(".root")
 
@@ -44,7 +44,7 @@ export function initializeWebSocket(id) {
 window.addEventListener("DOMContentLoaded", async (e) => {
   e.preventDefault()
 
-  await RouterFunction()
+  await router()
 })
 
 // window.addEventListener("hashchange", () => {
@@ -54,5 +54,12 @@ window.addEventListener("DOMContentLoaded", async (e) => {
 
 // Handle link clicks to prevent default navigation
 
+
+    window.history.pushState({}, "", e.target.href)
+
+    // Call RouterFunction asynchronously
+    await router()
+  }
+})
 
 export { ROOT, CONTAINER, Socket }
