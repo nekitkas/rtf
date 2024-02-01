@@ -79,7 +79,7 @@ func (c *CommentRepository) Get(id string) (*[]models.Comment, error) {
 			comment c
 		WHERE
 			c.post_id = ? AND (c.parent_id IS NULL OR c.parent_id = '')
-
+	
 		UNION ALL
 
 		-- Recursive member: Join with sub-comments

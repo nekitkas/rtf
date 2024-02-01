@@ -6,6 +6,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserWithChat struct {
+	User   User   `json:"user"`
+	ChatID string `json:"chat_id"`
+}
 type User struct {
 	ID          string    `db:"id" json:"id"`
 	Username    string    `db:"username" json:"username"`

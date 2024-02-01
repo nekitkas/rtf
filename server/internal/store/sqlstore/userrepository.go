@@ -15,6 +15,18 @@ type UserRepository struct {
 	store *Store
 }
 
+func (r *UserRepository) IsUser(id string) (bool, error) {
+	query := `SELECT EXISTS (SELECT 1 FROM user WHERE id = ?)`
+
+	var exists int
+	err := r.store.Db.QueryRow(query, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists == 1, nil
+}
+
 func (r *UserRepository) FindByID(id string) (*models.User, error) {
 	// command to find a user with a specific id
 	query := `SELECT * FROM user u WHERE u.id = ?`
@@ -38,6 +50,7 @@ func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.User, error)
 	if err != nil {
 		return nil, err
 	}
+
 	for rows.Next() {
 		var user models.User
 		if err := rows.Scan(&user.ID, &user.Username, &user.ImageURL, &user.FirstName, &user.LastName); err != nil {
