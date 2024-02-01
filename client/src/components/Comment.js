@@ -1,40 +1,57 @@
+import { GLOBAL_URL } from "../config"
+import { SinglePostRequest } from "../helpers/ServerRequests"
 
+export function CreateCommentComponent(createTime, text, author, id) {
+  const commentDiv = document.createElement("div")
+  commentDiv.className = "comment"
 
-export function CreateCommentComponent(createTime, text, author) {
+  const createTimeDiv = document.createElement("div")
+  createTimeDiv.className = "commentCreateTime"
 
-    const commentDiv = document.createElement("div");
-    commentDiv.className = "comment";
+  const dateObject = new Date(createTime)
 
-    const createTimeDiv = document.createElement("div");
-    createTimeDiv.className = "commentCreateTime";
+  const formattedCommentDate = dateObject.toLocaleString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+  createTimeDiv.textContent = formattedCommentDate
 
-    const dateObject = new Date(createTime);
+  const commentTextBlockDiv = document.createElement("div")
+  commentTextBlockDiv.className = "commentTextBlock"
 
-    const formattedCommentDate = dateObject.toLocaleString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    createTimeDiv.textContent = formattedCommentDate;
+  const commentTextParagraph = document.createElement("p")
+  commentTextParagraph.className = "commentText"
+  commentTextParagraph.textContent = text
 
-    const commentTextBlockDiv = document.createElement("div");
-    commentTextBlockDiv.className = "commentTextBlock";
+  commentTextBlockDiv.appendChild(commentTextParagraph)
 
-    const commentTextParagraph = document.createElement("p");
-    commentTextParagraph.className = "commentText";
-    commentTextParagraph.textContent = text;
+  const commentAuthorDiv = document.createElement("div")
+  commentAuthorDiv.className = "comment-author"
+  commentAuthorDiv.textContent = `Author: ${author}`
 
-    commentTextBlockDiv.appendChild(commentTextParagraph);
+  const deleteCommentButton = document.createElement("button")
+  deleteCommentButton.className = "delete-comment"
+  deleteCommentButton.textContent = "Delete"
 
-    const commentAuthorDiv = document.createElement("div");
-    commentAuthorDiv.className = "comment-author";
-    commentAuthorDiv.textContent = `Author: ${author}`;
+  commentDiv.appendChild(createTimeDiv)
+  commentDiv.appendChild(commentTextBlockDiv)
+  commentDiv.appendChild(commentAuthorDiv)
+  commentDiv.appendChild(deleteCommentButton)
 
-    commentDiv.appendChild(createTimeDiv);
-    commentDiv.appendChild(commentTextBlockDiv);
-    commentDiv.appendChild(commentAuthorDiv);
+  commentDiv.id = id
 
-    return commentDiv;
+  deleteCommentButton.addEventListener("click", async (e) => {
+    try {
+      await SinglePostRequest(`${GLOBAL_URL}/api/v1/jwt/comments/delete/${id}`, "DELETE");
+      document.querySelector(`#${id}`).remove();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      // Handle error, display message, etc.
+    }
+  });
+
+  return commentDiv
 }

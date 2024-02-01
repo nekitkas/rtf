@@ -1,5 +1,5 @@
 import { OpenMessengers } from "./components/Messenger.js"
-import { RouterFunction } from "./router/Router.js"
+import { router } from "./router/Router.js"
 
 export const Page = document.querySelector(".root")
 
@@ -44,28 +44,7 @@ export function initializeWebSocket(id) {
 window.addEventListener("DOMContentLoaded", async (e) => {
   e.preventDefault()
 
-  await RouterFunction()
-})
-
-// window.addEventListener("hashchange", () => {
-//   console.log("hashchange")
-//   RouterFunction()
-// })
-
-// Handle link clicks to prevent default navigation
-document.addEventListener("click", async (e) => {
-  const target = e.target
-
-  // Check if the clicked element is an anchor element and has the same origin
-  if (target.tagName === "A" && target.origin === location.origin) {
-    e.preventDefault() // Prevent the default behavior of anchor links
-
-
-    window.history.pushState({}, "", e.target.href)
-
-    // Call RouterFunction asynchronously
-    await RouterFunction()
-  }
+  await router()
 })
 
 export { ROOT, CONTAINER, Socket }
