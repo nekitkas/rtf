@@ -1,5 +1,5 @@
 import { ROOT } from ".."
-import { Messenger } from "./Messenger"
+import { Messenger, OpenMessengers } from "./Messenger"
 
 export function UserCard(data) {
   const { id, username, image_url } = data
@@ -17,8 +17,13 @@ export function UserCard(data) {
   userName.textContent = username
 
   userComponent.addEventListener('click', () => {
-    const Chats = new Messenger("CURRUSERID", id, username, image_url, ROOT)
-    Chats.Create()
+    console.log("OPENMESSENGERS   :   ", OpenMessengers)
+    if(OpenMessengers.length == 0){
+      const Chats = new Messenger("CURRUSERID", id, username, image_url, ROOT)
+      Chats.Create()
+    }else{
+      console.log("YOU CAN NOT OPEN MULTIPLE CHATS AT ONCE!")
+    }
   })
   // Append elements to the User component
   userComponent.appendChild(userImage)
