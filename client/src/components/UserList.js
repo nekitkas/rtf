@@ -4,6 +4,10 @@ export function UserList(arr) {
   const userList = document.createElement("div")
   userList.className = "user-list"
 
+  const hr = document.createElement("hr")
+
+  userList.appendChild(hr)
+
   for (let i = 0; i < arr.length; i++) {
     const userCard = UserCard(arr[i])
 
@@ -12,9 +16,6 @@ export function UserList(arr) {
 
   return userList
 }
-
-
-
 
 fetch("http://localhost:8080/api/v1/jwt/users/getAll", {
   method: "GET",

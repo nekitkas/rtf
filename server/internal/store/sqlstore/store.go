@@ -53,6 +53,10 @@ func (s *Store) Post() store.PostRepository {
 		return s.postRepository
 	}
 
+	s.commentRepository = &CommentRepository{
+		store: s,
+	}
+
 	s.postRepository = &PostRepository{
 		store: s,
 	}

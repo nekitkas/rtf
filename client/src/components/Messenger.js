@@ -82,6 +82,7 @@ export class Messenger {
 
   Close(){
     this.RootElement.removeChild(this.messenger);
+    OpenMessengers.pop(this.messenger);
   }
 
   Create(){
