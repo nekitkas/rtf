@@ -76,6 +76,8 @@ export class Messenger {
       console.log("ITEM ADDED!", items)
     })
     OpenMessengers.push(this)
+
+    this.chatBody.addEventListener('wheel', Throttle(() => this.LoadOlderChats(), 300));
   }
 
   //Get messages from the back-end
@@ -90,7 +92,12 @@ export class Messenger {
   }
 
   LoadOlderChats(){
-  // If scollred up, add more messages
+  // If scollred up, add more messagesconst isScrollCloseToBottom = () => {
+    const isAtTop = this.chatBody.scrollTop <= 800;
+    if (isAtTop){
+      for(let i = 0; i <= 20; i++)
+      this.AppendLine({text: "JUST A TESTING: " + i, class: "left"}, true)
+    }
   }
 
   Create(){
@@ -173,6 +180,8 @@ export class Messenger {
     this.messenger.appendChild(chatFooter)
     //appendToRoot
     this.RootElement.appendChild(this.messenger)
+    //move the chat to bottom
+    this.chatBody.scrollTop = this.chatBody.scrollHeight;
   }
 
   AddChats(){
@@ -200,6 +209,20 @@ export class Messenger {
       this.chatBody.scrollTop = this.chatBody.scrollHeight;
     }
     // return msgDiv
+  }
+}
+
+export function Throttle(func, delay){
+  let shouldWait = false;
+
+  return function(...args){
+      if(shouldWait) return;
+      func(...args);
+      shouldWait = true;
+
+      setTimeout(() => {
+          shouldWait = false;
+      }, delay)
   }
 }
 
