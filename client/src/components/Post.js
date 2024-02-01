@@ -1,5 +1,4 @@
 export function RenderPost(data, categories) {
-  console.log(data);
   const { id,title, content, image_url, comment_count } = data;
   const post = document.createElement("div");
   post.classList.add("post");

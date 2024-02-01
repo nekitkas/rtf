@@ -12,14 +12,13 @@ export async function RenderSeparatePostPage(postId) {
   await NavbarLogged();
   ROOT.append(CONTAINER);
 
-
+  console.log("POST ID bla bla" ,postId["id"])
+  postId = postId["id"]
   const apiUrl = GLOBAL_URL + `/api/v1/jwt/posts/${postId}`;
 
 
   SinglePostRequest(apiUrl, "GET")
     .then((data) => {
-
-      console.log(data);
       const postData = data.data.post;
 
       const { title, content, timestamp, nickname } = postData;

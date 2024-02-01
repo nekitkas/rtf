@@ -26,7 +26,7 @@ export async function RenderLoginPage() {
       Auth.appendChild(LoginForm)
       CONTAINER.appendChild(Auth)
       ROOT.appendChild(CONTAINER)
-
+      const html = Auth.innerHTML + CONTAINER.innerHTML + ROOT.innerHTML
       const errorMsg = document.querySelector(".errorMsg")
 
       const loginForm = document.querySelector(".form")

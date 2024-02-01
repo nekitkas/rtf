@@ -34,7 +34,6 @@ export async function RenderHomePage() {
 
   // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()
-  console.log(Socket)
   ROOT.append(CONTAINER)
 
   fetchData(PostFeed)
@@ -62,15 +61,10 @@ export async function RenderHomePage() {
 async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts()
-
-    console.log(postsData)
     if (postsData) {
       // Do something with the data
       postsData.forEach((post) => {
         const postLink = document.createElement("div")
-        // postLink.href = `post/${post.post.id}`
-
-        console.log(post.id)
         postLink.addEventListener("click", () => {
           history.pushState({}, "", `post/${post.id}`)
           RouterFunction()

@@ -7,79 +7,74 @@ import { RenderRegisterPage } from "../pages/register/Register.js"
 import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
 import { RenderNotFound } from "../pages/notfound/NotFound.js"
 
-export const RouterFunction = async () => {
-  const path = location.pathname
+const checkUserLoggedInMiddleware = async (params) => {
+    const isUserLogged = await CheckUserLoggedIn();
 
-  console.log("Current Path:", path)
-
-  if (path.startsWith("/post/")) {
-    const postId = path.split("/")[2]
-    console.log("Rendering Post Page for Post ID:", postId)
-    RenderSeparatePostPage(postId)
-  } else {
-    try {
-      const userLoggedIn = await CheckUserLoggedIn()
-
-      switch (path) {
-        case "/":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderHomePage()
-          break
-        case "/login":
-          RenderLoginPage()
-          break
-        case "/register":
-          RenderRegisterPage()
-          break
-        case "/create-post":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderPostPage()
-          break
-        case "/profile":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-
-          RenderProfilePage()
-          break
-        default:
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderNotFound(path)
-      }
-    } catch (error) {
-      console.error("Error checking user login:", error)
+    if (!isUserLogged) {
+        console.log('User not logged in. Redirect or handle accordingly.');
+        window.location.href = '/login';
     }
-  }
-}
 
-// try {
-//   const userCookie = getCookie("session");
+    // Continue to the next middleware or route handler
+    return params;
+};
 
-//   console.log("User Cookie:", userCookie);
-//   return userCookie ? true : false;
-// } catch (error) {
-//   console.error("Error checking user login:", error);
-//   return false;
-// }
+const routes = [
+    { path: '/', view: RenderHomePage, middleware: [checkUserLoggedInMiddleware] },
+    { path: '/login', view: RenderLoginPage },
+    { path: '/register', view: RenderRegisterPage },
+    { path: '/create-post', view: RenderPostPage, middleware: [checkUserLoggedInMiddleware] },
+    { path: '/profile', view: RenderProfilePage, middleware: [checkUserLoggedInMiddleware] },
+    { path: '/post/:id', view: RenderSeparatePostPage, middleware: [checkUserLoggedInMiddleware] },
+    { path: '.*', view: RenderNotFound },
+];
 
-// Function to retrieve the value of a cookie by name
-// const getCookie = (cookieName) => {
-//   const cookies = document.cookie.split("; ");
-//   for (const cookie of cookies) {
-//     const [name, value] = cookie.split("=");
-//     if (name.trim() === cookieName) {
-//       return value;
-//     }
-//   }
-//   return null;
-// };
+const matchRoute = (path, route) => {
+    const routePathSegments = route.path.split('/');
+    const urlPathSegments = path.split('/');
+
+    if (routePathSegments.length !== urlPathSegments.length) {
+        return false;
+    }
+
+    const params = {};
+
+    for (let i = 0; i < routePathSegments.length; i++) {
+        if (routePathSegments[i].startsWith(':')) {
+            const paramName = routePathSegments[i].slice(1);
+            params[paramName] = urlPathSegments[i];
+        } else if (routePathSegments[i] !== urlPathSegments[i]) {
+            return false;
+        }
+    }
+
+    return params;
+};
+
+const findMatchingRoute = async (path, routes) => {
+    for (const route of routes) {
+        const params = matchRoute(path, route);
+        if (params) {
+            // Execute middleware before rendering the view
+            const updatedParams = route.middleware
+                ? await route.middleware.reduce(async (prev, middleware) => {
+                    return await middleware(await prev);
+                }, Promise.resolve(params))
+                : params;
+
+            return { route, params: updatedParams };
+        }
+    }
+
+    // No matching route found, render the "not found" view
+    return { route: { view: RenderNotFound }, params: {} };
+};
+
+export const RouterFunction = async () => {
+    const { route, params } = await findMatchingRoute(location.pathname, routes) || {
+        route: routes[0],
+        params: {},
+    };
+
+    await route.view(params);
+};
