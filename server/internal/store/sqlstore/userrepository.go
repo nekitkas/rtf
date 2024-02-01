@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"forum/server/internal/models"
@@ -29,6 +30,29 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 	return &user, nil
 }
 
+func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.User, error) {
+	query := `SELECT id, username, image_url, first_name, last_name FROM user WHERE id != ?`
+
+	var users []models.User
+	rows, err := r.store.Db.Query(query, user_id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.ID, &user.Username, &user.ImageURL, &user.FirstName, &user.LastName); err != nil {
+			return make([]models.User, 1), fmt.Errorf("failed to scan post row: %v", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error reading posts rows: %v", err)
+	}
+
+	return users, nil
+}
+
 func (r *UserRepository) Create(user *models.User) error {
 	user.ID = uuid.New().String()
 	user.Timestamp = time.Now()
@@ -49,7 +73,7 @@ func (r *UserRepository) Create(user *models.User) error {
 }
 
 func (r *UserRepository) Check(login string) (*models.User, error) {
-	//command to find a user no matter if its email or username
+	// command to find a user no matter if its email or username
 	query := `SELECT * FROM user u WHERE u.email = ? OR u.username = ?`
 	var user models.User
 
@@ -59,7 +83,7 @@ func (r *UserRepository) Check(login string) (*models.User, error) {
 			return nil, err
 		}
 	}
-	//check if passwords match
+	// check if passwords match
 	return &user, nil
 }
 

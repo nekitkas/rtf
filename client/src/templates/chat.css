@@ -47,7 +47,7 @@
   display: none;
 }
 
-.chat-footer {
+.chat-footer form {
   padding: 10px;
   display: flex;
   align-items: center;
@@ -61,7 +61,7 @@
   color: white;
 }
 
-.chat-footer img {
+.chat-footer form .form-img-submit {
   width: 32px;
   height: 32px;
   padding: 4px;

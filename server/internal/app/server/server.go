@@ -2,11 +2,14 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/jwttoken"
 	"forum/server/pkg/router"
@@ -56,6 +59,9 @@ func (s *server) configureRouter() {
 	// -------------------- USER PATHS ------------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/:id", s.handleUsersGetByID())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete/:id", s.handleUsersDelete())
+	s.router.HandleFunc("POST", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
+	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
+	s.router.HandleFunc("GET", "/api/v1/jwt/users/getAll", s.handleUsersGetAll())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
@@ -104,7 +110,7 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
-		//check if user exist
+		// check if user exist
 		_, err = s.store.User().FindByID(claims.UserID)
 		if err != nil {
 			deletedCookie := s.deleteCookie()
@@ -114,6 +120,32 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusOK, nil)
+	}
+}
+
+func (s *server) handleUsersGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(ctxUserID).(string)
+
+		data, err := s.store.User().GetAllOtherUsers(userID)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, data)
+	}
+}
+
+func (s *server) handleGetReactionsOptions() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reactions, err := s.store.Reaction().GetAll()
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusFound, reactions)
 	}
 }
 
