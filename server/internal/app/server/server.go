@@ -78,7 +78,8 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 
-	s.router.HandleFunc("GET", "/chat/:user_id", s.wsHandler())
+	//s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
+	s.router.HandleFunc("GET", "/jwt/chat/:user_id", s.wsHandler())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }
@@ -90,8 +91,9 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) wsHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
-		user_id := router.Param(r.Context(), "user_id")
-		if err := s.websocket.HandleWebSocket(rw, r, user_id); err != nil {
+		//user_id := router.Param(r.Context(), "user_id")
+		userId := r.Context().Value(ctxUserID).(string)
+		if err := s.websocket.HandleWebSocket(rw, r, userId); err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 		}
 	}

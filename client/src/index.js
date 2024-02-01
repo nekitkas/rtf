@@ -11,14 +11,14 @@ let Socket
 
 export function initializeWebSocket(id) {
   // Replace 'ws://example.com/socket' with your WebSocket server URL
-  Socket = new WebSocket('ws://localhost:8080/chat/'+id);
+  Socket = new WebSocket('ws://localhost:8080/jwt/chat/'+id);
 
   // WebSocket event listeners
   Socket.addEventListener('open', (event) => {
     console.log('WebSocket connection opened:', event);
   });
 
-  Socket.addEventListener('message', (event) => {
+  Socket.addEventListener('message', (event) => {add c
     // console.log(event.data.json())
     const parsedData = JSON.parse(event.data)
 
