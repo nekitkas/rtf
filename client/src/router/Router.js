@@ -79,9 +79,59 @@ export const RouterFunction = async () => {
     await route.view(params);
 };
 
+<<<<<<< HEAD
 const navigateTo = url => {
     history.pushState(null, null, url);
     RouterFunction();
+=======
+  if (path.startsWith("/post/")) {
+    const postId = path.split("/")[2]
+    RenderSeparatePostPage(postId)
+  } else {
+    try {
+      const userLoggedIn = await CheckUserLoggedIn()
+
+      switch (path) {
+        case "/":
+          if (!userLoggedIn) {
+            RenderLoginPage()
+            return
+          }
+          RenderHomePage()
+          break
+        case "/login":
+          RenderLoginPage()
+          break
+        case "/register":
+          RenderRegisterPage()
+          break
+        case "/create-post":
+          if (!userLoggedIn) {
+            RenderLoginPage()
+            return
+          }
+          RenderPostPage()
+          break
+        case "/profile":
+          if (!userLoggedIn) {
+            RenderLoginPage()
+            return
+          }
+
+          RenderProfilePage()
+          break
+        default:
+          if (!userLoggedIn) {
+            RenderLoginPage()
+            return
+          }
+          RenderNotFound(path)
+      }
+    } catch (error) {
+      console.error("Error checking user login:", error)
+    }
+  }
+>>>>>>> d95110b2eec552b02634b60f1f320e59ed730f25
 }
 
 // const router = async () => {
