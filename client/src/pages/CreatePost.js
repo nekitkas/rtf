@@ -1,9 +1,9 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
-import "../../styles/createPostPage.css"
-import addCategory from "../../assets/img/addCategory.svg"
-import postImgIcon from "../../assets/img/postImgIcon.svg"
-import closeIcon from "../../assets/img/close.svg"
-import { router } from "../../router/Router"
+import { NavbarLogged } from "../components/Navbar/NavbarLogged"
+import "../styles/createPostPage.css"
+import addCategory from "../assets/img/addCategory.svg"
+import postImgIcon from "../assets/img/postImgIcon.svg"
+import closeIcon from "../assets/img/close.svg"
+import { router } from "../router/Router"
 
 export async function CreatePost() {
   const rootContainer = document.querySelector(".root")

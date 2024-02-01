@@ -1,7 +1,7 @@
-import "../../styles/style.css"
-import "../../styles/notFound.css"
+import "../styles/style.css"
+import "../styles/notFound.css"
 
-import { ROOT } from "../.."
+import { ROOT } from "../index"
 
 export function NotFound(text) {
   ROOT.innerHTML = ""

@@ -1,8 +1,8 @@
-import { GLOBAL_URL } from "../../config"
-import { SinglePostRequest } from "../../helpers/ServerRequests"
-import { router } from "../../router/Router"
-import { CreateCommentComponent } from "../../components/Comment"
-import { CONTAINER } from "../.."
+import { GLOBAL_URL } from "../config"
+import { SinglePostRequest } from "../helpers/ServerRequests"
+import { router } from "../router/Router"
+import { CreateCommentComponent } from "../components/Comment"
+import { CONTAINER } from "../index"
 
 export function CreatePostUi(data, postId) {
   const postData = data.data.post

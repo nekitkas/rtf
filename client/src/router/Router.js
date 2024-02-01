@@ -1,11 +1,11 @@
 import { isLoggedIn } from "../helpers/ServerRequests.js"
-import { Home } from "../pages/home/Home.js"
-import { Login } from "../pages/login/Login.js"
-import { CreatePost } from "../pages/createPost/CreatePostPage.js"
-import { Profile } from "../pages/profile/ProfilePage.js"
-import { Register } from "../pages/register/Register.js"
-import { Post } from "../pages/separatePost/SeparatePostPage.js"
-import { NotFound } from "../pages/notfound/NotFound.js"
+import { Home } from "../pages/Home.js"
+import { Login } from "../pages/Login.js"
+import { CreatePost } from "../pages/CreatePost.js"
+import { Profile } from "../pages/Profile.js"
+import { Register } from "../pages/Register.js"
+import { Post } from "../pages/Post.js"
+import { NotFound } from "../pages/NotFound";
 
 const authMiddleware = async (params) => {
     const isUserLogged = await isLoggedIn();

@@ -1,11 +1,11 @@
-import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
-import "../../styles/auth.css"
-import { router } from "../../router/Router.js"
-import { isLoggedIn } from "../../helpers/ServerRequests.js"
-import { initializeWebSocket } from "../../index.js"
-import { ROOT, CONTAINER } from "../../index.js"
-import { Auth, RenderLoginForm } from "../../components/Auth/Login.js"
-import { GLOBAL_URL } from '../../config.js'
+import { NavbarNotLogged } from "../components/Navbar/NavbarNotLogged.js"
+import "../styles/auth.css"
+import { router } from "../router/Router.js"
+import { isLoggedIn } from "../helpers/ServerRequests.js"
+import { initializeWebSocket } from "../index.js"
+import { ROOT, CONTAINER } from "../index.js"
+import { Auth, RenderLoginForm } from "../components/Auth/Login.js"
+import { GLOBAL_URL } from '../config.js'
 
 export async function Login() {
   try {

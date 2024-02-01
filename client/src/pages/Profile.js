@@ -1,9 +1,9 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
-import "../../styles/profile.css"
+import { NavbarLogged } from "../components/Navbar/NavbarLogged"
+import "../styles/profile.css"
 
-import { RenderProfile, profileContainer } from "../../components/Profile.js"
+import { RenderProfile, profileContainer } from "../components/Profile.js"
 
-import { ROOT, CONTAINER } from "../../index.js"
+import { ROOT, CONTAINER } from "../index.js"
 
 const userInfo = [
   "John",

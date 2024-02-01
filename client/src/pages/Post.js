@@ -1,8 +1,8 @@
-import { CONTAINER, ROOT } from "../.."
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
-import { GLOBAL_URL } from "../../config"
-import { SinglePostRequest } from "../../helpers/ServerRequests"
-import "../../styles/separatePost.css"
+import { CONTAINER, ROOT } from "../index"
+import { NavbarLogged } from "../components/Navbar/NavbarLogged"
+import { GLOBAL_URL } from "../config"
+import { SinglePostRequest } from "../helpers/ServerRequests"
+import "../styles/separatePost.css"
 import {
   CreateCommentContainer,
   CreatePostUi,
