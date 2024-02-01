@@ -5,16 +5,8 @@ import "../../styles/messenger.css"
 import "../../styles/chat.css"
 import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
-import {
-  Messenger,
-  OpenMessengers,
-  RenderMessenger,
-} from "../../components/Messenger"
-import {
-  GetAllUsers,
-  GetPosts,
-  SinglePostRequest,
-} from "../../helpers/ServerRequests.js"
+
+import { GetAllUsers, GetPosts } from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
@@ -68,7 +60,6 @@ async function fetchData(PostFeed) {
       // Do something with the data
       postsData.forEach((post) => {
         const postLink = document.createElement("div")
-        // postLink.href = `post/${post.post.id}`
 
         console.log(post.id)
         postLink.addEventListener("click", () => {
@@ -85,9 +76,6 @@ async function fetchData(PostFeed) {
           PostFeed.appendChild(postLink)
         }
       })
-      // postsData.forEach(post => {
-
-      // });
     } else {
       // Handle case when response is not OK
       console.log("Error: Response not OK")

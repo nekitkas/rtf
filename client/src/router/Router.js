@@ -14,7 +14,6 @@ export const RouterFunction = async () => {
 
   if (path.startsWith("/post/")) {
     const postId = path.split("/")[2]
-    console.log("Rendering Post Page for Post ID:", postId)
     RenderSeparatePostPage(postId)
   } else {
     try {

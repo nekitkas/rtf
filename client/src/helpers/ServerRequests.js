@@ -118,7 +118,7 @@ export function SinglePostRequest(url, method, body = null, headers = {}) {
       "Content-Type": "application/json",
       ...headers,
     },
-  
+
     credentials: "include",
   }
 
