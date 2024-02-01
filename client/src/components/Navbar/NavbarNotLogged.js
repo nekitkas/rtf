@@ -1,18 +1,9 @@
 import "../../styles/navbar.css"
 
-
-
-
-
-
-
-
-
-
+import { ROOT } from "../.."
 
 export function NavbarNotLogged() {
-  const mainContainer = document.querySelector(".root")
-  mainContainer.innerHTML = `
+  ROOT.innerHTML = `
     <nav class="navbar">
 
     <a href="/"> <h1 class="logo">VOYAGE</h1></a>
@@ -26,11 +17,4 @@ export function NavbarNotLogged() {
       </a>
       </div>
   </nav>`
-
-
-
-  
 }
-
-
-
