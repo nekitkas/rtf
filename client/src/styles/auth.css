@@ -13,7 +13,7 @@ form {
   width: 400px;
   margin: 0 auto;
   padding: 50px 30px;
-  margin-top: 40px;
+  /* margin-top: 40px; */
   background-color: var(--background-secondory);
   border-radius: 10px;
   border: 1px solid var(--border-color);
@@ -44,7 +44,6 @@ form button {
   border-radius: 5px;
   background-color: var(--primary-color);
   cursor: pointer;
-
 }
 
 form button:hover {
@@ -65,12 +64,11 @@ form .errorMsg p {
   text-align: center;
 }
 
-
 .fullName {
   display: flex;
 }
 
-.fullName div{
+.fullName div {
   width: 50%;
 }
 
@@ -78,15 +76,11 @@ form .errorMsg p {
   margin-right: 10px;
 }
 
-.fullName div input{
+.fullName div input {
   width: 100%;
 }
 
-
-
-
-
-#gender{
+#gender {
   width: 100%;
   margin: 5px auto;
   background: var(--background-color);
@@ -96,7 +90,7 @@ form .errorMsg p {
   color: var(--text-color);
 }
 
-.errorMsg{
+.errorMsg {
   color: rgb(194, 23, 23);
   display: flex;
   justify-content: center;

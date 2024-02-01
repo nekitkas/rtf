@@ -6,7 +6,6 @@ export function UserCard(data) {
 
   const userComponent = document.createElement("div")
   userComponent.className = "user"
-  userComponent.id = id
   // Create user image
   const userImage = document.createElement("img")
   userImage.src = image_url ? image_url : "https://images.nightcafe.studio//assets/profile.png?tr=w-1600,c-at_max"

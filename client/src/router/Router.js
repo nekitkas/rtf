@@ -1,7 +1,7 @@
 import { CheckUserLoggedIn } from "../helpers/ServerRequests.js"
 import { RenderHomePage } from "../pages/home/Home.js"
 import { RenderLoginPage } from "../pages/login/Login.js"
-import { RenderPostPage } from "../pages/cratePost/CreatePostPage.js"
+import { RenderPostPage } from "../pages/createPost/CreatePostPage.js"
 import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
 import { RenderRegisterPage } from "../pages/register/Register.js"
 import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
