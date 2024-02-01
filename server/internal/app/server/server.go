@@ -2,14 +2,11 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"forum/server/internal/models"
 	"forum/server/internal/store"
 	"forum/server/pkg/jwttoken"
 	"forum/server/pkg/router"
@@ -57,15 +54,13 @@ func (s *server) configureRouter() {
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	// -------------------- USER PATHS ------------------------------- //
+	s.router.HandleFunc("GET", "/api/v1/jwt/users", s.handleUsersGetAll())
 	s.router.HandleFunc("GET", "/api/v1/jwt/users/:id", s.handleUsersGetByID())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete/:id", s.handleUsersDelete())
-	s.router.HandleFunc("POST", "/api/v1/jwt/users/getUser", s.handleUsersGetByID())
-	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete", s.handleUsersDelete())
-	s.router.HandleFunc("GET", "/api/v1/jwt/users/getAll", s.handleUsersGetAll())
 	// -------------------- CATEGORY PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/categories", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts", s.handleAllPostInformation())
+	s.router.HandleFunc("POST", "/api/v1/jwt/posts", s.handleAllPostInformation())
 	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
 	s.router.HandleFunc("GET", "/api/v1/jwt/posts/:id", s.serveSinglePostInformation())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete/:id", s.handleRemovePost())
@@ -79,7 +74,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 	// -------------------- CHAT --------------------------- //
-	s.router.HandleFunc("GET", "jwt/chat/:user_id", s.wsHandler())
+	s.router.HandleFunc("GET", "/chat/:user_id", s.wsHandler())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -119,33 +114,10 @@ func (s *server) handleCheckCookie() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, nil)
-	}
-}
-
-func (s *server) handleUsersGetAll() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(ctxUserID).(string)
-
-		data, err := s.store.User().GetAllOtherUsers(userID)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, data)
-	}
-}
-
-func (s *server) handleGetReactionsOptions() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		reactions, err := s.store.Reaction().GetAll()
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		s.respond(w, r, http.StatusFound, reactions)
+		s.respond(w, r, http.StatusOK, Response{
+			Message: "Successful",
+			Data:    claims.UserID,
+		})
 	}
 }
 

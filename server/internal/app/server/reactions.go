@@ -126,3 +126,15 @@ func (s *server) handleRemoveReaction() http.HandlerFunc {
 		})
 	}
 }
+
+func (s *server) handleGetReactionsOptions() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reactions, err := s.store.Reaction().GetAll()
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusFound, reactions)
+	}
+}

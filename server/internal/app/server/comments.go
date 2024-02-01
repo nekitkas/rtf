@@ -23,7 +23,7 @@ func (s *server) handleCommentCreation() http.HandlerFunc {
 
 		s.respond(w, r, http.StatusCreated, Response{
 			Message: "Successful",
-			Data:    nil,
+			Data:    c,
 		})
 	}
 }

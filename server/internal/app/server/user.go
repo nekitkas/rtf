@@ -122,3 +122,20 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		})
 	}
 }
+
+func (s *server) handleUsersGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(ctxUserID).(string)
+
+		data, err := s.store.User().GetAllOtherUsers(userID)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, Response{
+			Message: "Successful",
+			Data:    data,
+		})
+	}
+}
