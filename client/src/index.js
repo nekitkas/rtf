@@ -47,19 +47,4 @@ window.addEventListener("DOMContentLoaded", async (e) => {
   await router()
 })
 
-// window.addEventListener("hashchange", () => {
-//   console.log("hashchange")
-//   RouterFunction()
-// })
-
-// Handle link clicks to prevent default navigation
-
-
-    window.history.pushState({}, "", e.target.href)
-
-    // Call RouterFunction asynchronously
-    await router()
-  }
-})
-
 export { ROOT, CONTAINER, Socket }

@@ -1,5 +1,5 @@
 import { CONTAINER, ROOT } from "../index"
-import { NavbarLogged } from "../components/Navbar/NavbarLogged"
+import { Navbar } from "../components/Navbar.js"
 import { GLOBAL_URL } from "../config"
 import { SinglePostRequest } from "../helpers/ServerRequests"
 import "../styles/separatePost.css"
@@ -10,28 +10,23 @@ import {
 } from "./PostCreateUi"
 
 export async function Post(postId) {
-  ROOT.innerHTML = ""
-  CONTAINER.innerHTML = ""
-  await NavbarLogged()
-  ROOT.append(CONTAINER)
+    ROOT.innerHTML = ""
+    CONTAINER.innerHTML = ""
+    await Navbar()
+    ROOT.append(CONTAINER)
     postId = postId["id"]
-  const apiUrl = GLOBAL_URL + `/api/v1/jwt/posts/${postId}`
+    const apiUrl = GLOBAL_URL + `/api/v1/jwt/posts/${postId}`
 
   SinglePostRequest(apiUrl, "GET")
     .then((data) => {
-
-      const postData = data.data.post;
-
       const pagePost = CreatePostUi(data, postId)
       const commentContainer = CreateCommentContainer(postId)
 
       CONTAINER.appendChild(pagePost)
       CONTAINER.appendChild(commentContainer)
 
-
       if (data.data.comments) {
         const commentsContainer = createCommentsContainer(data)
-
         CONTAINER.appendChild(commentsContainer)
       }
 

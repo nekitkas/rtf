@@ -1,11 +1,10 @@
-import { Navbar } from "../../components/Navbar"
-import "../../styles/createPostPage.css"
-import addCategory from "../../assets/img/addCategory.svg"
-import postImgIcon from "../../assets/img/postImgIcon.svg"
-import closeIcon from "../../assets/img/close.svg"
-import { RouterFunction } from "../../router/Router"
+import { Navbar } from "../components/Navbar.js"
+import "../styles/createPostPage.css"
+import addCategory from "../assets/img/addCategory.svg"
+import postImgIcon from "../assets/img/postImgIcon.svg"
+import closeIcon from "../assets/img/close.svg"
 
-export async function RenderPostPage() {
+export async function CreatePost() {
   const rootContainer = document.querySelector(".root")
   rootContainer.innerHTML = ""
   await Navbar()
@@ -112,7 +111,6 @@ export async function RenderPostPage() {
   imgInput.addEventListener("change", (e) => changeInputHandler(e))
 
   function changeInputHandler(e) {
-    console.log(e.target.files)
     const file = e.target.files[0]
     if (!file.type.match("image")) {
       alert("File must be an image.")
@@ -186,7 +184,6 @@ export async function RenderPostPage() {
 
 async function sendPostData(title, content, categories, image) {
   const url = "http://localhost:8080/api/v1/jwt/posts/create"
-
   const requestBody = {
     post: {
       title: title,
@@ -199,7 +196,6 @@ async function sendPostData(title, content, categories, image) {
     })),
   }
 
-  console.log("Request Body:", requestBody)
   try {
     const response = await fetch(url, {
       method: "POST",

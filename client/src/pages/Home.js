@@ -1,21 +1,21 @@
-import { Navbar } from "../../components/Navbar.js"
-import "../../styles/style.css"
-import "../../styles/post.css"
-import "../../styles/messenger.css"
-import "../../styles/chat.css"
-import "../../styles/users.css"
-import { RenderPost } from "../../components/Post"
+import { Navbar } from "../components/Navbar.js"
+import "../styles/style.css"
+import "../styles/post.css"
+import "../styles/messenger.css"
+import "../styles/chat.css"
+import "../styles/users.css"
+import { RenderPost } from "../components/Post"
 
 import {
   GetAllUsers,
   GetPosts,
   SinglePostRequest,
-} from "../../helpers/ServerRequests.js"
-import { CONTAINER, ROOT, Socket } from "../../index.js"
-import { RenderPostFeed } from "../../components/PostFeed.js"
-import { RenderFilter } from "../../components/Filter.js"
-import { RouterFunction } from "../../router/Router.js"
-import { UserList } from "../../components/UserList"
+} from "../helpers/ServerRequests.js"
+import { CONTAINER, ROOT, Socket } from "../index.js"
+import { RenderPostFeed } from "../components/PostFeed.js"
+import { RenderFilter } from "../components/Filter.js"
+import { router } from "../router/Router.js"
+import { UserList } from "../components/UserList"
 
 const usersContainer = document.createElement("div")
 

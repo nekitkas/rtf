@@ -1,5 +1,5 @@
-import { Navbar } from "../../components/Navbar"
-import "../../styles/profile.css"
+import { Navbar } from "../components/Navbar.js"
+import "../styles/profile.css"
 
 import { RenderProfile, profileContainer } from "../components/Profile.js"
 

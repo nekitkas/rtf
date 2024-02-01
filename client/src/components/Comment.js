@@ -46,7 +46,6 @@ export function CreateCommentComponent(createTime, text, author, id) {
   deleteCommentButton.addEventListener("click", async (e) => {
     try {
       await SinglePostRequest(`${GLOBAL_URL}/api/v1/jwt/comments/delete/${id}`, "DELETE");
-      console.log(id);
       document.querySelector(`#${id}`).remove();
     } catch (error) {
       console.error("Error deleting comment:", error);

@@ -6,7 +6,7 @@ import arrowSvg from "../assets/img/arrow.svg"
 import messageButtonImage from "../assets/img/message.svg"
 import modalProfile from "../assets/img/modalProfile.svg"
 import logout from "../assets/img/logout.svg"
-import { RouterFunction } from "../router/Router"
+import { router } from "../router/Router"
 import { GetUserInfo, Logout } from "../helpers/ServerRequests"
 import {ROOT} from "../index";
 
@@ -23,7 +23,7 @@ document.addEventListener("click", async (e) => {
     window.history.pushState({}, "", e.target.href)
 
     // Call RouterFunction asynchronously
-    await RouterFunction()
+    await router()
   }
 })
 
@@ -51,7 +51,7 @@ export async function Navbar() {
   if (UserprofileLink) {
     UserprofileLink.addEventListener("click", () => {
       window.history.pushState({}, "", "/profile")
-      RouterFunction()
+      router()
     })
   }
 
@@ -61,7 +61,7 @@ export async function Navbar() {
 
 
     window.history.pushState({}, "", "/login")
-    RouterFunction()
+    router()
   })
 
 
@@ -71,7 +71,7 @@ export async function Navbar() {
 
 
     window.history.pushState({}, "", "/")
-    RouterFunction()
+    router()
 
   })
 
@@ -81,7 +81,7 @@ export async function Navbar() {
 
 
     window.history.pushState({}, "", "/create-post")
-    RouterFunction()
+    router()
 
   })
 
@@ -97,19 +97,11 @@ export async function Navbar() {
 
 const RenderNavbar = async (user) =>{
   const currentUrl = window.location.href
-
-  console.log("123")
-
-  let navbarHTML = ""
-
-
   const navbar = document.createElement("nav");
   navbar.className = "navbar-post";
-
   // Create nav-start
   const navStart = document.createElement("div");
   navStart.className = "nav-start";
-
   // Create logo link
   const logoLink = document.createElement("div");
   // logoLink.href = "/";
@@ -131,9 +123,6 @@ const RenderNavbar = async (user) =>{
   messageButtonImg.src = messageButtonImage;
   messageButtonImg.alt = "message-button";
   messageButton.appendChild(messageButtonImg);
-
-
-
 
 // CREATE POST BUTTON //
   const createPostLink = document.createElement("div");

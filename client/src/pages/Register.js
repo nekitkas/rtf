@@ -1,5 +1,4 @@
 import { Auth } from "../components/Auth/Login.js"
-import { NavbarNotLogged } from "../components/Navbar/NavbarNotLogged.js"
 import { isLoggedIn } from "../helpers/ServerRequests.js"
 import { router } from "../router/Router.js"
 
@@ -10,7 +9,6 @@ import { GLOBAL_URL } from "../config.js"
 export async function Register() {
   try {
     const isUserLogged = await isLoggedIn()
-    console.log(isUserLogged)
 
     if (isUserLogged) {
       window.location.href = "/"
@@ -21,13 +19,10 @@ export async function Register() {
       const RegisterForm = RenderRegisterForm()
 
       Auth.appendChild(RegisterForm)
-
       CONTAINER.appendChild(Auth)
-
       ROOT.appendChild(CONTAINER)
 
       const errorMsg = document.querySelector(".errorMsg")
-
       const registerForm = document.querySelector(".form")
       registerForm.addEventListener("submit", handleFormSubmit)
 

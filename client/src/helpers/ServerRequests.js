@@ -111,8 +111,7 @@ export const GetAllUsers = async () => {
 }
 
 export function SinglePostRequest(url, method, body = null, headers = {}) {
-  console.log(url);
-  const options = {
+    const options = {
     method,
     headers: {
       "Content-Type": "application/json",

@@ -3,7 +3,7 @@ import "../styles/notFound.css"
 
 import { ROOT } from "../index"
 
-export function NotFound(text) {
+export function NotFound() {
   ROOT.innerHTML = ""
 
   const notFoundContainer = document.createElement("div")
@@ -15,7 +15,7 @@ export function NotFound(text) {
 
   const notFoundText = document.createElement("p")
   notFoundText.classList.add("not-found-text")
-  notFoundText.textContent = `OOPS! Page ${text} Not Found`
+  notFoundText.textContent = `OOPS! Page Not Found`
 
   const backButton = document.createElement("a")
   backButton.href = "/"
@@ -23,7 +23,6 @@ export function NotFound(text) {
   notFoundButton.classList.add("not-found-button")
   notFoundButton.textContent = "BACK TO HOMEPAGE"
   backButton.appendChild(notFoundButton)
-
   notFoundContainer.appendChild(notFoundHeader)
   notFoundContainer.appendChild(notFoundText)
   notFoundContainer.appendChild(backButton)
