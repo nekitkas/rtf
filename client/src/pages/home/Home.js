@@ -59,7 +59,6 @@ export async function RenderHomePage() {
     }
   }
   //Render all the user login in or not
-  console.log("RENDERING STATUSESESA:DSADSADSADSA")
   RefreshStatus()
 }
 

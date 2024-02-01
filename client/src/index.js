@@ -10,9 +10,9 @@ CONTAINER.className = "container"
 
 let Socket
 
-export function initializeWebSocket(id) {
+export function initializeWebSocket() {
   // Replace 'ws://example.com/socket' with your WebSocket server URL
-  Socket = new WebSocket('ws://localhost:8080/jwt/chat/'+id);
+  Socket = new WebSocket('ws://localhost:8080/jwt/chat');
 
   // WebSocket event listeners
   Socket.addEventListener('open', (event) => {
@@ -23,7 +23,7 @@ export function initializeWebSocket(id) {
   Socket.addEventListener('message', (event) => {
     // console.log(event.data.json())
     const parsedData = JSON.parse(event.data)
-    const onlineUsers = parsedData.online_users
+    let onlineUsers = parsedData.online_users
     console.log(onlineUsers)
     setTimeout(() => {
       if (onlineUsers != undefined){
@@ -52,7 +52,11 @@ export function initializeWebSocket(id) {
     if(parsedData.message == "offline" && parsedData.type == "status"){
       for(let i = 0; i < OnlineUsers.length; i++){
         if(OnlineUsers[i].id == parsedData.from_user){
+          console.log('true');
           OnlineUsers[i].online = false;
+          onlineUsers = onlineUsers.filter(function(item) {
+            return item !== OnlineUsers[i].id
+        })
         }
       }
     }

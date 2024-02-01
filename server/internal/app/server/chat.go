@@ -92,11 +92,11 @@ func (s *server) handleInitChatLines() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		limit := 20
 		var req requestBody
-
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
+
 		offset := req.Count * limit
 		lines, err := s.store.Chat().GetLinesInit(req.Chat_id, req.Time, limit, offset)
 		if err != nil {

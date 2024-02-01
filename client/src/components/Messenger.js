@@ -1,4 +1,5 @@
 import { Socket } from ".."
+import { GLOBAL_URL } from "../config";
 
 export const OpenMessengers = [];
 export class Messenger {
@@ -11,70 +12,13 @@ export class Messenger {
     this.chatBody = document.createElement("div");
     this.messenger = document.createElement("div")
     this.messages = new ObservableArray([
-      {
-        text: "Hey there! Have you delved into the Cyberpunk universe lately?",
-        class: "left",
-      },
-      {
-        text: "Absolutely! Night City is as chaotic as ever. The neon lights, the tech, it's all so immersive.",
-        class: "right",
-      },
-      {
-        text: "I know, right? The cityscape is mind-blowing. Did you explore the Badlands yet?",
-        class: "left",
-      },
-      {
-        text: "Just started roaming there. The wasteland vibes and the Nomad life are a whole new experience.",
-        class: "right",
-      },
-      {
-        text: "Nice! Nomad path adds such a different perspective. What's your go-to cyberware setup?",
-        class: "left",
-      },
-      {
-        text: "I'm all about the mantis blades and the projectile launch system. Makes every encounter intense. You?",
-        class: "right",
-      },
-      {
-        text: "Smart choice! I'm a netrunner at heart. Hacking into systems and manipulating the environment is my thing.",
-        class: "left",
-      },
-      {
-        text: "Oh, the hacking aspect is so intricate. Have you uncovered any hidden gems or Easter eggs in the game?",
-        class: "right",
-      },
-      {
-        text: "Found a few! There's this hidden bar with an NPC telling crazy stories about the old net. It's a goldmine.",
-        class: "left",
-      },
-      {
-        text: "Nice find! The attention to detail is insane. And the soundtrack? Pure cyberpunk vibes. Favorite track?",
-        class: "right",
-      },
-      {
-        text: "Gotta be 'Chippin' In' by Samurai. Takes me back to those Keanu Reeves moments. You?",
-        class: "left",
-      },
-      {
-        text: "'Never Fade Away' by Kerry Eurodyne. The emotions it evokes during key moments are unparalleled.",
-        class: "right",
-      },
-      {
-        text: "True, the narrative is gripping. Speaking of which, which lifepath did you choose for your V?",
-        class: "left",
-      },
-      {
-        text: "Street Kid. I love the street-smart attitude. You get to navigate the underbelly of Night City.",
-        class: "right",
-      },
-      {
-        text: "Nice. I went with Nomad for that nomadic freedom. Different paths, but both lead to a wild Cyberpunk journey!",
-        class: "left",
-      },
     ])
     this.messages.addListener((eventName, items, array) => {
       console.log("ITEM ADDED!", items)
     })
+    this.chatId;
+    this.openedAt = new Date().toISOString()
+    this.chatPage = 0;
     OpenMessengers.push(this)
 
     this.chatBody.addEventListener('wheel', Throttle(() => this.LoadOlderChats(), 300));
@@ -87,17 +31,69 @@ export class Messenger {
     OpenMessengers.pop(this.messenger);
   }
 
-  LoadChats(){
+  async LoadChats(){
+    await this.GetChatId()
     //Initalize last messages from database (like 20 last messages)
+    console.log("CHATID", this.chatId, "Timestamp", this.openedAt, "count", this.chatPage)
+    fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/init`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body:JSON.stringify({
+        "chat_id": this.chatId,
+        "timestamp": this.openedAt,
+        "count": this.chatPage,
+      }),
+      credentials: "include",
+    }).then((response) => {
+      return response.json()
+    }).then((data) => {
+      if(data.data != null){
+        data.data.forEach((item) => {
+          let toBeClass = "left";
+          if(item.user_id == this.currentUserId){
+            toBeClass = "right";
+          }
+          this.messages.push({text: item.content,
+          class: toBeClass})
+        })
+      }
+      console.log(data);
+      this.AddChats()
+    }).catch((err) => {
+      console.log("ERROR WHILE CREATING CHATID: ", err)
+      return
+    })
+  }
+
+  async GetChatId(){
+    ///api/v1/jwt/chat/:user_id
+    await fetch(GLOBAL_URL + `/api/v1/jwt/chat/`+this.userToId, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }).then((response) => {
+      return response.json()
+    }).then((data) => {
+      console.log(" THIS IS THE CHAT ID WE ARE CREAINTG", data)
+      this.chatId = data.data.chat_id[0];
+      // return data.data.chat_id[0]
+    }).catch((err) => {
+      console.log("ERROR WHILE CREATING CHATID: ", err)
+      return
+    })
   }
 
   LoadOlderChats(){
   // If scollred up, add more messagesconst isScrollCloseToBottom = () => {
-    const isAtTop = this.chatBody.scrollTop <= 800;
-    if (isAtTop){
-      for(let i = 0; i <= 20; i++)
-      this.AppendLine({text: "JUST A TESTING: " + i, class: "left"}, true)
-    }
+    // const isAtTop = this.chatBody.scrollTop <= 800;
+    // if (isAtTop){
+    //   for(let i = 0; i <= 20; i++)
+    //   this.AppendLine({text: "JUST A TESTING: " + i, class: "left"}, true)
+    // }
   }
 
   Create(){
@@ -130,8 +126,7 @@ export class Messenger {
     
     this.chatBody.classList.add("chat-body")
 
-
-    this.AddChats()
+    this.LoadChats()
 
 
     const chatFooter = document.createElement("div");
@@ -165,6 +160,7 @@ export class Messenger {
         text: messageInput.value,
         class: "right",
       }
+      this.AddToDatabase(messageInput.value)
       this.messages.push(textLine)
       messageInput.value = "";
       this.AppendLine(textLine)
@@ -187,8 +183,32 @@ export class Messenger {
   AddChats(){
     // const scrollTop = this.chatBody.scrollTop;
     this.chatBody.innerHTML = "";
-    this.messages.array.forEach((message) => {
+    this.messages.array.reverse().forEach((message) => {
       this.AppendLine(message)
+    })
+  }
+
+  async AddToDatabase(message){
+    await this.GetChatId()
+    await fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "chat_id": this.chatId,
+        "content": message,
+        "timestamp": new Date().toISOString(),
+      }),
+      credentials: "include",
+    }).then((response) => {
+      return response.json()
+    }).then((data) => {
+      console.log(data)
+      // return data.data.chat_id[0]
+    }).catch((err) => {
+      console.log("ERROR ADDING LINE TO DATABASE: ", err)
+      return
     })
   }
   

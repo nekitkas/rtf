@@ -1,6 +1,6 @@
 import { ROOT } from ".."
 import { Messenger, OpenMessengers } from "./Messenger"
-
+import { CURRENTUSER } from "../pages/login/Login";
 export const OnlineUsers = [];
 export class UsercardUser{
   constructor({id, username, image_url}){
@@ -26,8 +26,9 @@ export class UsercardUser{
     this.userComponent.addEventListener('click', () => {
       console.log("OPENMESSENGERS   :   ", OpenMessengers)
       if(OpenMessengers.length == 0){
-        const Chats = new Messenger("CURRUSERID", this.id, this.username, this.image_url, ROOT)
+        const Chats = new Messenger(CURRENTUSER.id, this.id, this.username, this.image_url, ROOT)
         Chats.Create()
+        
       }else{
         console.log("YOU CAN NOT OPEN MULTIPLE CHATS AT ONCE!")
       }

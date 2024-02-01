@@ -54,7 +54,7 @@ func (ws *WebSocket) HandleWebSocket(rw http.ResponseWriter, r *http.Request, us
 
 func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 	defer func() {
-		ws.broadcastStatusUpdate("offline", ws.clients[conn])
+		// ws.broadcastStatusUpdate("offline", ws.clients[conn])
 		conn.Close()
 		delete(ws.clients, conn)
 	}()

@@ -89,7 +89,7 @@ func (c *ChatRepository) GetLinesInit(chat_id string, time time.Time, limit int,
 	ORDER BY timestamp DESC
 	LIMIT ? OFFSET ?;
 	`
-
+	fmt.Println("THIS IS THE CHAT ID WE ARE LOONG FOR: ", chat_id)
 	rows, err := c.store.Db.Query(query, chat_id, time, limit, offset)
 	if err != nil {
 		return nil, err

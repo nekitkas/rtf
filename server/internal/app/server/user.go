@@ -59,6 +59,7 @@ func (s *server) handleUsersLogin() http.HandlerFunc {
 
 		http.SetCookie(w, &cookie)
 
+		user.Sanitize()
 		s.respond(w, r, http.StatusOK, Response{
 			Message: "Successful",
 			Data:    user,

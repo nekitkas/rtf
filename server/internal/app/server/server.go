@@ -70,7 +70,7 @@ func (s *server) configureRouter() {
 	// -------------------- CHAT PATHS ------------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/chat/:user_id", s.handleCreateChat())
 	s.router.HandleFunc("POST", "/api/v1/jwt/chat/line/create", s.handleWriteLines())
-	s.router.HandleFunc("GET", "/api/v1/jwt/chat/line/init", s.handleInitChatLines())
+	s.router.HandleFunc("POST", "/api/v1/jwt/chat/line/init", s.handleInitChatLines())
 
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactions())
@@ -80,7 +80,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 
 	//s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
-	s.router.HandleFunc("GET", "/jwt/chat/:user_id", s.wsHandler())
+	s.router.HandleFunc("GET", "/jwt/chat", s.wsHandler())
 	// EXAMPLE OF DYNAMIC PATH
 	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
 }

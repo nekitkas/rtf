@@ -6,7 +6,7 @@ import { initializeWebSocket } from "../../index.js"
 import { ROOT, CONTAINER } from "../../index.js"
 import { Auth, RenderLoginForm } from "../../components/Auth/Login.js"
 import { GLOBAL_URL } from '../../config.js'
-
+export let CURRENTUSER = {};
 export async function RenderLoginPage() {
   try {
     const isUserLogged = await CheckUserLoggedIn()
@@ -70,9 +70,10 @@ export async function RenderLoginPage() {
             return response.json()
           })
           .then((data) => {
-            console.log(data)
+            console.log("THIS IS HTE USER: ", data)
+            CURRENTUSER = data.data;
             // window.location.href = "/"
-            initializeWebSocket(data.id)
+            initializeWebSocket()
             window.history.pushState({}, "", "/")
             RouterFunction()
           })
