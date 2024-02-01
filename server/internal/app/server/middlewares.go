@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"forum/server/pkg/jwttoken"
-	"github.com/google/uuid"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func (s *server) setRequestID(next http.Handler) http.Handler {
@@ -82,6 +84,7 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Call the next handler
+		fmt.Println("THIS IS HTE USER ID: ", claims.UserID)
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, claims.UserID)))
 	})
 }

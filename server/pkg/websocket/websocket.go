@@ -40,7 +40,7 @@ func NewWebSocket() *WebSocket {
 
 // Takes in a custom responsewriter that has to have a hijack function
 func (ws *WebSocket) HandleWebSocket(rw http.ResponseWriter, r *http.Request, user_id string) error {
-	fmt.Println(user_id)
+	fmt.Println("WEBSOCKET INSIDE USER ID: ", user_id)
 	if conn, err := upgrader.Upgrade(rw, r, nil); err != nil {
 		return err
 	} else {
@@ -53,9 +53,9 @@ func (ws *WebSocket) HandleWebSocket(rw http.ResponseWriter, r *http.Request, us
 
 func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 	defer func() {
+		ws.broadcastStatusUpdate("offline", ws.clients[conn])
 		conn.Close()
 		delete(ws.clients, conn)
-		ws.broadcastStatusUpdate("offline", ws.clients[conn])
 	}()
 
 	ws.broadcastStatusUpdate("online", ws.clients[conn])
@@ -64,6 +64,7 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("WebSocket Read Error:", err)
+			ws.broadcastStatusUpdate("offline", ws.clients[conn])
 			delete(ws.clients, conn)
 			break
 		}
