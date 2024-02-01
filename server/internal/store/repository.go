@@ -8,6 +8,7 @@ import (
 
 type ChatRepository interface {
 	Create(*models.Chat) error
+	Get(id string) (models.Chat, error)
 }
 
 type UserRepository interface {
