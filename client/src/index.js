@@ -29,8 +29,9 @@ export function initializeWebSocket(id) {
     
     for(let i = 0; i < OpenMessengers.length; i++){
       if (OpenMessengers[i].userToId == parsedData.from_user && parsedData.type == "chat"){
-        OpenMessengers[i].messages.push({text: parsedData.message, class: "left"});
-        OpenMessengers[i].RefreshChats();
+        // OpenMessengers[i].messages.push({text: parsedData.message, class: "left"});
+        // OpenMessengers[i].RefreshChats();
+        OpenMessengers[i].AppendLine({text: parsedData.message, class: "left"})
       } 
     }
     console.log('Received message:', event.data);

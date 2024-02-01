@@ -1,4 +1,6 @@
 import { UserCard } from "./UserCard"
+import { UsercardUser } from "./UserCard"
+import { CONTAINER } from ".."
 
 export function UserList(arr) {
   const userList = document.createElement("div")
@@ -9,11 +11,11 @@ export function UserList(arr) {
   userList.appendChild(hr)
 
   for (let i = 0; i < arr.length; i++) {
-    const userCard = UserCard(arr[i])
-
-    userList.appendChild(userCard)
+    // const userCard = UserCard(arr[i])
+    const userCard = new UsercardUser(arr[i])
+    userList.appendChild(userCard.Create())
   }
-
+  // CONTAINER.appendChild(userList)
   return userList
 }
 

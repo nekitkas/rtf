@@ -85,6 +85,14 @@ export class Messenger {
     OpenMessengers.pop(this.messenger);
   }
 
+  LoadChats(){
+    //Initalize last messages from database (like 20 last messages)
+  }
+
+  LoadOlderChats(){
+  // If scollred up, add more messages
+  }
+
   Create(){
     this.messenger.classList.add("messenger")
     
@@ -116,7 +124,7 @@ export class Messenger {
     this.chatBody.classList.add("chat-body")
 
 
-    this.RefreshChats()
+    this.AddChats()
 
 
     const chatFooter = document.createElement("div");
@@ -146,11 +154,13 @@ export class Messenger {
         "to_user": this.userToId,
       }
       sendMessage(JSON.stringify(messageToSend))
-      this.messages.push(      {
+      let textLine = {
         text: messageInput.value,
         class: "right",
-      })
-      this.RefreshChats()
+      }
+      this.messages.push(textLine)
+      messageInput.value = "";
+      this.AppendLine(textLine)
     })
   
     messageForm.appendChild(messageInput);
@@ -165,21 +175,31 @@ export class Messenger {
     this.RootElement.appendChild(this.messenger)
   }
 
-  RefreshChats(){
+  AddChats(){
     // const scrollTop = this.chatBody.scrollTop;
     this.chatBody.innerHTML = "";
     this.messages.array.forEach((message) => {
-      const msgDiv = document.createElement("div")
-      msgDiv.classList.add("msg")
-  
-      const msgText = document.createElement("p")
-      msgText.classList.add(message.class)
-      msgText.textContent = message.text
-  
-      msgDiv.appendChild(msgText)
-      this.chatBody.appendChild(msgDiv)
+      this.AppendLine(message)
     })
-    this.chatBody.scrollTop = this.chatBody.scrollHeight;
+  }
+  
+  AppendLine(message, top=false){
+    const msgDiv = document.createElement("div")
+    msgDiv.classList.add("msg")
+    
+    const msgText = document.createElement("p")
+    msgText.classList.add(message.class)
+    msgText.textContent = message.text
+    
+    msgDiv.appendChild(msgText)
+
+    if(top){
+      this.chatBody.insertBefore(msgDiv, this.chatBody.firstChild);
+    }else{
+      this.chatBody.appendChild(msgDiv)
+      this.chatBody.scrollTop = this.chatBody.scrollHeight;
+    }
+    // return msgDiv
   }
 }
 
