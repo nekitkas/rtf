@@ -7,6 +7,23 @@ import { RenderRegisterPage } from "../pages/register/Register.js"
 import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
 import { RenderNotFound } from "../pages/notfound/NotFound.js"
 
+
+document.addEventListener("click", async (e) => {
+  const target = e.target
+
+  // Check if the clicked element is an anchor element and has the same origin
+  if (target.tagName === "A" && target.origin === location.origin) {
+    e.preventDefault() // Prevent the default behavior of anchor links
+
+
+    window.history.pushState({}, "", e.target.href)
+
+    // Call RouterFunction asynchronously
+    await RouterFunction()
+  }
+})
+
+
 export const RouterFunction = async () => {
   const path = location.pathname
 

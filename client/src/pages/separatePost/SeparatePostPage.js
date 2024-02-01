@@ -1,6 +1,6 @@
 import { CONTAINER, ROOT } from "../..";
 import { CreateCommentComponent } from "../../components/Comment";
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged";
+import { Navbar } from "../../components/Navbar";
 import { SinglePostRequest } from "../../helpers/ServerRequests";
 import { RouterFunction } from "../../router/Router";
 import "../../styles/separatePost.css";
@@ -8,7 +8,7 @@ import "../../styles/separatePost.css";
 export async function RenderSeparatePostPage(postId) {
   ROOT.innerHTML = "";
   CONTAINER.innerHTML = "";
-  await NavbarLogged();
+  await Navbar();
   ROOT.append(CONTAINER);
 
  

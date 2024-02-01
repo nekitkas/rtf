@@ -1,4 +1,4 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
+import { Navbar } from "../../components/Navbar"
 import "../../styles/profile.css"
 
 import { RenderProfile, profileContainer } from "../../components/Profile.js"
@@ -19,7 +19,7 @@ export async function RenderProfilePage() {
   CONTAINER.innerHTML = ""
   profileContainer.innerHTML = ""
 
-  await NavbarLogged()
+  await Navbar()
 
   const Profile = RenderProfile(userInfo)
 

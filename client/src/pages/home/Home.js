@@ -1,15 +1,11 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged.js"
+import { Navbar } from "../../components/Navbar.js"
 import "../../styles/style.css"
 import "../../styles/post.css"
 import "../../styles/messenger.css"
 import "../../styles/chat.css"
 import "../../styles/users.css"
 import { RenderPost } from "../../components/Post"
-import {
-  Messenger,
-  OpenMessengers,
-  RenderMessenger,
-} from "../../components/Messenger"
+
 import {
   GetAllUsers,
   GetPosts,
@@ -30,7 +26,7 @@ export async function RenderHomePage() {
   CONTAINER.innerHTML = ""
 
   usersContainer.innerHTML = ""
-  await NavbarLogged()
+  await Navbar()
 
   // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()

@@ -1,4 +1,4 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
+import { Navbar } from "../../components/Navbar"
 import "../../styles/createPostPage.css"
 import addCategory from "../../assets/img/addCategory.svg"
 import postImgIcon from "../../assets/img/postImgIcon.svg"
@@ -8,7 +8,7 @@ import { RouterFunction } from "../../router/Router"
 export async function RenderPostPage() {
   const rootContainer = document.querySelector(".root")
   rootContainer.innerHTML = ""
-  await NavbarLogged()
+  await Navbar()
 
   const main = document.createElement("main")
   main.className = "main"

@@ -1,4 +1,3 @@
-import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import "../../styles/auth.css"
 import { RouterFunction } from "../../router/Router.js"
 import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
@@ -19,7 +18,6 @@ export async function RenderLoginPage() {
       ROOT.innerHTML = ""
       CONTAINER.innerHTML = ""
       Auth.innerHTML = ""
-      NavbarNotLogged()
 
       const LoginForm = RenderLoginForm()
 

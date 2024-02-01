@@ -1,5 +1,4 @@
 import { Auth } from "../../components/Auth/Login.js"
-import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
 import { RouterFunction } from "../../router/Router.js"
 
@@ -18,7 +17,6 @@ export async function RenderRegisterPage() {
     } else {
       CONTAINER.innerHTML = ""
       Auth.innerHTML = ""
-      NavbarNotLogged()
       const RegisterForm = RenderRegisterForm()
 
       Auth.appendChild(RegisterForm)
