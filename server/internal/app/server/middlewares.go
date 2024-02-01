@@ -22,6 +22,7 @@ func (s *server) logRequest(next http.Handler) http.Handler {
 		rw := &responseWriter{w, http.StatusOK}
 		if r.Method == http.MethodOptions {
 			next.ServeHTTP(rw, r)
+			return
 		}
 
 		s.logger.Printf("started %s %s ----- remote_addr:%s request_id:%s",
@@ -79,8 +80,6 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
-
-		s.respond(w, r, http.StatusOK, nil)
 
 		// Call the next handler
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, claims.UserID)))
