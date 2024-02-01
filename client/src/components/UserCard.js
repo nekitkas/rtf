@@ -1,6 +1,6 @@
 import { ROOT } from ".."
 import { Messenger, OpenMessengers } from "./Messenger"
-import { CURRENTUSER } from "../pages/login/Login";
+import { CURRENTUSER } from "../pages/Login";
 export const OnlineUsers = [];
 export class UsercardUser{
   constructor({id, username, image_url}){

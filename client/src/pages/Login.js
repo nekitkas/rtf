@@ -4,7 +4,7 @@ import { initializeWebSocket } from "../index.js"
 import { ROOT, CONTAINER } from "../index.js"
 import { Auth, RenderLoginForm } from "../components/Auth/Login.js"
 import { GLOBAL_URL } from '../config.js'
-
+export let CURRENTUSER;
 export async function Login() {
   try {
       ROOT.innerHTML = ""
@@ -55,7 +55,8 @@ async function handleFormSubmit(e) {
         return response.json()
       })
       .then((data) => {
-        initializeWebSocket(data.id)
+        CURRENTUSER = data.data
+        initializeWebSocket()
         window.history.pushState({}, "", "/")
         router()
       })

@@ -16,6 +16,7 @@ import { RenderPostFeed } from "../components/PostFeed.js"
 import { RenderFilter } from "../components/Filter.js"
 import { router } from "../router/Router.js"
 import { UserList } from "../components/UserList"
+import { OpenMessengers } from "../components/Messenger.js"
 
 const usersContainer = document.createElement("div")
 
@@ -28,7 +29,7 @@ export async function Home() {
   usersContainer.innerHTML = ""
   await Navbar()
 
-  // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
+  OpenMessengers.length = 0;
   const PostFeed = RenderPostFeed()
   ROOT.append(CONTAINER)
 
