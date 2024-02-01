@@ -67,6 +67,11 @@ func (s *server) configureRouter() {
 	// -------------------- COMMENT PATHS ---------------------------- //
 	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
 	s.router.HandleFunc("DELETE", "/api/v1/jwt/comments/delete/:id", s.handleRemoveComment())
+	// -------------------- CHAT PATHS ------------------------------- //
+	s.router.HandleFunc("POST", "/api/v1/jwt/chat/:user_id", s.handleCreateChat())
+	s.router.HandleFunc("POST", "/api/v1/jwt/chat/line/create", s.handleWriteLines())
+	s.router.HandleFunc("GET", "/api/v1/jwt/chat/line/init", s.handleInitChatLines())
+
 	// -------------------- REACTION PATHS --------------------------- //
 	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactions())
 	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/remove", s.handleRemoveReaction())

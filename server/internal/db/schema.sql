@@ -22,7 +22,7 @@ CREATE TABLE
 CREATE TABLE
   IF NOT EXISTS category (
     id text PRIMARY KEY UNIQUE NOT NULL,
-    name text,
+    name text UNIQUE,
     description text
   );
 
