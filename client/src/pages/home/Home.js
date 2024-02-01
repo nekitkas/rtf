@@ -10,7 +10,7 @@ import { GetAllUsers, GetPosts } from "../../helpers/ServerRequests.js"
 import { CONTAINER, ROOT, Socket } from "../../index.js"
 import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
-import { RouterFunction } from "../../router/Router.js"
+import { router } from "../../router/Router.js"
 import { UserList } from "../../components/UserList"
 
 const usersContainer = document.createElement("div")
@@ -57,14 +57,12 @@ async function fetchData(PostFeed) {
       // Do something with the data
       postsData.forEach((post) => {
         const postLink = document.createElement("div")
-<<<<<<< HEAD
-=======
 
         console.log(post.id)
->>>>>>> d95110b2eec552b02634b60f1f320e59ed730f25
+
         postLink.addEventListener("click", () => {
           history.pushState({}, "", `post/${post.id}`)
-          RouterFunction()
+          router()
         })
 
         postLink.classList.add("post-link")

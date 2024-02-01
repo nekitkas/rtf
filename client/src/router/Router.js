@@ -70,7 +70,7 @@ const findMatchingRoute = async (path, routes) => {
     return { route: { view: NotFound }, params: {} };
 };
 
-export const RouterFunction = async () => {
+export const router = async () => {
     const { route, params } = await findMatchingRoute(location.pathname, routes) || {
         route: routes[0],
         params: {},
@@ -79,92 +79,10 @@ export const RouterFunction = async () => {
     await route.view(params);
 };
 
-<<<<<<< HEAD
-const navigateTo = url => {
-    history.pushState(null, null, url);
-    RouterFunction();
-=======
-  if (path.startsWith("/post/")) {
-    const postId = path.split("/")[2]
-    RenderSeparatePostPage(postId)
-  } else {
-    try {
-      const userLoggedIn = await CheckUserLoggedIn()
-
-      switch (path) {
-        case "/":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderHomePage()
-          break
-        case "/login":
-          RenderLoginPage()
-          break
-        case "/register":
-          RenderRegisterPage()
-          break
-        case "/create-post":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderPostPage()
-          break
-        case "/profile":
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-
-          RenderProfilePage()
-          break
-        default:
-          if (!userLoggedIn) {
-            RenderLoginPage()
-            return
-          }
-          RenderNotFound(path)
-      }
-    } catch (error) {
-      console.error("Error checking user login:", error)
-    }
-  }
->>>>>>> d95110b2eec552b02634b60f1f320e59ed730f25
-}
-
-// const router = async () => {
-//     const routes = [
-//         { path: '/', view: Main },
-//         { path: '/posts', view: Posts },
-//         { path: '/settings', view: Settings }
-//     ];
-//
-//     const potentialMatches = routes.map(route => {
-//         return {
-//             route: route,
-//             isMatch: location.pathname === route.path
-//         }
-//     });
-//
-//     let match = potentialMatches.find(potentialMatch => potentialMatch.isMatch);
-//
-//     if (!match) {
-//         match = {
-//             route: routes[0],
-//             isMatch: true
-//         }
-//     }
-//
-//     const view = new match.route.view();
-//     document.getElementById('container').innerHTML = await view.getHtml();
-// }
-
-window.addEventListener('popstate', RouterFunction);
+window.addEventListener('popstate', router);
 
 document.addEventListener('DOMContentLoaded', () => {
-    RouterFunction();
+    router();
 });
 
 document.addEventListener('click', e => {
@@ -173,3 +91,8 @@ document.addEventListener('click', e => {
         navigateTo(e.target.href);
     }
 });
+
+const navigateTo = url => {
+    history.pushState(null, null, url);
+    router();
+}

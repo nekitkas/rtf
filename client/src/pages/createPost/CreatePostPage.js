@@ -3,7 +3,7 @@ import "../../styles/createPostPage.css"
 import addCategory from "../../assets/img/addCategory.svg"
 import postImgIcon from "../../assets/img/postImgIcon.svg"
 import closeIcon from "../../assets/img/close.svg"
-import { RouterFunction } from "../../router/Router"
+import { router } from "../../router/Router"
 
 export async function CreatePost() {
   const rootContainer = document.querySelector(".root")
@@ -214,7 +214,7 @@ async function sendPostData(title, content, categories, image) {
       const data = await response.json()
       console.log("Server response:", data)
       window.history.pushState({}, "", "/")
-      RouterFunction()
+      router()
     } else {
       console.error("Server error:", response.statusText)
     }

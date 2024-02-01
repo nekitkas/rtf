@@ -1,6 +1,6 @@
 import { GLOBAL_URL } from "../../config"
 import { SinglePostRequest } from "../../helpers/ServerRequests"
-import { RouterFunction } from "../../router/Router"
+import { router } from "../../router/Router"
 import { CreateCommentComponent } from "../../components/Comment"
 import { CONTAINER } from "../.."
 
@@ -96,7 +96,7 @@ export function CreatePostUi(data, postId) {
     )
       .then(() => {
         history.pushState({}, "", `/`)
-        RouterFunction()
+        router()
       })
       .catch((error) => {
         console.error("Error in fetch operation:", error)

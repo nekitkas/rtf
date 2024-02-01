@@ -1,7 +1,7 @@
 import { Auth } from "../../components/Auth/Login.js"
 import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import { isLoggedIn } from "../../helpers/ServerRequests.js"
-import { RouterFunction } from "../../router/Router.js"
+import { router } from "../../router/Router.js"
 
 import { RenderRegisterForm } from "../../components/Auth/Register.js"
 import { CONTAINER, ROOT } from "../../index.js"
@@ -14,7 +14,7 @@ export async function Register() {
 
     if (isUserLogged) {
       window.location.href = "/"
-      RouterFunction()
+      router()
     } else {
       CONTAINER.innerHTML = ""
       Auth.innerHTML = ""
@@ -83,7 +83,7 @@ export async function Register() {
             // Handle the response from the server
 
             window.location.href = "/login"
-            RouterFunction()
+            router()
           })
           .catch((error) => {
             // Handle fetch errors

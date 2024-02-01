@@ -6,7 +6,7 @@ import arrowSvg from "../../assets/img/arrow.svg"
 import messageButtonImage from "../../assets/img/message.svg"
 import modalProfile from "../../assets/img/modalProfile.svg"
 import logout from "../../assets/img/logout.svg"
-import { RouterFunction } from "../../router/Router"
+import { router } from "../../router/Router"
 import { GetUserInfo, Logout } from "../../helpers/ServerRequests"
 
 export async function NavbarLogged() {
@@ -33,7 +33,7 @@ export async function NavbarLogged() {
     UserprofileLink.addEventListener("click", () => {
     
       window.history.pushState({}, "", "/profile")
-      RouterFunction()
+      router()
     })
   }
 
@@ -43,7 +43,7 @@ export async function NavbarLogged() {
 
 
     window.history.pushState({}, "", "/login")
-    RouterFunction()
+    router()
   })
 
   return navbarHTML;

@@ -1,6 +1,6 @@
 import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
 import "../../styles/auth.css"
-import { RouterFunction } from "../../router/Router.js"
+import { router } from "../../router/Router.js"
 import { isLoggedIn } from "../../helpers/ServerRequests.js"
 import { initializeWebSocket } from "../../index.js"
 import { ROOT, CONTAINER } from "../../index.js"
@@ -70,7 +70,7 @@ async function handleFormSubmit(e) {
         // window.location.href = "/"
         initializeWebSocket(data.id)
         window.history.pushState({}, "", "/")
-        RouterFunction()
+        router()
       })
       .catch((error) => {
         // Handle fetch errors
