@@ -1,7 +1,7 @@
 import { GLOBAL_URL } from "../config"
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
-export const CheckUserLoggedIn = async () => {
+export const isLoggedIn = async () => {
   try {
     const response = await fetch(GLOBAL_URL + `/api/v1/auth/checkCookie`, {
       method: "GET",
@@ -111,13 +111,13 @@ export const GetAllUsers = async () => {
 }
 
 export function SinglePostRequest(url, method, body = null, headers = {}) {
-  const options = {
+    const options = {
     method,
     headers: {
       "Content-Type": "application/json",
       ...headers,
     },
-    body: body ? JSON.stringify(body) : null,
+
     credentials: "include",
   }
 

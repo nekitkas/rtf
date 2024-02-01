@@ -1,41 +1,35 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged.js"
-import "../../styles/style.css"
-import "../../styles/post.css"
-import "../../styles/messenger.css"
-import "../../styles/chat.css"
-import "../../styles/users.css"
-import { RenderPost } from "../../components/Post"
-import {
-  Messenger,
-  OpenMessengers,
-  RenderMessenger,
-} from "../../components/Messenger"
+import { Navbar } from "../components/Navbar.js"
+import "../styles/style.css"
+import "../styles/post.css"
+import "../styles/messenger.css"
+import "../styles/chat.css"
+import "../styles/users.css"
+import { RenderPost } from "../components/Post"
+
 import {
   GetAllUsers,
   GetPosts,
   SinglePostRequest,
-} from "../../helpers/ServerRequests.js"
-import { CONTAINER, ROOT, Socket } from "../../index.js"
-import { RenderPostFeed } from "../../components/PostFeed.js"
-import { RenderFilter } from "../../components/Filter.js"
-import { RouterFunction } from "../../router/Router.js"
-import { UserList } from "../../components/UserList"
-import { RefreshStatus } from "../../components/UserCard.js"
+} from "../helpers/ServerRequests.js"
+import { CONTAINER, ROOT, Socket } from "../index.js"
+import { RenderPostFeed } from "../components/PostFeed.js"
+import { RenderFilter } from "../components/Filter.js"
+import { router } from "../router/Router.js"
+import { UserList } from "../components/UserList"
 
 const usersContainer = document.createElement("div")
 
 usersContainer.className = "users-container"
 
-export async function RenderHomePage() {
+export async function Home() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
 
   usersContainer.innerHTML = ""
-  await NavbarLogged()
+  await Navbar()
 
   // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()
-  console.log(Socket)
   ROOT.append(CONTAINER)
 
   fetchData(PostFeed)
@@ -58,25 +52,21 @@ export async function RenderHomePage() {
       selectArrow.classList.toggle("select-arrow-rotate")
     }
   }
-  //Render all the user login in or not
-  RefreshStatus()
 }
 
 async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts()
-
-    console.log(postsData)
     if (postsData) {
       // Do something with the data
       postsData.forEach((post) => {
         const postLink = document.createElement("div")
-        // postLink.href = `post/${post.post.id}`
 
         console.log(post.id)
+
         postLink.addEventListener("click", () => {
           history.pushState({}, "", `post/${post.id}`)
-          RouterFunction()
+          router()
         })
 
         postLink.classList.add("post-link")
@@ -88,9 +78,6 @@ async function fetchData(PostFeed) {
           PostFeed.appendChild(postLink)
         }
       })
-      // postsData.forEach(post => {
-
-      // });
     } else {
       // Handle case when response is not OK
       console.log("Error: Response not OK")

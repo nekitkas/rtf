@@ -1,34 +1,28 @@
-import { Auth } from "../../components/Auth/Login.js"
-import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
-import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
-import { RouterFunction } from "../../router/Router.js"
+import { Auth } from "../components/Auth/Login.js"
+import { isLoggedIn } from "../helpers/ServerRequests.js"
+import { router } from "../router/Router.js"
 
-import { RenderRegisterForm } from "../../components/Auth/Register.js"
-import { CONTAINER, ROOT } from "../../index.js"
-import { GLOBAL_URL } from "../../config.js"
+import { RenderRegisterForm } from "../components/Auth/Register.js"
+import { CONTAINER, ROOT } from "../index.js"
+import { GLOBAL_URL } from "../config.js"
 
-export async function RenderRegisterPage() {
+export async function Register() {
   try {
-    const isUserLogged = await CheckUserLoggedIn()
-    console.log(isUserLogged)
+    const isUserLogged = await isLoggedIn()
 
     if (isUserLogged) {
       window.location.href = "/"
-      RouterFunction()
+      router()
     } else {
       CONTAINER.innerHTML = ""
       Auth.innerHTML = ""
-      NavbarNotLogged()
       const RegisterForm = RenderRegisterForm()
 
       Auth.appendChild(RegisterForm)
-
       CONTAINER.appendChild(Auth)
-
       ROOT.appendChild(CONTAINER)
 
       const errorMsg = document.querySelector(".errorMsg")
-
       const registerForm = document.querySelector(".form")
       registerForm.addEventListener("submit", handleFormSubmit)
 
@@ -83,7 +77,7 @@ export async function RenderRegisterPage() {
             // Handle the response from the server
 
             window.location.href = "/login"
-            RouterFunction()
+            router()
           })
           .catch((error) => {
             // Handle fetch errors

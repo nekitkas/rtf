@@ -1,14 +1,14 @@
-import { NavbarLogged } from "../../components/Navbar/NavbarLogged"
-import "../../styles/createPostPage.css"
-import addCategory from "../../assets/img/addCategory.svg"
-import postImgIcon from "../../assets/img/postImgIcon.svg"
-import closeIcon from "../../assets/img/close.svg"
-import { RouterFunction } from "../../router/Router"
+import { Navbar } from "../components/Navbar.js"
+import { router } from "../router/Router";
+import "../styles/createPostPage.css"
+import addCategory from "../assets/img/addCategory.svg"
+import postImgIcon from "../assets/img/postImgIcon.svg"
+import closeIcon from "../assets/img/close.svg"
 
-export async function RenderPostPage() {
+export async function CreatePost() {
   const rootContainer = document.querySelector(".root")
   rootContainer.innerHTML = ""
-  await NavbarLogged()
+  await Navbar()
 
   const main = document.createElement("main")
   main.className = "main"
@@ -112,7 +112,6 @@ export async function RenderPostPage() {
   imgInput.addEventListener("change", (e) => changeInputHandler(e))
 
   function changeInputHandler(e) {
-    console.log(e.target.files)
     const file = e.target.files[0]
     if (!file.type.match("image")) {
       alert("File must be an image.")
@@ -186,7 +185,6 @@ export async function RenderPostPage() {
 
 async function sendPostData(title, content, categories, image) {
   const url = "http://localhost:8080/api/v1/jwt/posts/create"
-
   const requestBody = {
     post: {
       title: title,
@@ -199,7 +197,6 @@ async function sendPostData(title, content, categories, image) {
     })),
   }
 
-  console.log("Request Body:", requestBody)
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -214,7 +211,7 @@ async function sendPostData(title, content, categories, image) {
       const data = await response.json()
       console.log("Server response:", data)
       window.history.pushState({}, "", "/")
-      RouterFunction()
+      router()
     } else {
       console.error("Server error:", response.statusText)
     }
