@@ -1,4 +1,5 @@
 import { Navbar } from "../components/Navbar.js"
+import { router } from "../router/Router";
 import "../styles/createPostPage.css"
 import addCategory from "../assets/img/addCategory.svg"
 import postImgIcon from "../assets/img/postImgIcon.svg"
