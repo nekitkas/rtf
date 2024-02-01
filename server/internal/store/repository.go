@@ -7,12 +7,13 @@ import (
 )
 
 type ChatRepository interface {
-	CheckChatExists(user1 string, user2 string) (string, error)
-	Create(id string, user1 string, user2 string) error
+	CheckChatExists(user1 string, user2 string) ([]string, error)
+	Create(user1 string, user2 string) (models.Chat, error)
 	Get(id string) (models.Chat, error)
 }
 
 type UserRepository interface {
+	IsUser(id string) (bool, error)
 	Create(*models.User) error
 	// FindByID is used to send the client user data
 	// (password from db has been sanitized)

@@ -12,7 +12,7 @@ type ChatRepository struct {
 	store *Store
 }
 
-func (c *ChatRepository) CheckChatExists(user1 string, user2 string) (string, error) {
+func (c *ChatRepository) CheckChatExists(user1 string, user2 string) ([]string, error) {
 	query := `SELECT chat_id
 FROM chatUser
 WHERE user_id IN (?, ?)
@@ -22,36 +22,42 @@ HAVING COUNT(DISTINCT user_id) = 2;
 
 	row, err := c.store.Db.Query(query, user1, user2)
 	if err != nil {
-		return "", err
+		return []string{}, err
 	}
 
-	var str string
+	var strs []string
 	for row.Next() {
+		var str string
 		if err := row.Scan(&str); err != nil {
-			return "", err
+			return []string{}, err
 		}
-		fmt.Println(str)
+		strs = append(strs, str)
 	}
+	fmt.Println(strs)
 
-	return str, nil
+	return strs, nil
 }
 
-func (c *ChatRepository) Create(id string, user1 string, user2 string) error {
+func (c *ChatRepository) Create(user1 string, user2 string) (models.Chat, error) {
 	query := `INSERT INTO chat (id) VALUES (?)`
 
+	id := uuid.New().String()
+
 	if _, err := c.store.Db.Exec(query, id); err != nil {
-		return err
+		return models.Chat{}, err
 	}
 
 	if err := c.createChatUser(user1, id); err != nil {
-		return err
+		return models.Chat{}, err
 	}
 
 	if err := c.createChatUser(user2, id); err != nil {
-		return err
+		return models.Chat{}, err
 	}
 
-	return nil
+	return models.Chat{
+		ID: id,
+	}, nil
 }
 
 func (c *ChatRepository) createChatUser(user_id string, chat_id string) error {

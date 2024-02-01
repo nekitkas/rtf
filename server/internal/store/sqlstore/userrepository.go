@@ -15,6 +15,18 @@ type UserRepository struct {
 	store *Store
 }
 
+func (r *UserRepository) IsUser(id string) (bool, error) {
+	query := `SELECT EXISTS (SELECT 1 FROM user WHERE id = ?)`
+
+	var exists int
+	err := r.store.Db.QueryRow(query, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists == 1, nil
+}
+
 func (r *UserRepository) FindByID(id string) (*models.User, error) {
 	// command to find a user with a specific id
 	query := `SELECT * FROM user u WHERE u.id = ?`
@@ -50,13 +62,13 @@ func (r *UserRepository) GetAllOtherUsers(user_id string) ([]models.UserWithChat
 	var usersWithChat []models.UserWithChat
 	for i := range users {
 		// uuid := uuid.New().String()
-		chatId, err := r.store.Chat().CheckChatExists(user_id, users[i].ID)
+		_, err := r.store.Chat().CheckChatExists(user_id, users[i].ID)
 		if err != nil {
 			return nil, err
 		}
 		usersWithChat = append(usersWithChat, models.UserWithChat{
-			User:   users[i],
-			ChatID: chatId,
+			User: users[i],
+			// ChatID: chatId,
 		})
 	}
 
