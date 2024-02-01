@@ -26,6 +26,7 @@ func (s *server) handleCreateChat() http.HandlerFunc {
 		res, err := s.store.Chat().CheckChatExists(userID, otherUserID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
+			return
 		}
 
 		var chat_id []string
@@ -33,6 +34,7 @@ func (s *server) handleCreateChat() http.HandlerFunc {
 			chat, err := s.store.Chat().Create(userID, otherUserID)
 			if err != nil {
 				s.error(w, r, http.StatusCreated, err)
+				return
 			}
 			chat_id = append(chat_id, chat.ID)
 			s.respond(w, r, http.StatusOK, Response{
@@ -53,5 +55,6 @@ func (s *server) handleCreateChat() http.HandlerFunc {
 				"chat_id": chat_id,
 			},
 		})
+		return
 	}
 }
