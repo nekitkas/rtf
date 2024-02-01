@@ -1,6 +1,4 @@
-import { UserCard } from "./UserCard"
 import { UsercardUser } from "./UserCard"
-import { CONTAINER } from ".."
 
 export function UserList(arr) {
   const userList = document.createElement("div")

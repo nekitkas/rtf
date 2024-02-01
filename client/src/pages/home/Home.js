@@ -20,6 +20,7 @@ import { RenderPostFeed } from "../../components/PostFeed.js"
 import { RenderFilter } from "../../components/Filter.js"
 import { RouterFunction } from "../../router/Router.js"
 import { UserList } from "../../components/UserList"
+import { RefreshStatus } from "../../components/UserCard.js"
 
 const usersContainer = document.createElement("div")
 
@@ -57,6 +58,9 @@ export async function RenderHomePage() {
       selectArrow.classList.toggle("select-arrow-rotate")
     }
   }
+  //Render all the user login in or not
+  console.log("RENDERING STATUSESESA:DSADSADSADSA")
+  RefreshStatus()
 }
 
 async function fetchData(PostFeed) {

@@ -29,6 +29,7 @@ type Response struct {
 	MessageType string `json:"type"`
 	Message     string `json:"message"`
 	FromUser    string `json:"from_user"`
+	UserList    []string `json:"online_users"`
 }
 
 func NewWebSocket() *WebSocket {
@@ -85,7 +86,7 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 		if toUserConn == nil {
 			fmt.Println("That user is not connected with WS")
 		} else {
-			jsonBytes, err := json.Marshal(Response{MessageType:"chat", Message: data.Message, FromUser: ws.clients[conn]})
+			jsonBytes, err := json.Marshal(Response{MessageType: "chat", Message: data.Message, FromUser: ws.clients[conn]})
 			if err != nil {
 				fmt.Println("JSON Marshal error!", err)
 			}
@@ -107,7 +108,11 @@ func (ws *WebSocket) sendToUser(messType int, b []byte, userConn *websocket.Conn
 }
 
 func (ws *WebSocket) broadcastStatusUpdate(status, username string) {
-	jsonBytes, err := json.Marshal(Response{MessageType:"status", Message: status, FromUser: username})
+	var allConnections []string
+	for w := range ws.clients{
+		allConnections = append(allConnections, ws.clients[w])
+	}
+	jsonBytes, err := json.Marshal(Response{MessageType: "status", Message: status, FromUser: username, UserList: allConnections})
 	if err != nil {
 		fmt.Println("JSON Marshal error!", err)
 		return

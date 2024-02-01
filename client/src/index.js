@@ -1,5 +1,6 @@
 import { OpenMessengers } from "./components/Messenger.js"
 import { RouterFunction } from "./router/Router.js"
+import { OnlineUsers, RefreshStatus } from "./components/UserCard.js"
 
 export const Page = document.querySelector(".root")
 
@@ -8,7 +9,6 @@ const CONTAINER = document.createElement("div")
 CONTAINER.className = "container"
 
 let Socket
-const onlineUsers = [];
 
 export function initializeWebSocket(id) {
   // Replace 'ws://example.com/socket' with your WebSocket server URL
@@ -17,16 +17,47 @@ export function initializeWebSocket(id) {
   // WebSocket event listeners
   Socket.addEventListener('open', (event) => {
     console.log('WebSocket connection opened:', event);
+    RefreshStatus()
   });
 
   Socket.addEventListener('message', (event) => {
     // console.log(event.data.json())
     const parsedData = JSON.parse(event.data)
-    if(parsedData.message == "online" && parsedData.type == "status" || parsedData.message == "offline" && parsedData.type == "status"){
+    const onlineUsers = parsedData.online_users
+    console.log(onlineUsers)
+    setTimeout(() => {
+      if (onlineUsers != undefined){
+        for(let i = 0; i < OnlineUsers.length; i++){
+          for(let j = 0; j < onlineUsers.length; j++){
+            console.log("TESTINDASKDSALDKASDKLSADSA: ", OnlineUsers[i].id, onlineUsers[j])
+            if(OnlineUsers[i].id == onlineUsers[j]){
+                OnlineUsers[i].online = true;
+                RefreshStatus()
+             }
+          }
+        }
+      }
+    }, 200)
+
+    if(parsedData.message == "online" && parsedData.type == "status"){
       //fire a get all function
-      console.log(parsedData.from_user, "is", parsedData.message)
+      for(let i = 0; i < OnlineUsers.length; i++){
+        if(OnlineUsers[i].id == parsedData.from_user){
+          OnlineUsers[i].online = true;
+        }
+      }
+      
     }
-    
+
+    if(parsedData.message == "offline" && parsedData.type == "status"){
+      for(let i = 0; i < OnlineUsers.length; i++){
+        if(OnlineUsers[i].id == parsedData.from_user){
+          OnlineUsers[i].online = false;
+        }
+      }
+    }
+
+    RefreshStatus()
     for(let i = 0; i < OpenMessengers.length; i++){
       if (OpenMessengers[i].userToId == parsedData.from_user && parsedData.type == "chat"){
         // OpenMessengers[i].messages.push({text: parsedData.message, class: "left"});
