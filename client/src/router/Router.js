@@ -1,14 +1,14 @@
-import { CheckUserLoggedIn } from "../helpers/ServerRequests.js"
-import { RenderHomePage } from "../pages/home/Home.js"
-import { RenderLoginPage } from "../pages/login/Login.js"
-import { RenderPostPage } from "../pages/createPost/CreatePostPage.js"
-import { RenderProfilePage } from "../pages/profile/ProfilePage.js"
-import { RenderRegisterPage } from "../pages/register/Register.js"
-import { RenderSeparatePostPage } from "../pages/separatePost/SeparatePostPage.js"
-import { RenderNotFound } from "../pages/notfound/NotFound.js"
+import { isLoggedIn } from "../helpers/ServerRequests.js"
+import { Home } from "../pages/home/Home.js"
+import { Login } from "../pages/login/Login.js"
+import { CreatePost } from "../pages/createPost/CreatePostPage.js"
+import { Profile } from "../pages/profile/ProfilePage.js"
+import { Register } from "../pages/register/Register.js"
+import { Post } from "../pages/separatePost/SeparatePostPage.js"
+import { NotFound } from "../pages/notfound/NotFound.js"
 
-const checkUserLoggedInMiddleware = async (params) => {
-    const isUserLogged = await CheckUserLoggedIn();
+const authMiddleware = async (params) => {
+    const isUserLogged = await isLoggedIn();
 
     if (!isUserLogged) {
         console.log('User not logged in. Redirect or handle accordingly.');
@@ -20,13 +20,13 @@ const checkUserLoggedInMiddleware = async (params) => {
 };
 
 const routes = [
-    { path: '/', view: RenderHomePage, middleware: [checkUserLoggedInMiddleware] },
-    { path: '/login', view: RenderLoginPage },
-    { path: '/register', view: RenderRegisterPage },
-    { path: '/create-post', view: RenderPostPage, middleware: [checkUserLoggedInMiddleware] },
-    { path: '/profile', view: RenderProfilePage, middleware: [checkUserLoggedInMiddleware] },
-    { path: '/post/:id', view: RenderSeparatePostPage, middleware: [checkUserLoggedInMiddleware] },
-    { path: '.*', view: RenderNotFound },
+    { path: '/', view: Home, middleware: [authMiddleware] },
+    { path: '/login', view: Login },
+    { path: '/register', view: Register },
+    { path: '/create-post', view: CreatePost, middleware: [authMiddleware] },
+    { path: '/profile', view: Profile, middleware: [authMiddleware] },
+    { path: '/post/:id', view: Post, middleware: [authMiddleware] },
+    { path: '.*', view: NotFound },
 ];
 
 const matchRoute = (path, route) => {
@@ -67,7 +67,7 @@ const findMatchingRoute = async (path, routes) => {
     }
 
     // No matching route found, render the "not found" view
-    return { route: { view: RenderNotFound }, params: {} };
+    return { route: { view: NotFound }, params: {} };
 };
 
 export const RouterFunction = async () => {
@@ -78,3 +78,48 @@ export const RouterFunction = async () => {
 
     await route.view(params);
 };
+
+const navigateTo = url => {
+    history.pushState(null, null, url);
+    RouterFunction();
+}
+
+// const router = async () => {
+//     const routes = [
+//         { path: '/', view: Main },
+//         { path: '/posts', view: Posts },
+//         { path: '/settings', view: Settings }
+//     ];
+//
+//     const potentialMatches = routes.map(route => {
+//         return {
+//             route: route,
+//             isMatch: location.pathname === route.path
+//         }
+//     });
+//
+//     let match = potentialMatches.find(potentialMatch => potentialMatch.isMatch);
+//
+//     if (!match) {
+//         match = {
+//             route: routes[0],
+//             isMatch: true
+//         }
+//     }
+//
+//     const view = new match.route.view();
+//     document.getElementById('container').innerHTML = await view.getHtml();
+// }
+
+window.addEventListener('popstate', RouterFunction);
+
+document.addEventListener('DOMContentLoaded', () => {
+    RouterFunction();
+});
+
+document.addEventListener('click', e => {
+    if (e.target.className === 'link') {
+        e.preventDefault();
+        navigateTo(e.target.href);
+    }
+});

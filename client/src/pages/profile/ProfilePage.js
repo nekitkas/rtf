@@ -14,7 +14,7 @@ const userInfo = [
   "01.10.2001",
 ]
 
-export async function RenderProfilePage() {
+export async function Profile() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
   profileContainer.innerHTML = ""

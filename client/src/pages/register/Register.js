@@ -1,15 +1,15 @@
 import { Auth } from "../../components/Auth/Login.js"
 import { NavbarNotLogged } from "../../components/Navbar/NavbarNotLogged.js"
-import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
+import { isLoggedIn } from "../../helpers/ServerRequests.js"
 import { RouterFunction } from "../../router/Router.js"
 
 import { RenderRegisterForm } from "../../components/Auth/Register.js"
 import { CONTAINER, ROOT } from "../../index.js"
 import { GLOBAL_URL } from "../../config.js"
 
-export async function RenderRegisterPage() {
+export async function Register() {
   try {
-    const isUserLogged = await CheckUserLoggedIn()
+    const isUserLogged = await isLoggedIn()
     console.log(isUserLogged)
 
     if (isUserLogged) {

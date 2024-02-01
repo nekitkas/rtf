@@ -3,7 +3,7 @@ import "../../styles/notFound.css"
 
 import { ROOT } from "../.."
 
-export function RenderNotFound(text) {
+export function NotFound(text) {
   ROOT.innerHTML = ""
 
   const notFoundContainer = document.createElement("div")

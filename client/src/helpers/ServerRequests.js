@@ -1,7 +1,7 @@
 import { GLOBAL_URL } from "../config"
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
-export const CheckUserLoggedIn = async () => {
+export const isLoggedIn = async () => {
   try {
     const response = await fetch(GLOBAL_URL + `/api/v1/auth/checkCookie`, {
       method: "GET",

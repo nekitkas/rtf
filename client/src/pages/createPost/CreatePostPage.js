@@ -5,7 +5,7 @@ import postImgIcon from "../../assets/img/postImgIcon.svg"
 import closeIcon from "../../assets/img/close.svg"
 import { RouterFunction } from "../../router/Router"
 
-export async function RenderPostPage() {
+export async function CreatePost() {
   const rootContainer = document.querySelector(".root")
   rootContainer.innerHTML = ""
   await NavbarLogged()

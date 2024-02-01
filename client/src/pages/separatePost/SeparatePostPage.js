@@ -6,7 +6,7 @@ import { SinglePostRequest } from "../../helpers/ServerRequests";
 import { RouterFunction } from "../../router/Router";
 import "../../styles/separatePost.css";
 
-export async function RenderSeparatePostPage(postId) {
+export async function Post(postId) {
   ROOT.innerHTML = "";
   CONTAINER.innerHTML = "";
   await NavbarLogged();

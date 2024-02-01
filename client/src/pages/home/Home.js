@@ -25,7 +25,7 @@ const usersContainer = document.createElement("div")
 
 usersContainer.className = "users-container"
 
-export async function RenderHomePage() {
+export async function Home() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
 
