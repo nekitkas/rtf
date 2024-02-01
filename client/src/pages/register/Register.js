@@ -5,6 +5,7 @@ import { RouterFunction } from "../../router/Router.js"
 
 import { RenderRegisterForm } from "../../components/Auth/Register.js"
 import { CONTAINER, ROOT } from "../../index.js"
+import { GLOBAL_URL } from "../../config.js"
 
 export async function RenderRegisterPage() {
   try {
@@ -60,7 +61,7 @@ export async function RenderRegisterPage() {
         console.log("Form data:", formDataObject)
 
         // Make a fetch request to the server
-        fetch("http://localhost:8080/api/v1/users/create", {
+        fetch(GLOBAL_URL + "/api/v1/users/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

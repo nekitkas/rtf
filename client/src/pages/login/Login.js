@@ -5,6 +5,7 @@ import { CheckUserLoggedIn } from "../../helpers/ServerRequests.js"
 import { initializeWebSocket } from "../../index.js"
 import { ROOT, CONTAINER } from "../../index.js"
 import { Auth, RenderLoginForm } from "../../components/Auth/Login.js"
+import { GLOBAL_URL } from '../../config.js'
 
 export async function RenderLoginPage() {
   try {
@@ -50,7 +51,7 @@ export async function RenderLoginPage() {
         console.log("Form data:", formDataObject)
 
         // Make a fetch request to the server
-        fetch("http://localhost:8080/api/v1/users/login", {
+        fetch( GLOBAL_URL + "/api/v1/users/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

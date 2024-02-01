@@ -17,7 +17,7 @@ export function UserList(arr) {
   return userList
 }
 
-fetch("http://localhost:8080/api/v1/jwt/users/getAll", {
+fetch("http://localhost:8080/api/v1/jwt/users", {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
@@ -35,7 +35,7 @@ fetch("http://localhost:8080/api/v1/jwt/users/getAll", {
     return response.json()
   })
   .then((data) => {
-    UserList(data)
+    UserList(data.data)
   })
   .catch((error) => {
     // Handle fetch errors

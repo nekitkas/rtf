@@ -25,23 +25,13 @@ const usersContainer = document.createElement("div")
 
 usersContainer.className = "users-container"
 
-// const Messenger = RenderMessenger({ id: "user1" })
-
-//Get all the messages for the messenger
-//right now sample data, later fix that
-
-//Later change after request to userid
-
-// const Messenger = RenderMessenger("user1")
-
-
 export async function RenderHomePage() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
 
   usersContainer.innerHTML = ""
   await NavbarLogged()
-  
+
   // const Chats = new Messenger("CURRUSERID", "user2", "USERNAME", "testimageurl", ROOT)
   const PostFeed = RenderPostFeed()
   console.log(Socket)
@@ -72,22 +62,26 @@ export async function RenderHomePage() {
 async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts()
+
+    console.log(postsData)
     if (postsData) {
       // Do something with the data
-      postsData.posts.forEach((post) => {
+      postsData.forEach((post) => {
         const postLink = document.createElement("div")
         // postLink.href = `post/${post.post.id}`
+
+        console.log(post.id)
         postLink.addEventListener("click", () => {
-          history.pushState({}, "", `post/${post.post.id}`)
+          history.pushState({}, "", `post/${post.id}`)
           RouterFunction()
         })
 
         postLink.classList.add("post-link")
         if (post.categories) {
-          postLink.appendChild(RenderPost(post.post, post.categories))
+          postLink.appendChild(RenderPost(post, post.nickname))
           PostFeed.appendChild(postLink)
         } else {
-          postLink.appendChild(RenderPost(post.post))
+          postLink.appendChild(RenderPost(post))
           PostFeed.appendChild(postLink)
         }
       })
