@@ -46,43 +46,40 @@ func (s *server) configureRouter() {
 	s.router.Use(s.logRequest)
 	s.router.Use(s.CORSMiddleware)
 
-	s.router.HandleFunc("POST", "/api/v1/users/create", s.handleUsersCreate())
-	s.router.HandleFunc("POST", "/api/v1/users/login", s.handleUsersLogin())
-	s.router.HandleFunc("GET", "/api/v1/auth/checkCookie", s.handleCheckCookie())
-	s.router.HandleFunc("GET", "/api/v1/logout", s.handleLogOut())
+	s.router.POST("/api/v1/users/create", s.handleUsersCreate())
+	s.router.POST("/api/v1/users/login", s.handleUsersLogin())
+	s.router.GET("/api/v1/auth/checkCookie", s.handleCheckCookie())
+	s.router.GET("/api/v1/logout", s.handleLogOut())
 
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 
 	// -------------------- USER PATHS ------------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/users", s.handleUsersGetAll())
-	s.router.HandleFunc("GET", "/api/v1/jwt/users/:id", s.handleUsersGetByID())
-	s.router.HandleFunc("DELETE", "/api/v1/jwt/users/delete/:id", s.handleUsersDelete())
+	s.router.GET("/api/v1/jwt/users", s.handleUsersGetAll())
+	s.router.GET("/api/v1/jwt/users/:id", s.handleUsersGetByID())
+	s.router.DELETE("/api/v1/jwt/users/delete/:id", s.handleUsersDelete())
 	// -------------------- CATEGORY PATHS --------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/categories", s.handleGetAllCategories())
+	s.router.GET("/api/v1/jwt/categories", s.handleGetAllCategories())
 	// -------------------- POST PATHS ------------------------------- //
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts", s.handleAllPostInformation())
-	s.router.HandleFunc("POST", "/api/v1/jwt/posts/create", s.handlePostCreation())
-	s.router.HandleFunc("GET", "/api/v1/jwt/posts/:id", s.serveSinglePostInformation())
-	s.router.HandleFunc("DELETE", "/api/v1/jwt/posts/delete/:id", s.handleRemovePost())
+	s.router.POST("/api/v1/jwt/posts", s.handleAllPostInformation())
+	s.router.POST("/api/v1/jwt/posts/create", s.handlePostCreation())
+	s.router.GET("/api/v1/jwt/posts/:id", s.serveSinglePostInformation())
+	s.router.DELETE("/api/v1/jwt/posts/delete/:id", s.handleRemovePost())
 	// -------------------- COMMENT PATHS ---------------------------- //
-	s.router.HandleFunc("POST", "/api/v1/jwt/comments/create", s.handleCommentCreation())
-	s.router.HandleFunc("DELETE", "/api/v1/jwt/comments/delete/:id", s.handleRemoveComment())
+	s.router.POST("/api/v1/jwt/comments/create", s.handleCommentCreation())
+	s.router.DELETE("/api/v1/jwt/comments/delete/:id", s.handleRemoveComment())
 	// -------------------- CHAT PATHS ------------------------------- //
-	s.router.HandleFunc("POST", "/api/v1/jwt/chat/:user_id", s.handleCreateChat())
-	s.router.HandleFunc("POST", "/api/v1/jwt/chat/line/create", s.handleWriteLines())
-	s.router.HandleFunc("POST", "/api/v1/jwt/chat/line/init", s.handleInitChatLines())
+	s.router.POST("/api/v1/jwt/chat/:user_id", s.handleCreateChat())
+	s.router.POST("/api/v1/jwt/chat/line/create", s.handleWriteLines())
+	s.router.POST("/api/v1/jwt/chat/line/init", s.handleInitChatLines())
 
 	// -------------------- REACTION PATHS --------------------------- //
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getAll", s.handleGetReactions())
-	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/remove", s.handleRemoveReaction())
-	s.router.HandleFunc("POST", "/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
-	s.router.HandleFunc("GET", "/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
+	s.router.GET("/api/v1/jwt/reactions/getAll", s.handleGetReactions())
+	s.router.POST("/api/v1/jwt/reactions/remove", s.handleRemoveReaction())
+	s.router.POST("/api/v1/jwt/reactions/addToParent", s.handleAddReactionsToParent())
+	s.router.GET("/api/v1/jwt/reactions/getByUserParentID", s.handleGetUserReactions())
+	s.router.GET("/api/v1/jwt/reactions/getByParentID", s.handleGetReactionsByParentID())
 
-	//s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
-	s.router.HandleFunc("GET", "/jwt/chat", s.wsHandler())
-	// EXAMPLE OF DYNAMIC PATH
-	// s.router.HandleFunc("GET", "/api/v1/jwt/users/:test", s.handleTest())
+	s.router.GET("/jwt/chat", s.wsHandler())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +89,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) wsHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{w, http.StatusOK}
-		//user_id := router.Param(r.Context(), "user_id")
 		userId := r.Context().Value(ctxUserID).(string)
 		if err := s.websocket.HandleWebSocket(rw, r, userId); err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)

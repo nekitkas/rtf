@@ -34,7 +34,6 @@ HAVING COUNT(DISTINCT user_id) = 2;
 		}
 		strs = append(strs, str)
 	}
-	fmt.Println(strs)
 
 	return strs, nil
 }
@@ -132,7 +131,6 @@ func (c *ChatRepository) Get(id string) (models.Chat, error) {
 		if err := rows.Scan(&chat.ID, &chat.Users[0].UserID, &chat.Users[0].Username); err != nil {
 			return models.Chat{}, err
 		}
-		fmt.Println(chat)
 	}
 
 	return models.Chat{}, nil

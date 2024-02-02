@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"forum/server/pkg/jwttoken"
 	"net/http"
 	"os"
@@ -62,7 +61,6 @@ func (s *server) CORSMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Call the next handler in the chain for actual requests
 		next.ServeHTTP(w, r)
 	})
 }
@@ -83,8 +81,6 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Call the next handler
-		fmt.Println("THIS IS HTE USER ID: ", claims.UserID)
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, claims.UserID)))
 	})
 }
