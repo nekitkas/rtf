@@ -63,7 +63,7 @@ async function fetchData(PostFeed) {
       postsData.forEach((post) => {
         const postLink = document.createElement("div")
 
-        console.log(post.id)
+      
 
         postLink.addEventListener("click", () => {
           history.pushState({}, "", `post/${post.id}`)

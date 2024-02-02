@@ -1,12 +1,20 @@
 import { OpenMessengers } from "./components/Messenger.js"
 import { router } from "./router/Router.js"
 import { OnlineUsers, RefreshStatus } from "./components/UserCard.js"
+import { CheckPosition } from "./helpers/LazyLoading.js"
 
 export const Page = document.querySelector(".root")
 
 const ROOT = document.querySelector(".root")
 const CONTAINER = document.createElement("div")
 CONTAINER.className = "container"
+
+
+function checkScroll() {
+  window.addEventListener('scroll', CheckPosition)
+  window.addEventListener('resize', CheckPosition)
+}
+checkScroll()
 
 let Socket
 
@@ -46,7 +54,7 @@ export function initializeWebSocket() {
           OnlineUsers[i].online = true;
         }
       }
-      
+
     }
 
     if(parsedData.message == "offline" && parsedData.type == "status"){
@@ -67,7 +75,7 @@ export function initializeWebSocket() {
         // OpenMessengers[i].messages.push({text: parsedData.message, class: "left"});
         // OpenMessengers[i].RefreshChats();
         OpenMessengers[i].AppendLine({text: parsedData.message, class: "left"})
-      } 
+      }
     }
     console.log('Received message:', event.data);
   });
