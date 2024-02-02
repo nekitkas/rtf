@@ -1,7 +1,7 @@
 import { OpenMessengers } from "./components/Messenger.js"
 import { router } from "./router/Router.js"
 import { OnlineUsers, RefreshStatus } from "./components/UserCard.js"
-import { CheckPosition } from "./helpers/LazyLoading.js"
+
 
 export const Page = document.querySelector(".root")
 
@@ -10,11 +10,7 @@ const CONTAINER = document.createElement("div")
 CONTAINER.className = "container"
 
 
-function checkScroll() {
-  window.addEventListener('scroll', CheckPosition)
-  window.addEventListener('resize', CheckPosition)
-}
-checkScroll()
+
 
 let Socket
 

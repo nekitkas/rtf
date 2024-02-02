@@ -16,7 +16,8 @@ import { RenderPostFeed } from "../components/PostFeed.js"
 import { RenderFilter } from "../components/Filter.js"
 import { router } from "../router/Router.js"
 import { UserList } from "../components/UserList"
-import { OpenMessengers } from "../components/Messenger.js"
+import { OpenMessengers, Throttle } from "../components/Messenger.js"
+import { CheckPosition, PostsLoadedIndex, setPostsLoadedIndex } from "../helpers/LazyLoading.js"
 
 const usersContainer = document.createElement("div")
 
@@ -42,6 +43,13 @@ export async function Home() {
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)
 
+  //check for scrollin to lazy load posts
+  function checkScroll() {
+    window.addEventListener('scroll', Throttle(CheckPosition, 250))
+    window.addEventListener('resize', Throttle(CheckPosition, 250))
+  }
+  checkScroll()
+
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
     selectBlock.addEventListener("click", displayCategoryModal)
@@ -59,26 +67,9 @@ async function fetchData(PostFeed) {
   try {
     const postsData = await GetPosts()
     if (postsData) {
-      // Do something with the data
       postsData.forEach((post) => {
-        const postLink = document.createElement("div")
-
-      
-
-        postLink.addEventListener("click", () => {
-          history.pushState({}, "", `post/${post.id}`)
-          router()
-        })
-
-        postLink.classList.add("post-link")
-        if (post.categories) {
-          postLink.appendChild(RenderPost(post, post.nickname))
-          PostFeed.appendChild(postLink)
-        } else {
-          postLink.appendChild(RenderPost(post))
-          PostFeed.appendChild(postLink)
-        }
-      })
+        const postLink = ProcessPostData(post, router);
+        PostFeed.appendChild(postLink)})
     } else {
       // Handle case when response is not OK
       console.log("Error: Response not OK")
@@ -100,4 +91,26 @@ async function fetchUsers(usersContainer) {
   } catch (error) {
     console.error("Error during fetch:", error)
   }
+}
+
+
+//create a link and calls function to create post out of provided data
+export function ProcessPostData(post) {
+  const postLink = document.createElement("div");
+
+  postLink.addEventListener("click", () => {
+    history.pushState({}, "", `post/${post.id}`);
+   setPostsLoadedIndex(0);
+    router();
+  });
+
+  postLink.classList.add("post-link");
+
+  if (post.categories) {
+    postLink.appendChild(RenderPost(post, post.nickname));
+  } else {
+    postLink.appendChild(RenderPost(post));
+  }
+
+  return postLink;
 }
