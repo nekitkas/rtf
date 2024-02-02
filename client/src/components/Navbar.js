@@ -7,7 +7,7 @@ import messageButtonImage from "../assets/img/message.svg"
 import modalProfile from "../assets/img/modalProfile.svg"
 import logout from "../assets/img/logout.svg"
 import { router } from "../router/Router"
-import { GetUserInfo, Logout } from "../helpers/ServerRequests"
+import {GetUserInfo, isLoggedIn, Logout} from "../helpers/ServerRequests"
 import {ROOT} from "../index";
 
 
@@ -29,7 +29,8 @@ document.addEventListener("click", async (e) => {
 
 
 export async function Navbar() {
-  const userInfo = await GetUserInfo()
+  const userId = await isLoggedIn()
+  const userInfo = await GetUserInfo(userId)
 
   console.log("user info:", userInfo);
 
@@ -96,6 +97,7 @@ export async function Navbar() {
 
 
 const RenderNavbar = async (user) =>{
+  user = user.data
   const currentUrl = window.location.href
   const navbar = document.createElement("nav");
   navbar.className = "navbar-post";
