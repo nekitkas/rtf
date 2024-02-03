@@ -71,6 +71,22 @@ func (r *Router) HandleFunc(method, pattern string, fn http.HandlerFunc) {
 	r.Handle(method, pattern, fn)
 }
 
+func (r *Router) GET(pattern string, fn http.HandlerFunc) {
+	r.HandleFunc(http.MethodGet, pattern, fn)
+}
+
+func (r *Router) POST(pattern string, fn http.HandlerFunc) {
+	r.HandleFunc(http.MethodPost, pattern, fn)
+}
+
+func (r *Router) DELETE(pattern string, fn http.HandlerFunc) {
+	r.HandleFunc(http.MethodDelete, pattern, fn)
+}
+
+func (r *Router) PUT(pattern string, fn http.HandlerFunc) {
+	r.HandleFunc(http.MethodPut, pattern, fn)
+}
+
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	method := strings.ToLower(req.Method)
 	segs := r.pathSegments(req.RequestURI)
