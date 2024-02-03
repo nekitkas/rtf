@@ -1,10 +1,11 @@
 import { Socket } from ".."
 import { GLOBAL_URL } from "../config";
+import { CURRENTUSER } from "../router/Router";
 
 export const OpenMessengers = [];
 export class Messenger {
-  constructor(currentUserId, userToId, username, imageUrl, RootElement){
-    this.currentUserId = currentUserId;
+  constructor(userToId, username, imageUrl, RootElement){
+    this.currentUserId = CURRENTUSER;
     this.userToId = userToId;
     this.username = username;
     this.imageUrl = imageUrl;
@@ -14,7 +15,7 @@ export class Messenger {
     this.messages = new ObservableArray([
     ])
     this.messages.addListener((eventName, items, array) => {
-      console.log("ITEM ADDED!", items)
+      // console.log("ITEM ADDED! on work!", items)
     })
     this.chatId;
     this.openedAt = new Date().toISOString()
@@ -52,6 +53,7 @@ export class Messenger {
       if(data.data != null){
         data.data.forEach((item) => {
           let toBeClass = "left";
+          console.log("COMPARING USERID: ", this.currentUserId)
           if(item.user_id == this.currentUserId){
             toBeClass = "right";
           }
@@ -59,8 +61,8 @@ export class Messenger {
           class: toBeClass})
         })
       }
-      console.log(data);
-      this.AddChats()
+      this.AddChats();
+      this.chatPage++;
     }).catch((err) => {
       console.log("ERROR WHILE CREATING CHATID: ", err)
       return
@@ -87,13 +89,39 @@ export class Messenger {
     })
   }
 
-  LoadOlderChats(){
-  // If scollred up, add more messagesconst isScrollCloseToBottom = () => {
-    // const isAtTop = this.chatBody.scrollTop <= 800;
-    // if (isAtTop){
-    //   for(let i = 0; i <= 20; i++)
-    //   this.AppendLine({text: "JUST A TESTING: " + i, class: "left"}, true)
-    // }
+  async LoadOlderChats(){
+  // If scollred up, add more messagesconst 
+    // await this.GetChatId()
+    const isAtTop = this.chatBody.scrollTop <= 400;
+    console.log(this.chatBody.scrollTop);
+    if (isAtTop){
+      fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/init`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body:JSON.stringify({
+          "chat_id": this.chatId,
+          "timestamp": this.openedAt,
+          "count": this.chatPage,
+        }),
+        credentials: "include",
+      }).then((response) => {
+        return response.json()
+      }).then((data) => {
+        console.log(data);
+        if (data.data != null){
+          data.data.forEach((element) => {
+            if(element.user_id == this.currentUserId){
+              this.AppendLine({text: element.content, class: "right"}, true)
+            }else{
+              this.AppendLine({text: element.content, class: "left"}, true)
+            }
+          })
+          this.chatPage++;
+        }
+      })
+    }
   }
 
   Create(){
@@ -125,7 +153,7 @@ export class Messenger {
     chatHeader.appendChild(closeIcon)
     
     this.chatBody.classList.add("chat-body")
-
+    console.log("BEFORE LOADING:", this.currentUserId)
     this.LoadChats()
 
 
