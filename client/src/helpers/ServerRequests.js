@@ -1,4 +1,4 @@
-import { GLOBAL_URL } from "../config"
+import {GLOBAL_URL} from "../config"
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
 export const isLoggedIn = async () => {
@@ -19,8 +19,8 @@ export const isLoggedIn = async () => {
         return false
       }
     }
-
-    return true
+    const result = await response.json()
+    return result.data
   } catch (error) {
     console.error("Fetch error:", error)
     throw error // Rethrow the error if needed
@@ -159,8 +159,7 @@ export const GetUserInfo = async (user_id) => {
       return false
     }
 
-    const result = await response.json()
-    return result
+    return await response.json()
   } catch (error) {
     console.error("Fetch error:", error)
     throw error // Rethrow the error if needed

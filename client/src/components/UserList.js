@@ -1,3 +1,4 @@
+import { GLOBAL_URL } from "../config"
 import { UsercardUser } from "./UserCard"
 
 export function UserList(arr) {
@@ -17,7 +18,7 @@ export function UserList(arr) {
   return userList
 }
 
-fetch("http://localhost:8080/api/v1/jwt/users", {
+fetch(GLOBAL_URL + "/api/v1/jwt/users", {
   method: "GET",
   headers: {
     "Content-Type": "application/json",

@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"forum/server/internal/models"
 	"forum/server/pkg/router"
 	"net/http"
@@ -49,7 +48,6 @@ func (s *server) handlePostCreation() http.HandlerFunc {
 func (s *server) handleRemovePost() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := router.Param(r.Context(), "id")
-		fmt.Println("ID::::: ", id)
 		if err := s.store.Post().Delete(id); err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
@@ -121,7 +119,7 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 			Category:    *categories,
 			Reactions:   *reactions,
 		}
-		fmt.Println("we are here")
+
 		s.respond(w, r, http.StatusOK, Response{
 			Message: "Successful",
 			Data:    response,
@@ -148,8 +146,6 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-
-		fmt.Println(posts)
 
 		for i, post := range posts {
 			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
