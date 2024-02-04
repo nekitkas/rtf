@@ -6,7 +6,9 @@ import { Profile } from "../pages/Profile.js";
 import { Register } from "../pages/Register.js";
 import { Post } from "../pages/Post.js";
 import { NotFound } from "../pages/NotFound";
-
+import { Socket, initializeWebSocket } from "../index.js";
+import { GLOBAL_URL } from "../config.js";
+export let CURRENTUSER;
 const authMiddleware = async (params) => {
     const isUserLogged = await isLoggedIn();
 
@@ -18,13 +20,37 @@ const authMiddleware = async (params) => {
     return params;
 };
 
+const checkWebSocketConn = (params) => {
+  const isSocketConnected = typeof(Socket) != undefined
+  if(isSocketConnected){
+    initializeWebSocket()
+  }
+  return params
+}
+
+const checkUserId = (params) => {
+  fetch(GLOBAL_URL + `/api/v1/auth/checkCookie`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  }).then((response) => {
+    return response.json()
+  }).then((data) => {
+    CURRENTUSER = data.data;
+  })
+
+  return params
+}
+
 const routes = [
-    { path: '/', view: Home, middleware: [authMiddleware] },
+    { path: '/', view: Home, middleware: [authMiddleware, checkWebSocketConn, checkUserId] },
     { path: '/login', view: Login },
     { path: '/register', view: Register },
-    { path: '/create-post', view: CreatePost, middleware: [authMiddleware] },
-    { path: '/profile', view: Profile, middleware: [authMiddleware] },
-    { path: '/post/:id', view: Post, middleware: [authMiddleware] },
+    { path: '/create-post', view: CreatePost, middleware: [authMiddleware, checkWebSocketConn, checkUserId] },
+    { path: '/profile', view: Profile, middleware: [authMiddleware, checkWebSocketConn, checkUserId] },
+    { path: '/post/:id', view: Post, middleware: [authMiddleware, checkWebSocketConn, checkUserId] },
     { path: '.*', view: NotFound },
 ];
 

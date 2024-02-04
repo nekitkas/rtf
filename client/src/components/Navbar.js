@@ -32,8 +32,6 @@ export async function Navbar() {
   const userId = await isLoggedIn()
   const userInfo = await GetUserInfo(userId)
 
-  console.log("user info:", userInfo);
-
   const navbarHTML = await RenderNavbar(userInfo);
 
   ROOT.appendChild(navbarHTML)
