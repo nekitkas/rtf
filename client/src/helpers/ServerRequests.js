@@ -53,12 +53,15 @@ export const Logout = async () => {
   }
 }
 
-const requestData = {
-  current_index: 0,
-  page_open_time_stamp: new Date().toISOString(),
-}
 
-export const GetPosts = async () => {
+
+export const GetPosts = async (index = 0) => {
+  let current_index = 0+ index
+  const requestData = {
+    current_index: current_index,
+    page_open_time_stamp: new Date().toISOString(),
+  }
+  console.log("requestData: ", requestData.current_index);
   try {
     const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
       method: "POST",

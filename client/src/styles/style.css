@@ -12,6 +12,7 @@
   --background-secondory: #1e1d1d;
   --border-color: rgba(79, 79, 79, 0.72);
   --text-color: rgba(255, 255, 255, 0.72);
+  scroll-behavior: smooth;
 }
 
 body {

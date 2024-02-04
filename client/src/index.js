@@ -3,11 +3,15 @@ import { router } from "./router/Router.js"
 import { OnlineUsers, RefreshStatus } from "./components/UserCard.js"
 import { Notification } from "./helpers/Notifications.js"
 
+
 export const Page = document.querySelector(".root")
 
 const ROOT = document.querySelector(".root")
 const CONTAINER = document.createElement("div")
 CONTAINER.className = "container"
+
+
+
 
 let Socket
 
@@ -43,7 +47,7 @@ export function initializeWebSocket() {
           OnlineUsers[i].online = true;
         }
       }
-      
+
     }
 
     if(parsedData.message == "offline" && parsedData.type == "status"){
@@ -61,7 +65,7 @@ export function initializeWebSocket() {
     for(let i = 0; i < OpenMessengers.length; i++){
       if (OpenMessengers[i].userToId == parsedData.from_user && parsedData.type == "chat"){
         OpenMessengers[i].AppendLine({text: parsedData.message, class: "left"})
-      } 
+      }
     }
     //Add notification
     if (parsedData.type == "chat" && OpenMessengers.length > 0){
