@@ -9,7 +9,6 @@ import { RenderPost } from "../components/Post"
 import {
   GetAllUsers,
   GetPosts,
-  SinglePostRequest,
 } from "../helpers/ServerRequests.js"
 import { CONTAINER, ROOT, Socket } from "../index.js"
 import { RenderPostFeed } from "../components/PostFeed.js"
@@ -68,8 +67,27 @@ async function fetchData(PostFeed) {
     const postsData = await GetPosts()
     if (postsData) {
       postsData.forEach((post) => {
+
         const postLink = ProcessPostData(post, router);
         PostFeed.appendChild(postLink)})
+
+        const postLink = document.createElement("div")
+
+        postLink.addEventListener("click", () => {
+          history.pushState({}, "", `post/${post.id}`)
+          router()
+        })
+
+        postLink.classList.add("post-link")
+        if (post.categories) {
+          postLink.appendChild(RenderPost(post, post.nickname))
+          PostFeed.appendChild(postLink)
+        } else {
+          postLink.appendChild(RenderPost(post))
+          PostFeed.appendChild(postLink)
+        }
+      })
+
     } else {
       // Handle case when response is not OK
       console.log("Error: Response not OK")

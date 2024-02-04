@@ -102,7 +102,6 @@ func (c *ChatRepository) GetLinesInit(chat_id string, time time.Time, limit int,
 		}
 		lines = append(lines, line)
 	}
-
 	return lines, nil
 }
 
