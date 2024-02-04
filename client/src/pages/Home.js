@@ -64,40 +64,35 @@ export async function Home() {
 
 async function fetchData(PostFeed) {
   try {
-    const postsData = await GetPosts()
+    const postsData = await GetPosts();
+
     if (postsData) {
       postsData.forEach((post) => {
-
-        const postLink = ProcessPostData(post, router);
-        PostFeed.appendChild(postLink)})
-
-        const postLink = document.createElement("div")
+        const postLink = document.createElement("div");
+        postLink.classList.add("post-link");
 
         postLink.addEventListener("click", () => {
-          history.pushState({}, "", `post/${post.id}`)
-          router()
-        })
+          history.pushState({}, "", `post/${post.id}`);
+          router();
+        });
 
-        postLink.classList.add("post-link")
         if (post.categories) {
-          postLink.appendChild(RenderPost(post, post.nickname))
-          PostFeed.appendChild(postLink)
+          postLink.appendChild(RenderPost(post, post.nickname));
         } else {
-          postLink.appendChild(RenderPost(post))
-          PostFeed.appendChild(postLink)
+          postLink.appendChild(RenderPost(post));
         }
-      })
 
+        PostFeed.appendChild(postLink);
+      });
     } else {
       // Handle case when response is not OK
-      console.log("Error: Response not OK")
+      console.log("Error: Response not OK");
     }
   } catch (error) {
     // Handle errors that occurred during the fetch
-    console.error("Error during fetch:", error)
+    console.error("Error during fetch:", error);
   }
 }
-
 async function fetchUsers(usersContainer) {
   try {
     const usersData = await GetAllUsers()
