@@ -6,17 +6,15 @@ import "../styles/chat.css"
 import "../styles/users.css"
 import { RenderPost } from "../components/Post"
 
-import {
-  GetAllUsers,
-  GetPosts,
-} from "../helpers/ServerRequests.js"
-import { CONTAINER, ROOT, Socket } from "../index.js"
+import { GetAllUsers, GetPosts } from "../helpers/ServerRequests.js"
+import { CONTAINER, ROOT } from "../index.js"
 import { RenderPostFeed } from "../components/PostFeed.js"
 import { RenderFilter } from "../components/Filter.js"
 import { router } from "../router/Router.js"
 import { UserList } from "../components/UserList"
 import { OpenMessengers, Throttle } from "../components/Messenger.js"
 import { CheckPosition, PostsLoadedIndex, setPostsLoadedIndex } from "../helpers/LazyLoading.js"
+import { Notification } from "../helpers/Notifications.js"
 
 const usersContainer = document.createElement("div")
 
@@ -29,7 +27,7 @@ export async function Home() {
   usersContainer.innerHTML = ""
   await Navbar()
 
-  OpenMessengers.length = 0;
+  OpenMessengers.length = 0
   const PostFeed = RenderPostFeed()
   ROOT.append(CONTAINER)
 
@@ -48,6 +46,10 @@ export async function Home() {
     window.addEventListener('resize', Throttle(CheckPosition, 250))
   }
   checkScroll()
+
+  // AddNotification("Test1", "Looool")
+  // AddNotification("Test2", "sadasdasdasd")
+
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {

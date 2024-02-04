@@ -5,10 +5,12 @@ import avatar from "../assets/img/avatar.svg.png"
 import arrowSvg from "../assets/img/arrow.svg"
 import messageButtonImage from "../assets/img/message.svg"
 import modalProfile from "../assets/img/modalProfile.svg"
+import notificationButtonImage from "../assets/img/notifications.svg"
 import logout from "../assets/img/logout.svg"
 import { router } from "../router/Router"
 import {GetUserInfo, isLoggedIn, Logout} from "../helpers/ServerRequests"
 import {ROOT} from "../index";
+import { ShowNotificationsModal } from "../helpers/Notifications"
 
 
 
@@ -63,6 +65,14 @@ export async function Navbar() {
     router()
   })
 
+  const notificationButton = document.querySelector(".notification-button")
+  notificationButton.addEventListener("click", () => {
+
+  const  notificationCounter = document.querySelector(".notification-counter")
+     notificationCounter.textContent = 0
+     notificationCounter.classList.remove("show-notification-counter")
+    ShowNotificationsModal()
+  })
 
   const Logo = document.querySelector(".navbar-logo")
 
@@ -123,6 +133,28 @@ const RenderNavbar = async (user) =>{
   messageButtonImg.src = messageButtonImage;
   messageButtonImg.alt = "message-button";
   messageButton.appendChild(messageButtonImg);
+
+//Create notification button
+const notificationButton = document.createElement("div");
+notificationButton.className = "notification-button";
+const notificationButtonImg = document.createElement("img");
+notificationButtonImg.src = notificationButtonImage;
+notificationButtonImg.alt = "notification-button";
+notificationButton.appendChild(notificationButtonImg);
+
+
+//nofification counter
+const notificationCounter = document.createElement("div");
+notificationCounter.className = "notification-counter";
+notificationCounter.textContent = 0;
+notificationButton.appendChild(notificationCounter);
+
+//create notifications modal
+const notificationsModal = document.createElement("div");
+notificationsModal.className = "notifications-modal";
+
+notificationButton.appendChild(notificationsModal);
+
 
 // CREATE POST BUTTON //
   const createPostLink = document.createElement("div");
@@ -203,6 +235,8 @@ const RenderNavbar = async (user) =>{
 
   // Assemble the components
   userBlock.appendChild(messageButton);
+  userBlock.appendChild(notificationButton);
+
   userBlock.appendChild(createPostLink);
   userBlock.appendChild(userProfile);
 

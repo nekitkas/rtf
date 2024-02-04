@@ -112,6 +112,65 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+
+}
+
+.notification-button{
+ margin-left: 10px;
+ cursor: pointer;
+ position: relative;
+ transition: transform 0.4s ease-out, opacity 0.5s ease-in-out;
+}
+
+
+.notification-button img{
+  width: 25px;
+  height: 25px;
+}
+
+.notifications-modal{
+
+  width: 220px;
+  height: 100px;
+  background-color: var(--background-secondory);
+  border-radius: 25px;
+  border: 2px solid var(--border-color);
+  position: absolute;
+  top: 50px;
+  left: -10px;
+  display: none;
+  overflow: auto;
+  padding: 12px;
+  scrollbar-width: thin;
+
+
+}
+
+.notifications-modal::-webkit-scrollbar {
+  width: 0;
+
+
+
+}
+
+
+.show-notifications-modal{
+  display: block;
+}
+
+.notification{
+  width: 100%;
+  background-color:var(--primary-color);
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-color);
+  padding: 1px 5px 1px 5px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-color);
+  text-wrap: wrap;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+
 }
 
 .user-profile {
@@ -305,4 +364,23 @@
 
 .select-arrow-rotate{
   transform: rotate(180deg);
+}
+
+.notification-counter{
+  width: 11px;
+  height: 11px;
+  background-color: rgb(255, 77, 0);
+  position:absolute ;
+  bottom: 0;
+  right: 0;
+  font-size:9px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+.show-notification-counter{
+  display: flex;
 }
