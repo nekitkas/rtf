@@ -67,7 +67,10 @@ export async function Navbar() {
 
   const notificationButton = document.querySelector(".notification-button")
   notificationButton.addEventListener("click", () => {
-    console.log("click notification button");
+
+  const  notificationCounter = document.querySelector(".notification-counter")
+     notificationCounter.textContent = 0
+     notificationCounter.classList.remove("show-notification-counter")
     ShowNotificationsModal()
   })
 
@@ -139,6 +142,12 @@ notificationButtonImg.src = notificationButtonImage;
 notificationButtonImg.alt = "notification-button";
 notificationButton.appendChild(notificationButtonImg);
 
+
+//nofification counter
+const notificationCounter = document.createElement("div");
+notificationCounter.className = "notification-counter";
+notificationCounter.textContent = 0;
+notificationButton.appendChild(notificationCounter);
 
 //create notifications modal
 const notificationsModal = document.createElement("div");

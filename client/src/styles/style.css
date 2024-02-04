@@ -56,3 +56,19 @@ body {
 .post-link {
   text-decoration: none;
 }
+
+
+body::-webkit-scrollbar {
+
+  width: 6px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 6px; /* Закругленные углы для ползунка */
+}
+
+body::-webkit-scrollbar-track {
+  background-color: var(--background-secondory);
+  border-radius: 6px; /* Закругленные углы для трека */
+}

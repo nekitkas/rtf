@@ -130,33 +130,29 @@
 
 .notifications-modal{
 
-  width: 300px;
+  width: 220px;
   height: 100px;
   background-color: var(--background-secondory);
   border-radius: 25px;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   position: absolute;
   top: 50px;
   left: -10px;
   display: none;
   overflow: auto;
-  padding: 8px;
+  padding: 12px;
   scrollbar-width: thin;
+
 
 }
 
 .notifications-modal::-webkit-scrollbar {
-  width: 6px;
+  width: 0;
+
+
+
 }
 
-.notifications-modal::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color)
-}
-
-.notifications-modal::-webkit-scrollbar-track {
-  background-color: #010101;
-  border-radius: 20px;
-}
 
 .show-notifications-modal{
   display: block;
@@ -164,13 +160,17 @@
 
 .notification{
   width: 100%;
-  background-color: var(--primary-color);
-  border-radius: 20px;
+  background-color:var(--primary-color);
+  border-radius: 5px;
   display: flex;
-  justify-content: space-around;
-  padding: 3px;
-  margin-bottom: 5px;
+  justify-content: space-between;
+  color: var(--text-color);
+  padding: 1px 5px 1px 5px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-color);
   text-wrap: wrap;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+
 }
 
 .user-profile {
@@ -364,4 +364,23 @@
 
 .select-arrow-rotate{
   transform: rotate(180deg);
+}
+
+.notification-counter{
+  width: 11px;
+  height: 11px;
+  background-color: rgb(255, 77, 0);
+  position:absolute ;
+  bottom: 0;
+  right: 0;
+  font-size:9px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+.show-notification-counter{
+  display: flex;
 }
