@@ -64,7 +64,17 @@ export function initializeWebSocket() {
       } 
     }
     //Add notification
-    if (parsedData.type == "chat"){
+    if (parsedData.type == "chat" && OpenMessengers.length > 0){
+      //check if chat is open or no
+      for(let i = 0; i < OpenMessengers.length; i++){
+        if (OpenMessengers[i].userToId == parsedData.from_user){
+          console.log('Chat is open!');
+        }else{
+          const notification = new Notification(parsedData.from_user, parsedData.message, "Created_at")
+          notification.Create()
+        } 
+      }
+    }else if (parsedData.type == "chat"){
       const notification = new Notification(parsedData.from_user, parsedData.message, "Created_at")
       notification.Create()
     }

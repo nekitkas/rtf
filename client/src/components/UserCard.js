@@ -23,18 +23,9 @@ export class UsercardUser{
     userName.textContent = this.username
     
     this.userComponent.addEventListener('click', () => {
-      if(OpenMessengers.length == 0){
-        const Chats = new Messenger(this.id, this.username, this.image_url, ROOT)
-        Chats.Create()
-      }else{
-        //close all instances
-        OpenMessengers.forEach((messenger) => {
-          messenger.Close();
-        })
         //Open new one
         const Chats = new Messenger(this.id, this.username, this.image_url, ROOT)
         Chats.Create()
-      }
     })
     // Append elements to the User component
     this.userComponent.appendChild(userImage)

@@ -16,7 +16,6 @@ export class Messenger {
     this.chatId;
     this.openedAt = new Date().toISOString()
     this.chatPage = 0;
-    OpenMessengers.push(this)
 
     this.chatBody.addEventListener('wheel', Throttle(() => this.LoadOlderChats(), 300));
   }
@@ -118,6 +117,14 @@ export class Messenger {
   }
 
   Create(){
+    if (OpenMessengers.length > 0){
+      OpenMessengers.forEach((mess) => {
+        mess.Close();
+      })
+    }
+    //Create new messenger
+    OpenMessengers.push(this)
+
     this.messenger.classList.add("messenger")
     
     const chatHeader = document.createElement("div")

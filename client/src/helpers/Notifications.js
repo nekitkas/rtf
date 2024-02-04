@@ -1,6 +1,34 @@
 import { ROOT } from "..";
 import { Messenger } from "../components/Messenger";
 import { GLOBAL_URL } from "../config";
+class ArrWithEventListener {
+    constructor(arr) {
+      this.array = arr;
+      this.listeners = [];
+    }
+  
+    addListener(callback) {
+      this.listeners.push(callback);
+    }
+  
+    push(item) {
+      this.array.push(item);
+      this.notifyListeners('add', [item]);
+    }
+  
+    // Add other array methods as needed
+  
+    notifyListeners(eventName, items) {
+      this.listeners.forEach(listener => {
+        listener(eventName, items, this.array);
+      });
+    }
+  }
+
+const NotificationArray = new ArrWithEventListener([]);
+NotificationArray.addListener(() => {
+    console.log("INCREMENT THE COUNTER TO SHOW NOTIFICATION OR WHATEVER");
+})
 export class Notification{
     constructor(FromUserId, content, createdAt){
         this.fromUser = FromUserId;
@@ -32,6 +60,7 @@ export class Notification{
     }
 
     async Create(){
+
         await this.GetUserInformation()
         this.notification.className = "notification";
         
@@ -53,7 +82,7 @@ export class Notification{
             Chats.Create();
 
         })
-        
+        NotificationArray.push(this);
         this.Root.appendChild(this.notification);
     }
 
