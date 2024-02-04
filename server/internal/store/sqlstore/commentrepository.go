@@ -111,6 +111,13 @@ func (c *CommentRepository) Get(id string) (*[]models.Comment, error) {
 		if err != nil {
 			return nil, fmt.Errorf(`Error while looping through comments - %v`, err)
 		}
+		//get user
+		user, err := c.store.User().FindByID(comment.ID)
+		if err != nil {
+			return nil, fmt.Errorf(`Error while retrieving user information for comments - %v`, err)
+		}
+
+		comment.Author = user.Username
 		comments = append(comments, comment)
 	}
 

@@ -146,7 +146,12 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
+		type postAndCategory struct {
+			Post     models.Post        `json:"post"`
+			Category *[]models.Category `json:"categories"`
+		}
 
+		var response []postAndCategory
 		for i, post := range posts {
 			commentCount, err := s.store.Post().GetCommentNumber(post.ID)
 			if err != nil {
@@ -154,11 +159,20 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 				return
 			}
 			posts[i].CommentCount = commentCount
+			categories, err := s.store.Category().GetForPost(post.ID)
+			if err != nil {
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+			response = append(response, postAndCategory{
+				Post:     posts[i],
+				Category: categories,
+			})
 		}
 
 		s.respond(w, r, http.StatusOK, Response{
 			Message: "Successful",
-			Data:    posts,
+			Data:    response,
 		})
 	}
 }

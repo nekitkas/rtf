@@ -10,4 +10,5 @@ type Comment struct {
 	Content         string    `db:"content" json:"content"`
 	Timestamp       time.Time `db:"datetime" json:"datetime"`
 	SubcommentCount int       `db:"subcomment_count" json:"subcomment_count"`
+	Author          string    `json:"author"`
 }
