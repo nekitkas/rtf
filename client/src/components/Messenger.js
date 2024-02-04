@@ -12,11 +12,7 @@ export class Messenger {
     this.RootElement = RootElement;
     this.chatBody = document.createElement("div");
     this.messenger = document.createElement("div")
-    this.messages = new ObservableArray([
-    ])
-    this.messages.addListener((eventName, items, array) => {
-      // console.log("ITEM ADDED! on work!", items)
-    })
+    this.messages = [];
     this.chatId;
     this.openedAt = new Date().toISOString()
     this.chatPage = 0;
@@ -35,7 +31,6 @@ export class Messenger {
   async LoadChats(){
     await this.GetChatId()
     //Initalize last messages from database (like 20 last messages)
-    console.log("CHATID", this.chatId, "Timestamp", this.openedAt, "count", this.chatPage)
     fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/init`, {
       method: "POST",
       headers: {
@@ -53,7 +48,6 @@ export class Messenger {
       if(data.data != null){
         data.data.forEach((item) => {
           let toBeClass = "left";
-          console.log("COMPARING USERID: ", this.currentUserId)
           if(item.user_id == this.currentUserId){
             toBeClass = "right";
           }
@@ -80,7 +74,6 @@ export class Messenger {
     }).then((response) => {
       return response.json()
     }).then((data) => {
-      console.log(" THIS IS THE CHAT ID WE ARE CREAINTG", data)
       this.chatId = data.data.chat_id[0];
       // return data.data.chat_id[0]
     }).catch((err) => {
@@ -153,7 +146,7 @@ export class Messenger {
     chatHeader.appendChild(closeIcon)
     
     this.chatBody.classList.add("chat-body")
-    console.log("BEFORE LOADING:", this.currentUserId)
+
     this.LoadChats()
 
 
@@ -211,7 +204,7 @@ export class Messenger {
   AddChats(){
     // const scrollTop = this.chatBody.scrollTop;
     this.chatBody.innerHTML = "";
-    this.messages.array.reverse().forEach((message) => {
+    this.messages.reverse().forEach((message) => {
       this.AppendLine(message)
     })
   }
@@ -274,30 +267,6 @@ export function Throttle(func, delay){
   }
 }
 
-
-class ObservableArray {
-  constructor(arr) {
-    this.array = arr;
-    this.listeners = [];
-  }
-
-  addListener(callback) {
-    this.listeners.push(callback);
-  }
-
-  push(item) {
-    this.array.push(item);
-    this.notifyListeners('add', [item]);
-  }
-
-  // Add other array methods as needed
-
-  notifyListeners(eventName, items) {
-    this.listeners.forEach(listener => {
-      listener(eventName, items, this.array);
-    });
-  }
-}
 // Append the 'messenger' element to the document or any other container element in your HTML
 function sendMessage(message) {
   if (Socket.readyState === WebSocket.OPEN) {

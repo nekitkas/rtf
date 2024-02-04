@@ -26,9 +26,14 @@ export class UsercardUser{
       if(OpenMessengers.length == 0){
         const Chats = new Messenger(this.id, this.username, this.image_url, ROOT)
         Chats.Create()
-        
       }else{
-        console.log("YOU CAN NOT OPEN MULTIPLE CHATS AT ONCE!")
+        //close all instances
+        OpenMessengers.forEach((messenger) => {
+          messenger.Close();
+        })
+        //Open new one
+        const Chats = new Messenger(this.id, this.username, this.image_url, ROOT)
+        Chats.Create()
       }
     })
     // Append elements to the User component

@@ -1,6 +1,7 @@
 import { OpenMessengers } from "./components/Messenger.js"
 import { router } from "./router/Router.js"
 import { OnlineUsers, RefreshStatus } from "./components/UserCard.js"
+import { Notification } from "./helpers/Notifications.js"
 
 export const Page = document.querySelector(".root")
 
@@ -61,6 +62,11 @@ export function initializeWebSocket() {
       if (OpenMessengers[i].userToId == parsedData.from_user && parsedData.type == "chat"){
         OpenMessengers[i].AppendLine({text: parsedData.message, class: "left"})
       } 
+    }
+    //Add notification
+    if (parsedData.type == "chat"){
+      const notification = new Notification(parsedData.from_user, parsedData.message, "Created_at")
+      notification.Create()
     }
   });
 
