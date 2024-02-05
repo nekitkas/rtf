@@ -10,6 +10,9 @@
 
 
 
+*.exec
+
+
 /node_modules
 node_modules
 
@@ -29,4 +32,6 @@ node_modules
 go.work
 
 server/internal/db/database.db
+.idea
 /.idea/
+

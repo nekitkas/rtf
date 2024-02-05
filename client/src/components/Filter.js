@@ -1,7 +1,9 @@
 import searchSvg from "../assets/img//search.svg"
 import arrowSvg from "../assets/img/arrow.svg"
+import { GetCategories } from "../helpers/ServerRequests"
+import { POSTFEED, fetchPosts } from "../pages/Home"
 
-export function RenderFilter() {
+export async function RenderFilter() {
   // Create info-div container
   const infoDiv = document.createElement("div")
   infoDiv.classList.add("filter")
@@ -44,11 +46,20 @@ export function RenderFilter() {
   selectDropdown.classList.add("select-dropdown")
 
   // Sample categories
-  const categories = ["Fun", "Sport", "Cars", "Politics"]
+  const categories = [{ name: "ALL", id: "" }, ...(await GetCategories())]
+
+  console.log(categories)
 
   categories.forEach((category) => {
-    const categoryOption = document.createElement("p")
-    categoryOption.textContent = category
+    const categoryOption = document.createElement("div")
+    categoryOption.textContent = category.name
+
+    categoryOption.addEventListener("click", (e) => {
+      e.preventDefault()
+      POSTFEED.innerHTML = ""
+      fetchPosts(POSTFEED, category.id)
+    })
+
     selectDropdown.appendChild(categoryOption)
   })
 
@@ -57,26 +68,11 @@ export function RenderFilter() {
   selectBlock.appendChild(selectDropdown)
 
   // Append input-block and select-block to input-select-block
-  inputSelectBlock.appendChild(inputBlock)
+  // inputSelectBlock.appendChild(inputBlock)
   inputSelectBlock.appendChild(selectBlock)
 
   // Append input-select-block to info-div
   infoDiv.appendChild(inputSelectBlock)
 
-
-
-//   const selectBlock = document.querySelector(".select-block")
-//   if (selectBlock) {
-//     selectBlock.addEventListener("click", displayCategoryModal)
-//     const dropdown = document.querySelector(".select-dropdown")
-//     const selectArrow = document.querySelector(".select-arrow")
-
-//     function displayCategoryModal() {
-//       dropdown.classList.toggle("showSelectModal")
-//       selectArrow.classList.toggle("select-arrow-rotate")
-//     }
-//   }
-
   return infoDiv
 }
-

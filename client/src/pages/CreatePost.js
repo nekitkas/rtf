@@ -1,21 +1,20 @@
 import { Navbar } from "../components/Navbar.js"
-import { router } from "../router/Router";
+import { router } from "../router/Router"
 import "../styles/createPostPage.css"
 import addCategory from "../assets/img/addCategory.svg"
 import postImgIcon from "../assets/img/postImgIcon.svg"
 import closeIcon from "../assets/img/close.svg"
-import { GLOBAL_URL } from '../config.js';
-
+import { GLOBAL_URL } from "../config.js"
+import { CONTAINER, ROOT } from "../index.js"
 export async function CreatePost() {
-  const rootContainer = document.querySelector(".root")
-  rootContainer.innerHTML = ""
+  ROOT.innerHTML = ""
+  CONTAINER.innerHTML = ""
   await Navbar()
 
-  const main = document.createElement("main")
-  main.className = "main"
+  // const main = document.createElement("main")
+  // main.className = "main"
 
-  main.innerHTML = `
-<div class="container">
+  CONTAINER.innerHTML = `
 <div class="create-post-container">
   <h2 class="auth-title">Create Post</h2>
   <form
@@ -60,10 +59,9 @@ export async function CreatePost() {
     </div>
   </form>
 </div>
-</div>
 `
 
-  rootContainer.appendChild(main)
+  ROOT.appendChild(CONTAINER)
 
   const addCategoryBtn = document.querySelector(".add-category-btn")
   addCategoryBtn.addEventListener("click", (e) => showCategoryInput(e))
@@ -92,7 +90,7 @@ export async function CreatePost() {
 
     if (categoryValue !== "") {
       const categoryElement = document.createElement("div")
-      categoryElement.textContent = "/" + categoryValue
+      categoryElement.textContent = categoryValue
       categoryContainer.appendChild(categoryElement)
 
       categoryInputValue.value = ""
@@ -185,7 +183,7 @@ export async function CreatePost() {
 }
 
 async function sendPostData(title, content, categories, image) {
-  const url = GLOBAL_URL +"/api/v1/jwt/posts/create"
+  const url = GLOBAL_URL + "/api/v1/jwt/posts/create"
   const requestBody = {
     post: {
       title: title,
