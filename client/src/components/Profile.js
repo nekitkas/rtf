@@ -18,11 +18,7 @@ function RenderProfile(data) {
   const changeAvatarDiv = document.createElement("div")
   changeAvatarDiv.classList.add("changeAvatarDiv")
 
-  const changeAvatarBtn = document.createElement("button")
-  changeAvatarBtn.classList.add("changeAvatarBtn")
-  changeAvatarBtn.textContent = "Change Avatar"
 
-  changeAvatarDiv.appendChild(changeAvatarBtn)
 
   avatarBlock.appendChild(imgBlock)
   avatarBlock.appendChild(changeAvatarDiv)
@@ -33,9 +29,10 @@ function RenderProfile(data) {
 
   const userTextBlock = document.createElement("div")
   userTextBlock.classList.add("userTextBlock")
-
-  //temporary DATA
-  data.forEach((info) => {
+console.log(data);
+const usetInfo = [data.first_name,data.last_name,data.username,data.email,data.gender,data.date_of_birth]
+console.log(usetInfo);
+usetInfo.forEach((info) => {
     const nameDiv = document.createElement("div")
     nameDiv.classList.add("name")
 
