@@ -48,8 +48,9 @@ export async function RenderFilter() {
   const categories = await GetCategories()
 
   categories.forEach((category) => {
-    const categoryOption = document.createElement("p")
+    const categoryOption = document.createElement("div")
     categoryOption.textContent = category.name
+
     selectDropdown.appendChild(categoryOption)
   })
 
