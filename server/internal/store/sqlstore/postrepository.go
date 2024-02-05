@@ -83,11 +83,12 @@ func (r *PostRepository) Get(id string) (*models.Post, error) {
 	return &post, nil
 }
 
-func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time) ([]models.Post, error) {
+func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time, categoryID string) ([]models.Post, error) {
 	query := `SELECT p.*, u.username AS user_name
 FROM post p
 JOIN user u ON p.user_id = u.id
-WHERE p.timestamp <= ?
+JOIN postCategory pc ON p.id = pc.post_id
+WHERE p.timestamp <= ? AND (pc.category_id = ? OR ? IS NULL OR ? = '')
 ORDER BY p.timestamp DESC
 LIMIT ? OFFSET ?`
 
@@ -97,7 +98,7 @@ LIMIT ? OFFSET ?`
 
 	nearestSecond := dateTimeParts[0] + "T" + timeParts[0]
 
-	rows, err := r.store.Db.Query(query, nearestSecond, limit, offset*limit)
+	rows, err := r.store.Db.Query(query, nearestSecond, categoryID, categoryID, categoryID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch posts from the database: %v", err)
 	}

@@ -2,10 +2,11 @@ package server
 
 import (
 	"encoding/json"
-	"forum/server/internal/models"
-	"forum/server/pkg/router"
 	"net/http"
 	"time"
+
+	"forum/server/internal/models"
+	"forum/server/pkg/router"
 )
 
 func (s *server) handlePostCreation() http.HandlerFunc {
@@ -129,8 +130,9 @@ func (s *server) serveSinglePostInformation() http.HandlerFunc {
 
 func (s *server) handleAllPostInformation() http.HandlerFunc {
 	type requestBody struct {
-		Index int       `json:"current_index"`
-		Time  time.Time `json:"page_open_time_stamp"`
+		Index      int       `json:"current_index"`
+		Time       time.Time `json:"page_open_time_stamp"`
+		CategoryID string    `json:"category_id"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +143,7 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
-		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time)
+		posts, err := s.store.Post().GetFeed(request.Index, 10, request.Time, request.CategoryID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
