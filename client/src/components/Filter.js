@@ -1,12 +1,8 @@
 import searchSvg from "../assets/img//search.svg"
 import arrowSvg from "../assets/img/arrow.svg"
+import { GetCategories } from "../helpers/ServerRequests"
 
-
-
-
-
-
-export function RenderFilter(categories) {
+export async function RenderFilter() {
   // Create info-div container
   const infoDiv = document.createElement("div")
   infoDiv.classList.add("filter")
@@ -49,11 +45,11 @@ export function RenderFilter(categories) {
   selectDropdown.classList.add("select-dropdown")
 
   // Sample categories
-  categories = ["Fun", "Sport", "Cars", "Politics"]
+  const categories = await GetCategories()
 
   categories.forEach((category) => {
     const categoryOption = document.createElement("p")
-    categoryOption.textContent = category
+    categoryOption.textContent = category.name
     selectDropdown.appendChild(categoryOption)
   })
 

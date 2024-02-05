@@ -39,7 +39,7 @@ export async function Home() {
 
   fetchUsers(usersContainer)
 
-  const Filter = RenderFilter()
+  const Filter = await RenderFilter()
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(PostFeed)

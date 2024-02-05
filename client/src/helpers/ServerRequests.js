@@ -1,4 +1,4 @@
-import {GLOBAL_URL} from "../config"
+import { GLOBAL_URL } from "../config"
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
 export const isLoggedIn = async () => {
@@ -53,15 +53,13 @@ export const Logout = async () => {
   }
 }
 
-
-
 export const GetPosts = async (index = 0) => {
   let current_index = 0 + index
   const requestData = {
     current_index: current_index,
     page_open_time_stamp: new Date().toISOString(),
   }
-  console.log("requestData: ", requestData.current_index);
+  console.log("requestData: ", requestData.current_index)
   try {
     const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
       method: "POST",
@@ -85,7 +83,7 @@ export const GetPosts = async (index = 0) => {
     }
 
     const result = await response.json()
-    console.log(result.data);
+    console.log(result.data)
     return result.data
   } catch (error) {
     console.error("Fetch error:", error)
@@ -114,7 +112,7 @@ export const GetAllUsers = async () => {
 }
 
 export function SinglePostRequest(url, method, body = null, headers = {}) {
-    const options = {
+  const options = {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -160,6 +158,37 @@ export const GetUserInfo = async (user_id) => {
     }
 
     return await response.json()
+  } catch (error) {
+    console.error("Fetch error:", error)
+    throw error // Rethrow the error if needed
+  }
+}
+
+export const GetCategories = async () => {
+  try {
+    const response = await fetch(GLOBAL_URL + `/api/v1/jwt/categories`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.error("Unauthorized: User needs to authenticate")
+      } else {
+        console.error(
+          `Non-OK response: ${response.status} - ${response.statusText}`
+        )
+        // Log additional details if available (e.g., response.json())
+      }
+      return false
+    }
+
+    const result = await response.json()
+
+    return result.data
   } catch (error) {
     console.error("Fetch error:", error)
     throw error // Rethrow the error if needed
