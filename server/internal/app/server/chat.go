@@ -26,6 +26,11 @@ func (s *server) handleCreateChat() http.HandlerFunc {
 
 		userID := r.Context().Value(ctxUserID).(string)
 
+		if userID == otherUserID {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
 		res, err := s.store.Chat().CheckChatExists(userID, otherUserID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)

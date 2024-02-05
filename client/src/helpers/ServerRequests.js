@@ -56,7 +56,7 @@ export const Logout = async () => {
 
 
 export const GetPosts = async (index = 0) => {
-  let current_index = 0+ index
+  let current_index = 0 + index
   const requestData = {
     current_index: current_index,
     page_open_time_stamp: new Date().toISOString(),
@@ -85,7 +85,7 @@ export const GetPosts = async (index = 0) => {
     }
 
     const result = await response.json()
-
+    console.log(result.data);
     return result.data
   } catch (error) {
     console.error("Fetch error:", error)

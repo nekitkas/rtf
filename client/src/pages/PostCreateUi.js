@@ -78,30 +78,36 @@ export function CreatePostUi(data, postId) {
   pagePost.appendChild(postPagePostBody)
   pagePost.appendChild(postPagePostFooter)
 
-  const deleteBtn = document.createElement("button")
-  deleteBtn.textContent = "Delete post"
-  deleteBtn.className = "PostDeleteBtn"
-  pagePost.appendChild(deleteBtn)
-  //function to send request to delete post
-  deleteBtn.addEventListener("click", (e) => {
-    e.preventDefault()
+  const userNickname = document.querySelector(".username")
 
-    SinglePostRequest(
-      `${GLOBAL_URL}/api/v1/jwt/posts/delete/${postId}`,
-      "DELETE",
+  if(userNickname.textContent === nickname){
+    const deleteBtn = document.createElement("button")
+    deleteBtn.textContent = "Delete post"
+    deleteBtn.className = "PostDeleteBtn"
+    pagePost.appendChild(deleteBtn)
+    //function to send request to delete post
+    deleteBtn.addEventListener("click", (e) => {
+      e.preventDefault()
 
-      {
-        "Content-Type": "application/json",
-      }
-    )
-      .then(() => {
-        history.pushState({}, "", `/`)
-        router()
-      })
-      .catch((error) => {
-        console.error("Error in fetch operation:", error)
-      })
-  })
+      SinglePostRequest(
+        `${GLOBAL_URL}/api/v1/jwt/posts/delete/${postId}`,
+        "DELETE",
+
+        {
+          "Content-Type": "application/json",
+        }
+      )
+        .then(() => {
+          history.pushState({}, "", `/`)
+          router()
+        })
+        .catch((error) => {
+          console.error("Error in fetch operation:", error)
+        })
+    })
+  }
+
+
 
   return pagePost
 }
@@ -172,13 +178,13 @@ export function CreateCommentContainer(postId) {
 
 export function addPostToCommentsContainer(data) {
   const commentsContainer = document.querySelector(".commentsContainer")
+  const userNickname = document.querySelector(".username")
 
   const postElement = CreateCommentComponent(
     data.data.datetime,
     data.data.content,
-    data.data.user_id,
+    userNickname.textContent,
     data.data.id
-
   )
 
   if (commentsContainer) {
@@ -199,18 +205,16 @@ export function createCommentsContainer(data) {
   const commentDiv = document.createElement("div")
   commentDiv.className = "comment"
   console.log("data")
-  data.data.comments
-    .reverse()
-    .forEach((comment) =>
-      commentsContainer.appendChild(
-        CreateCommentComponent(
-          comment.comment.datetime,
-          comment.comment.content,
-          comment.comment.user_id,
+  data.data.comments.reverse().forEach((comment) =>
+    commentsContainer.appendChild(
+      CreateCommentComponent(
+        comment.comment.datetime,
+        comment.comment.content,
+        comment.comment.nickname,
 
-          comment.comment.id
-        )
+        comment.comment.id
       )
     )
+  )
   return commentsContainer
 }

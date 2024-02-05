@@ -13,7 +13,11 @@ import { RenderFilter } from "../components/Filter.js"
 import { router } from "../router/Router.js"
 import { UserList } from "../components/UserList"
 import { OpenMessengers, Throttle } from "../components/Messenger.js"
-import { CheckPosition, PostsLoadedIndex, setPostsLoadedIndex } from "../helpers/LazyLoading.js"
+import {
+  CheckPosition,
+  PostsLoadedIndex,
+  setPostsLoadedIndex,
+} from "../helpers/LazyLoading.js"
 import { Notification } from "../helpers/Notifications.js"
 
 const usersContainer = document.createElement("div")
@@ -42,14 +46,13 @@ export async function Home() {
 
   //check for scrollin to lazy load posts
   function checkScroll() {
-    window.addEventListener('scroll', Throttle(CheckPosition, 250))
-    window.addEventListener('resize', Throttle(CheckPosition, 250))
+    window.addEventListener("scroll", Throttle(CheckPosition, 250))
+    window.addEventListener("resize", Throttle(CheckPosition, 250))
   }
   checkScroll()
 
   // AddNotification("Test1", "Looool")
   // AddNotification("Test2", "sadasdasdasd")
-
 
   const selectBlock = document.querySelector(".select-block")
   if (selectBlock) {
@@ -66,33 +69,34 @@ export async function Home() {
 
 async function fetchData(PostFeed) {
   try {
-    const postsData = await GetPosts();
+    const postsData = await GetPosts()
+    console.log(postsData)
 
     if (postsData) {
       postsData.forEach((post) => {
-        const postLink = document.createElement("div");
-        postLink.classList.add("post-link");
+        const postLink = document.createElement("div")
+        postLink.classList.add("post-link")
 
         postLink.addEventListener("click", () => {
-          history.pushState({}, "", `post/${post.id}`);
-          router();
-        });
+          history.pushState({}, "", `post/${post.post.id}`)
+          router()
+        })
 
         if (post.categories) {
-          postLink.appendChild(RenderPost(post, post.nickname));
+          postLink.appendChild(RenderPost(post.post, post.categories))
         } else {
-          postLink.appendChild(RenderPost(post));
+          postLink.appendChild(RenderPost(post.post))
         }
 
-        PostFeed.appendChild(postLink);
-      });
+        PostFeed.appendChild(postLink)
+      })
     } else {
       // Handle case when response is not OK
-      console.log("Error: Response not OK");
+      console.log("Error: Response not OK")
     }
   } catch (error) {
     // Handle errors that occurred during the fetch
-    console.error("Error during fetch:", error);
+    console.error("Error during fetch:", error)
   }
 }
 async function fetchUsers(usersContainer) {
@@ -108,24 +112,23 @@ async function fetchUsers(usersContainer) {
   }
 }
 
-
 //create a link and calls function to create post out of provided data
 export function ProcessPostData(post) {
-  const postLink = document.createElement("div");
+  const postLink = document.createElement("div")
 
   postLink.addEventListener("click", () => {
-    history.pushState({}, "", `post/${post.id}`);
-   setPostsLoadedIndex(0);
-    router();
-  });
+    history.pushState({}, "", `post/${post.id}`)
+    setPostsLoadedIndex(0)
+    router()
+  })
 
-  postLink.classList.add("post-link");
+  postLink.classList.add("post-link")
 
   if (post.categories) {
-    postLink.appendChild(RenderPost(post, post.nickname));
+    postLink.appendChild(RenderPost(post, post.nickname))
   } else {
-    postLink.appendChild(RenderPost(post));
+    postLink.appendChild(RenderPost(post))
   }
 
-  return postLink;
+  return postLink
 }
