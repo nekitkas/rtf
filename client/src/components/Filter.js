@@ -1,6 +1,7 @@
 import searchSvg from "../assets/img//search.svg"
 import arrowSvg from "../assets/img/arrow.svg"
 import { GetCategories } from "../helpers/ServerRequests"
+import { POSTFEED, fetchPosts } from "../pages/Home"
 
 export async function RenderFilter() {
   // Create info-div container
@@ -45,11 +46,19 @@ export async function RenderFilter() {
   selectDropdown.classList.add("select-dropdown")
 
   // Sample categories
-  const categories = await GetCategories()
+  const categories = [{ name: "ALL", id: "" }, ...(await GetCategories())]
+
+  console.log(categories)
 
   categories.forEach((category) => {
     const categoryOption = document.createElement("div")
     categoryOption.textContent = category.name
+
+    categoryOption.addEventListener("click", (e) => {
+      e.preventDefault()
+      POSTFEED.innerHTML = ""
+      fetchPosts(POSTFEED, category.id)
+    })
 
     selectDropdown.appendChild(categoryOption)
   })

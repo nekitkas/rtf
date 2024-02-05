@@ -24,6 +24,8 @@ const usersContainer = document.createElement("div")
 
 usersContainer.className = "users-container"
 
+export let POSTFEED
+
 export async function Home() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
@@ -32,17 +34,17 @@ export async function Home() {
   await Navbar()
 
   OpenMessengers.length = 0
-  const PostFeed = RenderPostFeed()
+  POSTFEED = RenderPostFeed()
   ROOT.append(CONTAINER)
 
-  fetchData(PostFeed)
+  fetchPosts(POSTFEED)
 
   fetchUsers(usersContainer)
 
   const Filter = await RenderFilter()
 
   ROOT.appendChild(Filter)
-  CONTAINER.appendChild(PostFeed)
+  CONTAINER.appendChild(POSTFEED)
 
   //check for scrollin to lazy load posts
   function checkScroll() {
@@ -67,9 +69,9 @@ export async function Home() {
   }
 }
 
-async function fetchData(PostFeed) {
+export async function fetchPosts(PostFeed, category_id = "") {
   try {
-    const postsData = await GetPosts()
+    const postsData = await GetPosts(0, category_id)
     console.log(postsData)
 
     if (postsData) {

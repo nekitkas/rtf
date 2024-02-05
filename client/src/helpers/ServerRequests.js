@@ -53,11 +53,12 @@ export const Logout = async () => {
   }
 }
 
-export const GetPosts = async (index = 0) => {
+export const GetPosts = async (index = 0, category_id = "") => {
   let current_index = 0 + index
   const requestData = {
     current_index: current_index,
     page_open_time_stamp: new Date().toISOString(),
+    category_id: category_id,
   }
   console.log("requestData: ", requestData.current_index)
   try {
