@@ -79,7 +79,7 @@ export function CreatePostUi(data, postId) {
   pagePost.appendChild(postPagePostFooter)
 
   const userNickname = document.querySelector(".username")
- 
+
   if(userNickname.textContent === nickname){
     const deleteBtn = document.createElement("button")
     deleteBtn.textContent = "Delete post"
@@ -178,11 +178,12 @@ export function CreateCommentContainer(postId) {
 
 export function addPostToCommentsContainer(data) {
   const commentsContainer = document.querySelector(".commentsContainer")
-  console.log(data)
+  const userNickname = document.querySelector(".username")
+
   const postElement = CreateCommentComponent(
     data.data.datetime,
     data.data.content,
-    data.data.nickname,
+    userNickname.textContent,
     data.data.id
   )
 

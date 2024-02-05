@@ -31,6 +31,8 @@ export function CreateCommentComponent(createTime, text, author, id) {
 
   const commentAuthorDiv = document.createElement("div")
   commentAuthorDiv.className = "comment-author"
+  const userNickname = document.querySelector(".username")
+
   commentAuthorDiv.textContent = `Author: ${author}`
 
 
@@ -44,7 +46,7 @@ export function CreateCommentComponent(createTime, text, author, id) {
   commentDiv.id = `comment-${id}`;
 
 
-  const userNickname = document.querySelector(".username")
+
   if(userNickname.textContent === author){
     const deleteCommentButton = document.createElement("button")
     deleteCommentButton.className = "delete-comment"
