@@ -4,15 +4,9 @@ import "../styles/profile.css"
 import { RenderProfile, profileContainer } from "../components/Profile.js"
 
 import { ROOT, CONTAINER } from "../index.js"
+import { GetUserInfo, isLoggedIn } from "../helpers/ServerRequests.js"
 
-const userInfo = [
-  "John",
-  "Doe",
-  "test1",
-  "test1@gmail.com",
-  "Male",
-  "01.10.2001",
-]
+
 
 export async function Profile() {
   ROOT.innerHTML = ""
@@ -21,7 +15,10 @@ export async function Profile() {
 
   await Navbar()
 
-  const Profile = RenderProfile(userInfo)
+  const userId = await isLoggedIn()
+  const userInfo = await GetUserInfo(userId)
+
+  const Profile = RenderProfile(userInfo.data)
 
   CONTAINER.appendChild(Profile)
 

@@ -33,6 +33,7 @@ document.addEventListener("click", async (e) => {
 export async function Navbar() {
   const userId = await isLoggedIn()
   const userInfo = await GetUserInfo(userId)
+ 
 
   const navbarHTML = await RenderNavbar(userInfo);
 
