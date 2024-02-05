@@ -250,3 +250,10 @@
 .image-preview-container {
   margin-bottom: 2rem;
 }
+
+.PosterrorMessage{
+  display: flex;
+  justify-content: center;
+  color: rgb(215, 27, 27) ;
+  margin-top: 10px;
+}
