@@ -95,72 +95,72 @@ CREATE TABLE
     FOREIGN KEY (user_id) REFERENCES user (id)
   );
 
-INSERT INTO
-  user (
-    id,
-    username,
-    email,
-    password,
-    date_of_birth,
-    first_name,
-    last_name,
-    gender,
-    image_url
-  )
-VALUES
-  (
-    'user_1',
-    'john_doe',
-    'john.doe@example.com',
-    'hashed_password_1',
-    '2024-01-13',
-    'John',
-    'Doe',
-    'Male',
-    'http://example.com/images/john_doe.png'
-  ),
-  (
-    'user_2',
-    'jane_smith',
-    'jane.smith@example.com',
-    'hashed_password_2',
-    '2024-01-13',
-    'Jane',
-    'Smith',
-    'Female',
-    'http://example.com/images/jane_smith.png'
-  ),
-  (
-    'user_3',
-    'alex_jones',
-    'alex.jones@example.com',
-    'hashed_password_3',
-    '2024-01-13',
-    'Alex',
-    'Jones',
-    'Non-Binary',
-    'http://example.com/images/alex_jones.png'
-  ) ON CONFLICT DO NOTHING;
-
-INSERT INTO
-  category (id, name, description)
-VALUES
-  (
-    'category_1',
-    'Technology',
-    'Discussions related to technology and gadgets.'
-  ),
-  (
-    'category_2',
-    'Cooking',
-    'Share and discover new recipes.'
-  ),
-  (
-    'category_3',
-    'Travel',
-    'Share travel stories and advice.'
-  ) ON CONFLICT DO NOTHING;
-
+-- {{{
+-- INSERT INTO
+--   user (
+--     id,
+--     username,
+--     email,
+--     password,
+--     date_of_birth,
+--     first_name,
+--     last_name,
+--     gender,
+--     image_url
+--   )
+-- VALUES
+--   (
+--     'user_1',
+--     'john_doe',
+--     'john.doe@example.com',
+--     'hashed_password_1',
+--     '2024-01-13',
+--     'John',
+--     'Doe',
+--     'Male',
+--     'http://example.com/images/john_doe.png'
+--   ),
+--   (
+--     'user_2',
+--     'jane_smith',
+--     'jane.smith@example.com',
+--     'hashed_password_2',
+--     '2024-01-13',
+--     'Jane',
+--     'Smith',
+--     'Female',
+--     'http://example.com/images/jane_smith.png'
+--   ),
+--   (
+--     'user_3',
+--     'alex_jones',
+--     'alex.jones@example.com',
+--     'hashed_password_3',
+--     '2024-01-13',
+--     'Alex',
+--     'Jones',
+--     'Non-Binary',
+--     'http://example.com/images/alex_jones.png'
+--   ) ON CONFLICT DO NOTHING;
+-- INSERT INTO
+--   category (id, name, description)
+-- VALUES
+--   (
+--     'category_1',
+--     'Technology',
+--     'Discussions related to technology and gadgets.'
+--   ),
+--   (
+--     'category_2',
+--     'Cooking',
+--     'Share and discover new recipes.'
+--   ),
+--   (
+--     'category_3',
+--     'Travel',
+--     'Share travel stories and advice.'
+--   ) ON CONFLICT DO NOTHING;
+-- }}}
 INSERT INTO
   reaction (id, emoji, description)
 VALUES
