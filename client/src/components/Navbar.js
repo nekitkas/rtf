@@ -185,6 +185,7 @@ notificationButton.appendChild(notificationsModal);
   const userSelector = document.createElement("div");
   userSelector.className = "user-profile-selector";
   const username = document.createElement("p");
+  username.classList.add("username");
   username.textContent = user.username;
 
   // Create modal arrow

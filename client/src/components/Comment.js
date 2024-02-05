@@ -33,16 +33,23 @@ export function CreateCommentComponent(createTime, text, author, id) {
   commentAuthorDiv.className = "comment-author"
   commentAuthorDiv.textContent = `Author: ${author}`
 
-  const deleteCommentButton = document.createElement("button")
-  deleteCommentButton.className = "delete-comment"
-  deleteCommentButton.textContent = "Delete"
+
+
 
   commentDiv.appendChild(createTimeDiv)
   commentDiv.appendChild(commentTextBlockDiv)
   commentDiv.appendChild(commentAuthorDiv)
-  commentDiv.appendChild(deleteCommentButton)
+
 
   commentDiv.id = `comment-${id}`;
+
+
+  const userNickname = document.querySelector(".username")
+  if(userNickname.textContent === author){
+    const deleteCommentButton = document.createElement("button")
+    deleteCommentButton.className = "delete-comment"
+    deleteCommentButton.textContent = "Delete"
+    commentDiv.appendChild(deleteCommentButton)
 
   deleteCommentButton.addEventListener("click", async (e) => {
     try {
@@ -54,6 +61,7 @@ export function CreateCommentComponent(createTime, text, author, id) {
       // Handle error, display message, etc.
     }
   });
+  }
 
   return commentDiv
 }
