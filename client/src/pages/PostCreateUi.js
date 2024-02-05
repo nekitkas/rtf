@@ -206,7 +206,7 @@ export function createCommentsContainer(data) {
         CreateCommentComponent(
           comment.comment.datetime,
           comment.comment.content,
-          comment.comment.user_id,
+          comment.comment.nickname,
 
           comment.comment.id
         )
