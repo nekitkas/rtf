@@ -36,12 +36,14 @@ cd real-time-forum
 Ensure Go is installed and set up the Go workspace.
 
 ```bash
-make && ./api
+make run-api
 ```
 
 3. **Set up the Frontend:**
 
-WE NEED TO FIGURE OUT HOW WE HANDLE THE FRONT END
+```bash
+make run-client
+```
 
 4. **Database Setup:**
 

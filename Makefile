@@ -1,8 +1,10 @@
-.PHONY: build
+.PHONY: build run-api run-client
+.SILENT:
 build:
-	go build -v ./server/cmd/api
+	go build -o ./build/api ./cmd/api/main.go
+	go build -o ./build/client ./cmd/client/main.go
+run-api: build
+	./build/api
 
-.PHONY: test
-test:
-	go test -v ./...
-.DEFAULT_GOAL := build
+run-client: build
+	./build/client

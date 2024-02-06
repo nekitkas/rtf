@@ -35,3 +35,4 @@ server/internal/db/database.db
 .idea
 /.idea/
 
+/build/
