@@ -7,6 +7,15 @@ export function RenderPost(data, categories) {
 
   const postHeader = document.createElement("div")
   postHeader.classList.add("post-header")
+  
+  if (categories) {
+    const postHeaderCategory = document.createElement("p")
+    postHeaderCategory.classList.add("post-header-category")
+    categories.forEach((category) => {
+      postHeaderCategory.textContent += category.name + " "
+      postHeader.appendChild(postHeaderCategory)
+    })
+  }
 
   const postHeaderTitle = document.createElement("div")
   postHeaderTitle.classList.add("post-header-title")
@@ -39,14 +48,6 @@ export function RenderPost(data, categories) {
     postBody.appendChild(postBodyImg)
   }
 
-  if (categories) {
-    const postHeaderCategory = document.createElement("p")
-    postHeaderCategory.classList.add("post-header-category")
-    categories.forEach((category) => {
-      postHeaderCategory.textContent += category.name + " "
-      postHeader.appendChild(postHeaderCategory)
-    })
-  }
 
   const postFooter = document.createElement("div")
   postFooter.classList.add("post-footer")

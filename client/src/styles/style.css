@@ -73,3 +73,8 @@ body::-webkit-scrollbar-track {
   background-color: var(--background-secondory);
   border-radius: 6px; /* Закругленные углы для трека */
 }
+
+
+.users-container::-webkit-scrollbar {
+  display: none;
+}

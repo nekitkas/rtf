@@ -33,7 +33,7 @@ document.addEventListener("click", async (e) => {
 export async function Navbar() {
   const userId = await isLoggedIn()
   const userInfo = await GetUserInfo(userId)
- 
+
 
   const navbarHTML = await RenderNavbar(userInfo);
 
@@ -128,12 +128,12 @@ const RenderNavbar = async (user) =>{
   userBlock.className = "user-block";
 
   // Create message button
-  const messageButton = document.createElement("div");
-  messageButton.className = "message-button";
-  const messageButtonImg = document.createElement("img");
-  messageButtonImg.src = messageButtonImage;
-  messageButtonImg.alt = "message-button";
-  messageButton.appendChild(messageButtonImg);
+  // const messageButton = document.createElement("div");
+  // messageButton.className = "message-button";
+  // const messageButtonImg = document.createElement("img");
+  // messageButtonImg.src = messageButtonImage;
+  // messageButtonImg.alt = "message-button";
+  // messageButton.appendChild(messageButtonImg);
 
 //Create notification button
 const notificationButton = document.createElement("div");
@@ -236,7 +236,7 @@ notificationButton.appendChild(notificationsModal);
   userProfile.appendChild(userSelector);
 
   // Assemble the components
-  userBlock.appendChild(messageButton);
+  // userBlock.appendChild(messageButton);
   userBlock.appendChild(notificationButton);
 
   userBlock.appendChild(createPostLink);

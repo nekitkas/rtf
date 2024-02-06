@@ -1,6 +1,7 @@
 import { Socket } from ".."
 import { GLOBAL_URL } from "../config";
 import { CURRENTUSER } from "../router/Router";
+import chatAvatar from "../assets/img/avatar.svg.png"
 
 export const OpenMessengers = [];
 export class Messenger {
@@ -82,7 +83,7 @@ export class Messenger {
   }
 
   async LoadOlderChats(){
-  // If scollred up, add more messagesconst 
+  // If scollred up, add more messagesconst
     // await this.GetChatId()
     const isAtTop = this.chatBody.scrollTop <= 400;
     console.log(this.chatBody.scrollTop);
@@ -126,15 +127,15 @@ export class Messenger {
     OpenMessengers.push(this)
 
     this.messenger.classList.add("messenger")
-    
+
     const chatHeader = document.createElement("div")
     chatHeader.classList.add("chat-header")
-    
+
     const userChatInfo = document.createElement("div")
     userChatInfo.classList.add("user-chat-info")
-    
+
     const userImage = document.createElement("img")
-    userImage.src = this.imageUrl
+    userImage.src = chatAvatar
     userImage.alt = this.userToId
 
     const userName = document.createElement("p")
@@ -145,13 +146,13 @@ export class Messenger {
     closeIcon.addEventListener("click", () => {
       this.Close()
     })
-    
+
     userChatInfo.appendChild(userImage)
     userChatInfo.appendChild(userName)
-    
+
     chatHeader.appendChild(userChatInfo)
     chatHeader.appendChild(closeIcon)
-    
+
     this.chatBody.classList.add("chat-body")
 
     this.LoadChats()
@@ -159,17 +160,17 @@ export class Messenger {
 
     const chatFooter = document.createElement("div");
     chatFooter.className = "chat-footer";
-  
+
   // Create form for message input
     const messageForm = document.createElement("form");
-  
-  
+
+
   // Create message input
     const messageInput = document.createElement("input");
     messageInput.type = "text";
     messageInput.placeholder = "Aa";
     messageInput.id = "message";
-  
+
   // Create send button
     const sendButton = document.createElement("input");
     sendButton.type = "image";
@@ -193,12 +194,12 @@ export class Messenger {
       messageInput.value = "";
       this.AppendLine(textLine)
     })
-  
+
     messageForm.appendChild(messageInput);
     messageForm.appendChild(sendButton);
-  
+
     chatFooter.appendChild(messageForm);
-  
+
     this.messenger.appendChild(chatHeader)
     this.messenger.appendChild(this.chatBody)
     this.messenger.appendChild(chatFooter)
@@ -239,15 +240,15 @@ export class Messenger {
       return
     })
   }
-  
+
   AppendLine(message, top=false){
     const msgDiv = document.createElement("div")
     msgDiv.classList.add("msg")
-    
+
     const msgText = document.createElement("p")
     msgText.classList.add(message.class)
     msgText.textContent = message.text
-    
+
     msgDiv.appendChild(msgText)
 
     if(top){

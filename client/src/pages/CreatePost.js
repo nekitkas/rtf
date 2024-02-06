@@ -47,10 +47,7 @@ export async function CreatePost() {
     <button class="input-add-category-btn">Add</button></div>
       <button class="add-category-btn">Category <img class="category-item" src=${addCategory} alt="category-img"></button>
     </div>
-    <div class="img-button-container">
-    <input type="file" name="add-image" class="add-image-input">
-      <button class="add-image-button">Image<img class="add-img-icon" src=${postImgIcon}  alt="addimg"></button>
-    </div>
+
 
     <div class="image-preview-container"></div>
 
@@ -112,63 +109,63 @@ textarea.insertAdjacentElement("afterend", errorMessage)
   const imgBtn = document.querySelector(".add-image-button")
   const imgInput = document.querySelector(".add-image-input")
 
-  imgBtn.addEventListener("click", (e) => {
-    e.preventDefault()
-    imgInput.click()
-  })
+  // imgBtn.addEventListener("click", (e) => {
+  //   e.preventDefault()
+  //   imgInput.click()
+  // })
 
-  imgInput.addEventListener("change", (e) => changeInputHandler(e))
+  // imgInput.addEventListener("change", (e) => changeInputHandler(e))
 
-  function changeInputHandler(e) {
-    const file = e.target.files[0]
-    if (!file.type.match("image")) {
-      alert("File must be an image.")
-      return
-    }
+  // function changeInputHandler(e) {
+  //   const file = e.target.files[0]
+  //   if (!file.type.match("image")) {
+  //     alert("File must be an image.")
+  //     return
+  //   }
 
-    const reader = new FileReader()
+  //   const reader = new FileReader()
 
-    reader.onload = (e) => {
-      const imgPreviewContainer = document.querySelector(
-        ".image-preview-container"
-      )
+  //   reader.onload = (e) => {
+  //     const imgPreviewContainer = document.querySelector(
+  //       ".image-preview-container"
+  //     )
 
-      // Check if an existing preview is present
-      const existingPreview = document.querySelector(".image-preview-wrapper")
+  //     // Check if an existing preview is present
+  //     const existingPreview = document.querySelector(".image-preview-wrapper")
 
-      // If an existing preview is found, remove it
-      if (existingPreview) {
-        existingPreview.remove()
-      }
+  //     // If an existing preview is found, remove it
+  //     if (existingPreview) {
+  //       existingPreview.remove()
+  //     }
 
-      // Create a wrapper div for the image and close button
-      const wrapperDiv = document.createElement("div")
-      wrapperDiv.classList.add("image-preview-wrapper")
+  //     // Create a wrapper div for the image and close button
+  //     const wrapperDiv = document.createElement("div")
+  //     wrapperDiv.classList.add("image-preview-wrapper")
 
-      // Create the preview image
-      const previewImg = document.createElement("img")
-      previewImg.src = e.target.result
-      previewImg.classList.add("image-preview")
+  //     // Create the preview image
+  //     const previewImg = document.createElement("img")
+  //     previewImg.src = e.target.result
+  //     previewImg.classList.add("image-preview")
 
-      // Create the close button
-      const closePostImg = document.createElement("img")
-      closePostImg.src = closeIcon
-      closePostImg.classList.add("close-post-img")
+  //     // Create the close button
+  //     const closePostImg = document.createElement("img")
+  //     closePostImg.src = closeIcon
+  //     closePostImg.classList.add("close-post-img")
 
-      // Append the close button and preview image to the wrapper
-      wrapperDiv.appendChild(previewImg)
-      wrapperDiv.appendChild(closePostImg)
+  //     // Append the close button and preview image to the wrapper
+  //     wrapperDiv.appendChild(previewImg)
+  //     wrapperDiv.appendChild(closePostImg)
 
-      // Append the wrapper to the preview container
-      imgPreviewContainer.appendChild(wrapperDiv)
+  //     // Append the wrapper to the preview container
+  //     imgPreviewContainer.appendChild(wrapperDiv)
 
-      closePostImg.addEventListener("click", () => {
-        wrapperDiv.remove()
-      })
-    }
+  //     closePostImg.addEventListener("click", () => {
+  //       wrapperDiv.remove()
+  //     })
+  //   }
 
-    reader.readAsDataURL(file)
-  }
+  //   reader.readAsDataURL(file)
+  // }
 
   const sendPostDataBtn = document.querySelector(".add-post-button")
   sendPostDataBtn.addEventListener("click", (e) => {
@@ -226,7 +223,7 @@ async function sendPostData(title, content, categories, image) {
 
     if (response.ok) {
       const data = await response.json()
-     
+
       window.history.pushState({}, "", "/")
       router()
     } else {
@@ -236,3 +233,9 @@ async function sendPostData(title, content, categories, image) {
     console.error("Error:", error)
   }
 }
+
+//we removed ability to add images
+    // <div class="img-button-container">
+    // <input type="file" name="add-image" class="add-image-input">
+    //   <button class="add-image-button">Image<img class="add-img-icon" src=${postImgIcon}  alt="addimg"></button>
+    // </div>
