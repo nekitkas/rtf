@@ -39,7 +39,7 @@ Ensure Go is installed and set up the Go workspace.
 make run-api
 ```
 
-3. **Set up the Frontend:**
+3. **Set up the Frontend(in separate terminal):**
 
 ```bash
 make run-client
