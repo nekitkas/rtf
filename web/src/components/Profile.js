@@ -1,3 +1,5 @@
+import AvatarImg from "../assets/img/avatar.svg.png"
+
 const profileContainer = document.createElement("div")
 profileContainer.classList.add("profile-container")
 
@@ -10,15 +12,13 @@ function RenderProfile(data) {
 
   const userAvatar = document.createElement("img")
   userAvatar.classList.add("userAvatar")
-  userAvatar.src = "assets/avatar.svg.png"
+  userAvatar.src = AvatarImg
   userAvatar.alt = ""
 
   imgBlock.appendChild(userAvatar)
 
   const changeAvatarDiv = document.createElement("div")
   changeAvatarDiv.classList.add("changeAvatarDiv")
-
-
 
   avatarBlock.appendChild(imgBlock)
   avatarBlock.appendChild(changeAvatarDiv)
@@ -29,10 +29,17 @@ function RenderProfile(data) {
 
   const userTextBlock = document.createElement("div")
   userTextBlock.classList.add("userTextBlock")
-console.log(data);
-const usetInfo = [data.first_name,data.last_name,data.username,data.email,data.gender,data.date_of_birth]
-console.log(usetInfo);
-usetInfo.forEach((info) => {
+  console.log(data)
+  const usetInfo = [
+    data.first_name,
+    data.last_name,
+    data.username,
+    data.email,
+    data.gender,
+    data.date_of_birth,
+  ]
+  console.log(usetInfo)
+  usetInfo.forEach((info) => {
     const nameDiv = document.createElement("div")
     nameDiv.classList.add("name")
 
