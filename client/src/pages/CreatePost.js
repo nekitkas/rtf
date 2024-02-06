@@ -97,6 +97,15 @@ export async function CreatePost() {
     }
   }
 
+//add error block
+const errorMessage = document.createElement("div")
+errorMessage.classList.add("PosterrorMessage")
+const textarea = document.querySelector(".post-textarea")
+textarea.insertAdjacentElement("afterend", errorMessage)
+
+
+
+//add image error block
   /////////
   //ADD IMAGE
 
@@ -178,7 +187,16 @@ export async function CreatePost() {
     const categories = postCategories
     const image = postImageWrapper ? postImageWrapper.src : null
 
-    sendPostData(title, content, categories, image)
+    if(title !== "" && content!= "" && categories.length !== 0){
+      sendPostData(title, content, categories, image)
+    }else if(title !== "" && content!= ""){
+      errorMessage.textContent = "Please add at least one category"
+    }
+    else{
+
+      errorMessage.textContent = "Please fill in all fields"
+
+    }
   })
 }
 
@@ -208,7 +226,7 @@ async function sendPostData(title, content, categories, image) {
 
     if (response.ok) {
       const data = await response.json()
-      console.log("Server response:", data)
+     
       window.history.pushState({}, "", "/")
       router()
     } else {

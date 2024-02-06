@@ -131,7 +131,7 @@ form input {
     height: 15px;
     margin-left: 3px;
   }
-  
+
   .add-category-container{
     display: flex;
     justify-content: flex-end;
@@ -154,3 +154,4 @@ form input {
   .add-category-btn:hover{
     background-color: #405c2d;
   }
+
