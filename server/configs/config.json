@@ -1,4 +1,0 @@
-{
-  "port" : ":8080",
-  "database_ulr" : "./server/internal/db/database.db"
-}

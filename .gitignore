@@ -9,6 +9,14 @@
 *.dylib
 
 
+
+*.exec
+
+
+/node_modules
+node_modules
+
+
 .DS_Store
 
 # Test binary, built with `go test -c`
@@ -23,6 +31,8 @@
 # Go workspace file
 go.work
 
-.DS_Store
+server/internal/db/database.db
+.idea
+/.idea/
 
-api
+/build/
