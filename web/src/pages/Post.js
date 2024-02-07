@@ -1,21 +1,29 @@
-import { CONTAINER, ROOT } from "../index"
+import { CONTAINER, ROOT, USERSCONTAINER } from "../index"
 import { Navbar } from "../components/Navbar.js"
 import { GLOBAL_URL } from "../config"
-import { SinglePostRequest } from "../helpers/ServerRequests"
+import { GetAllUsers, SinglePostRequest } from "../helpers/ServerRequests"
 import "../styles/separatePost.css"
 import {
   CreateCommentContainer,
   CreatePostUi,
   createCommentsContainer,
 } from "./PostCreateUi"
+import { UserList } from "../components/UserList.js"
 
 export async function Post(postId) {
-    ROOT.innerHTML = ""
-    CONTAINER.innerHTML = ""
-    await Navbar()
-    ROOT.append(CONTAINER)
-    postId = postId["id"]
-    const apiUrl = GLOBAL_URL + `/api/v1/jwt/posts/${postId}`
+  ROOT.innerHTML = ""
+  CONTAINER.innerHTML = ""
+  USERSCONTAINER.innerHTML = ""
+
+  await Navbar()
+
+  const usersData = await GetAllUsers()
+  USERSCONTAINER.appendChild(UserList(usersData))
+  CONTAINER.appendChild(USERSCONTAINER)
+
+  ROOT.append(CONTAINER)
+  postId = postId["id"]
+  const apiUrl = GLOBAL_URL + `/api/v1/jwt/posts/${postId}`
 
   SinglePostRequest(apiUrl, "GET")
     .then((data) => {

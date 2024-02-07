@@ -7,44 +7,48 @@ import "../styles/users.css"
 import { RenderPost } from "../components/Post"
 
 import { GetAllUsers, GetPosts } from "../helpers/ServerRequests.js"
-import { CONTAINER, ROOT } from "../index.js"
+import { CONTAINER, ROOT, USERSCONTAINER } from "../index.js"
 import { RenderPostFeed } from "../components/PostFeed.js"
 import { RenderFilter } from "../components/Filter.js"
 import { router } from "../router/Router.js"
-import { UserList } from "../components/UserList"
 import { OpenMessengers, Throttle } from "../components/Messenger.js"
 import {
   CheckPosition,
   PostsLoadedIndex,
   setPostsLoadedIndex,
 } from "../helpers/LazyLoading.js"
-import { Notification } from "../helpers/Notifications.js"
-
-const usersContainer = document.createElement("div")
-
-usersContainer.className = "users-container"
+import { UserList } from "../components/UserList.js"
 
 export let POSTFEED
 
 export async function Home() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
+  USERSCONTAINER.innerHTML = ""
 
-  usersContainer.innerHTML = ""
+
   await Navbar()
 
   OpenMessengers.length = 0
   POSTFEED = RenderPostFeed()
   ROOT.append(CONTAINER)
 
-  fetchPosts(POSTFEED)
+  await fetchPosts(POSTFEED)
 
-  fetchUsers(usersContainer)
+  ///
+  const usersData = await GetAllUsers()
+  USERSCONTAINER.appendChild(UserList(usersData))
+  CONTAINER.appendChild(USERSCONTAINER)
+  
+  ///
+
+
 
   const Filter = await RenderFilter()
 
   ROOT.appendChild(Filter)
   CONTAINER.appendChild(POSTFEED)
+  CONTAINER.appendChild(USERSCONTAINER)
 
   //check for scrollin to lazy load posts
   function checkScroll() {
@@ -101,18 +105,8 @@ export async function fetchPosts(PostFeed, category_id = "") {
     console.error("Error during fetch:", error)
   }
 }
-async function fetchUsers(usersContainer) {
-  try {
-    const usersData = await GetAllUsers()
-    if (usersData) {
-      usersContainer.appendChild(UserList(usersData))
 
-      CONTAINER.appendChild(usersContainer)
-    }
-  } catch (error) {
-    console.error("Error during fetch:", error)
-  }
-}
+////
 
 //create a link and calls function to create post out of provided data
 export function ProcessPostData(post) {
@@ -133,4 +127,17 @@ export function ProcessPostData(post) {
   }
 
   return postLink
+}
+
+async function fetchUsers(usersContainer) {
+  try {
+    const usersData = await GetAllUsers()
+    if (usersData) {
+      usersContainer.appendChild(UserList(usersData))
+
+      CONTAINER.appendChild(usersContainer)
+    }
+  } catch (error) {
+    console.error("Error during fetch:", error)
+  }
 }

@@ -5,11 +5,16 @@ import addCategory from "../assets/img/addCategory.svg"
 import postImgIcon from "../assets/img/postImgIcon.svg"
 import closeIcon from "../assets/img/close.svg"
 import { GLOBAL_URL } from "../config.js"
-import { CONTAINER, ROOT } from "../index.js"
+import { CONTAINER, ROOT, USERSCONTAINER } from "../index.js"
+import { GetAllUsers, GetUserInfo } from "../helpers/ServerRequests.js"
+import { UserList } from "../components/UserList.js"
+
 export async function CreatePost() {
   ROOT.innerHTML = ""
   CONTAINER.innerHTML = ""
+  USERSCONTAINER.innerHTML = ""
   await Navbar()
+
 
   // const main = document.createElement("main")
   // main.className = "main"
@@ -58,6 +63,10 @@ export async function CreatePost() {
 </div>
 `
 
+  const usersData = await GetAllUsers()
+  USERSCONTAINER.appendChild(UserList(usersData))
+  CONTAINER.appendChild(USERSCONTAINER)
+
   ROOT.appendChild(CONTAINER)
 
   const addCategoryBtn = document.querySelector(".add-category-btn")
@@ -94,15 +103,13 @@ export async function CreatePost() {
     }
   }
 
-//add error block
-const errorMessage = document.createElement("div")
-errorMessage.classList.add("PosterrorMessage")
-const textarea = document.querySelector(".post-textarea")
-textarea.insertAdjacentElement("afterend", errorMessage)
+  //add error block
+  const errorMessage = document.createElement("div")
+  errorMessage.classList.add("PosterrorMessage")
+  const textarea = document.querySelector(".post-textarea")
+  textarea.insertAdjacentElement("afterend", errorMessage)
 
-
-
-//add image error block
+  //add image error block
   /////////
   //ADD IMAGE
 
@@ -184,15 +191,12 @@ textarea.insertAdjacentElement("afterend", errorMessage)
     const categories = postCategories
     const image = postImageWrapper ? postImageWrapper.src : null
 
-    if(title !== "" && content!= "" && categories.length !== 0){
+    if (title !== "" && content != "" && categories.length !== 0) {
       sendPostData(title, content, categories, image)
-    }else if(title !== "" && content!= ""){
+    } else if (title !== "" && content != "") {
       errorMessage.textContent = "Please add at least one category"
-    }
-    else{
-
+    } else {
       errorMessage.textContent = "Please fill in all fields"
-
     }
   })
 }
@@ -235,7 +239,7 @@ async function sendPostData(title, content, categories, image) {
 }
 
 //we removed ability to add images
-    // <div class="img-button-container">
-    // <input type="file" name="add-image" class="add-image-input">
-    //   <button class="add-image-button">Image<img class="add-img-icon" src=${postImgIcon}  alt="addimg"></button>
-    // </div>
+// <div class="img-button-container">
+// <input type="file" name="add-image" class="add-image-input">
+//   <button class="add-image-button">Image<img class="add-img-icon" src=${postImgIcon}  alt="addimg"></button>
+// </div>
