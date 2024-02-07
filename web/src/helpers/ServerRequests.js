@@ -92,7 +92,7 @@ export const GetPosts = async (index = 0, category_id = "") => {
   }
 }
 
-export const GetAllUsers = async () => {
+export async function GetAllUsers() {
   try {
     const response = await fetch(GLOBAL_URL + "/api/v1/jwt/users", {
       method: "GET",
