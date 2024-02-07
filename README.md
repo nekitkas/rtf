@@ -7,7 +7,7 @@
 The Real-Time Forum is an advanced web application designed to facilitate dynamic interactions among users through features like post creation, commenting, live messaging, and more, all in real-time. This project builds upon a previous forum model, enhancing its capabilities with real-time data exchange using WebSockets, a single-page application (SPA) architecture, and a blend of technologies including SQLite, Golang, JavaScript, HTML, and CSS.
 
 ## Table of Contents
-
+- [Demo](#demo)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Registration and Login](#registration-and-login)
@@ -22,12 +22,27 @@ The Real-Time Forum is an advanced web application designed to facilitate dynami
 - [Contributors](#contributors)
 - [License](#license)
 
+<hr>
+
+## DEMO
+
+**Our link** :
+<center>
+
+ http://165.22.197.149:3000/
+
+<span style="color:red">*Note: This offer is valid until the completion of audits.*</span>
+
+</center>
+
+<hr>
+
 ## Installation
 
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/kood-voyage/real-time-forum.git
+git clone "LINK HERE"
 cd real-time-forum
 ```
 
@@ -36,13 +51,13 @@ cd real-time-forum
 Ensure Go is installed and set up the Go workspace.
 
 ```bash
-make run-api
+chmod +x ./run-api.sh; ./run-api.sh
 ```
 
 3. **Set up the Frontend(in separate terminal):**
 
 ```bash
-make run-client
+chmod +x ./run-client.sh; ./run-client.sh
 ```
 
 4. **Database Setup:**
