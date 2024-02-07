@@ -5,6 +5,7 @@ import chatAvatar from "../assets/img/avatar.svg.png";
 
 import closeImg from "../assets/img/close.svg";
 import sendImg from "../assets/img/send.svg";
+import { isLoggedIn } from "../helpers/ServerRequests";
 
 export const OpenMessengers = [];
 export class Messenger {
@@ -20,6 +21,7 @@ export class Messenger {
     this.chatId;
     this.openedAt = new Date().toISOString();
     this.chatPage = 0;
+    this.sendButtonActive = false;
 
     this.chatBody.addEventListener(
       "wheel",
@@ -59,7 +61,7 @@ export class Messenger {
             if (item.user_id == this.currentUserId) {
               toBeClass = "right";
             }
-            this.messages.push({ text: item.content, class: toBeClass });
+            this.messages.push({ text: item.content, class: toBeClass, timeStamp: item.timestamp });
           });
         }
         this.AddChats();
@@ -120,11 +122,11 @@ export class Messenger {
             data.data.forEach((element) => {
               if (element.user_id == this.currentUserId) {
                 this.AppendLine(
-                  { text: element.content, class: "right" },
+                  { text: element.content, class: "right", timeStamp: element.timestamp },
                   true
                 );
               } else {
-                this.AppendLine({ text: element.content, class: "left" }, true);
+                this.AppendLine({ text: element.content, class: "left", timeStamp: element.timestamp }, true);
               }
             });
             this.chatPage++;
@@ -178,22 +180,26 @@ export class Messenger {
 
     // Create form for message input
     const messageForm = document.createElement("form");
-
+    //do not allow to send things with enter
+    
+    
     // Create message input
     const messageInput = document.createElement("input");
     messageInput.type = "text";
     messageInput.placeholder = "Aa";
     messageInput.id = "message";
 
-    // Create send button
     const sendButton = document.createElement("input");
+
+    
+    // Create send button
     sendButton.type = "image";
     sendButton.src = sendImg;
     sendButton.name = "submit";
     sendButton.alt = "submit";
     sendButton.className = "form-img-submit";
-    sendButton.addEventListener("click", async (event) => {
-      event.preventDefault();
+
+    const submitForm = async () => {
       let is = false;
       await fetch(GLOBAL_URL + `/api/v1/auth/checkCookie`, {
         method: "GET",
@@ -223,13 +229,20 @@ export class Messenger {
         let textLine = {
           text: messageInput.value,
           class: "right",
+          timeStamp: new Date().toISOString(),
         };
         this.AddToDatabase(messageInput.value);
         this.messages.push(textLine);
         messageInput.value = "";
         this.AppendLine(textLine);
       }
-    });
+    }
+    sendButton.addEventListener("click", async (event) => {
+      event.preventDefault()
+      if(messageInput.value.trim().length !== 0){
+        await submitForm()
+      }
+    })
 
     messageForm.appendChild(messageInput);
     messageForm.appendChild(sendButton);
@@ -288,6 +301,11 @@ export class Messenger {
     msgText.classList.add(message.class);
     msgText.textContent = message.text;
 
+    msgDiv.addEventListener('mouseover', (event) => {
+      let timeValue = formatTimestamp(message.timeStamp);
+      event.currentTarget.title = `Sent at ${timeValue}`;
+    })
+
     msgDiv.appendChild(msgText);
 
     if (top) {
@@ -322,4 +340,16 @@ function sendMessage(message) {
   } else {
     console.error("WebSocket connection not open. Cannot send message.");
   }
+}
+
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
