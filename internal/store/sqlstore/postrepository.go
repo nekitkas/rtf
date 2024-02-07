@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"forum/internal/models"
@@ -84,7 +83,7 @@ func (r *PostRepository) Get(id string) (*models.Post, error) {
 }
 
 func (r *PostRepository) GetFeed(offset, limit int, timeStamp time.Time, categoryID string) ([]models.Post, error) {
-	query := `SELECT p.*, u.username AS user_name
+	query := `SELECT DISTINCT p.*, u.username AS user_name
 FROM post p
 JOIN user u ON p.user_id = u.id
 JOIN postCategory pc ON p.id = pc.post_id
@@ -92,13 +91,7 @@ WHERE p.timestamp <= ? AND (pc.category_id = ? OR ? IS NULL OR ? = '')
 ORDER BY p.timestamp DESC
 LIMIT ? OFFSET ?`
 
-	dateTimeParts := strings.Split(timeStamp.String(), " ")
-
-	timeParts := strings.Split(dateTimeParts[1], ".")
-
-	nearestSecond := dateTimeParts[0] + "T" + timeParts[0]
-
-	rows, err := r.store.Db.Query(query, nearestSecond, categoryID, categoryID, categoryID, limit, offset)
+	rows, err := r.store.Db.Query(query, timeStamp, categoryID, categoryID, categoryID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch posts from the database: %v", err)
 	}
@@ -112,6 +105,7 @@ LIMIT ? OFFSET ?`
 		}
 		posts = append(posts, post)
 	}
+	fmt.Println(posts)
 
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("error reading posts rows: %v", err)
