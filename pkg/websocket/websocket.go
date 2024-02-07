@@ -23,8 +23,14 @@ var upgrader = websocket.Upgrader{
 
 type WebSocket struct {
 	Upgrader websocket.Upgrader
-	clients  map[*websocket.Conn]string
+	clients  map[*websocket.Conn]*client
 	lock     sync.Mutex
+}
+
+type client struct {
+	userID string
+	conn   *websocket.Conn
+	lock   sync.Mutex
 }
 
 type Response struct {
@@ -37,7 +43,7 @@ type Response struct {
 func NewWebSocket() *WebSocket {
 	return &WebSocket{
 		Upgrader: upgrader,
-		clients:  make(map[*websocket.Conn]string),
+		clients:  make(map[*websocket.Conn]*client),
 	}
 }
 
@@ -48,31 +54,34 @@ func (ws *WebSocket) HandleWebSocket(rw http.ResponseWriter, r *http.Request, us
 		return err
 	} else {
 		ws.lock.Lock()
-		ws.clients[conn] = user_id
+		ws.clients[conn] = &client{
+			userID: user_id,
+			conn:   conn,
+		}
 		ws.lock.Unlock()
-		go ws.handleWebSocketConnection(conn)
+		go ws.handleWebSocketConnection(ws.clients[conn])
 	}
 
 	return nil
 }
 
-func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
+func (ws *WebSocket) handleWebSocketConnection(cli *client) {
 	defer func() {
-		// ws.broadcastStatusUpdate("offline", ws.clients[conn])
-		conn.Close()
-		delete(ws.clients, conn)
+		cli.lock.Lock()
+		ws.broadcastStatusUpdate("offline", cli.userID)
+		delete(ws.clients, cli.conn)
+		cli.conn.Close()
+		cli.lock.Unlock()
 	}()
 
-	ws.lock.Lock()
-	ws.broadcastStatusUpdate("online", ws.clients[conn])
-	ws.lock.Unlock()
+	// ws.lock.Lock()
+	ws.broadcastStatusUpdate("online", cli.userID)
+	// ws.lock.Unlock()
 
 	for {
-		messageType, p, err := conn.ReadMessage()
+		messageType, p, err := cli.conn.ReadMessage()
 		if err != nil {
 			fmt.Println("WebSocket Read Error:", err)
-			ws.broadcastStatusUpdate("offline", ws.clients[conn])
-			delete(ws.clients, conn)
 			break
 		}
 
@@ -92,7 +101,7 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 		if toUserConn == nil {
 			fmt.Println("That user is not connected with WS")
 		} else {
-			jsonBytes, err := json.Marshal(Response{MessageType: "chat", Message: data.Message, FromUser: ws.clients[conn]})
+			jsonBytes, err := json.Marshal(Response{MessageType: "chat", Message: data.Message, FromUser: cli.userID})
 			if err != nil {
 				fmt.Println("JSON Marshal error!", err)
 			}
@@ -102,24 +111,24 @@ func (ws *WebSocket) handleWebSocketConnection(conn *websocket.Conn) {
 }
 
 func (ws *WebSocket) sendToUser(messType int, b []byte, userConn *websocket.Conn) {
-	ws.lock.Lock()
 	for conn := range ws.clients {
-		if conn == userConn {
-			go func(conn *websocket.Conn) {
-				if err := conn.WriteMessage(messType, b); err != nil {
+		if ws.clients[conn].conn == userConn {
+			go func(cli2 *client) {
+				cli2.lock.Lock()
+				if err := cli2.conn.WriteMessage(messType, b); err != nil {
 					fmt.Println("SOMETING ERROR", err)
 				}
-			}(conn)
+				cli2.lock.Unlock()
+			}(ws.clients[conn])
 		}
 	}
-	ws.lock.Unlock()
 }
 
 func (ws *WebSocket) broadcastStatusUpdate(status, username string) {
 	ws.lock.Lock()
 	var allConnections []string
 	for w := range ws.clients {
-		allConnections = append(allConnections, ws.clients[w])
+		allConnections = append(allConnections, ws.clients[w].userID)
 	}
 	ws.lock.Unlock()
 	jsonBytes, err := json.Marshal(Response{MessageType: "status", Message: status, FromUser: username, UserList: allConnections})
@@ -133,18 +142,20 @@ func (ws *WebSocket) broadcastStatusUpdate(status, username string) {
 func (ws *WebSocket) broadCastToAll(messType int, b []byte) {
 	ws.lock.Lock()
 	for conn := range ws.clients {
-		go func(conn *websocket.Conn) {
-			if err := conn.WriteMessage(messType, b); err != nil {
+		go func(cli *client) {
+			cli.lock.Lock()
+			if err := cli.conn.WriteMessage(messType, b); err != nil {
 				fmt.Println("SOMETING ERROR", err)
 			}
-		}(conn)
+			cli.lock.Unlock()
+		}(ws.clients[conn])
 	}
 	ws.lock.Unlock()
 }
 
-func getKeyByValue(m map[*websocket.Conn]string, targetValue string) *websocket.Conn {
-	for key, value := range m {
-		if value == targetValue {
+func getKeyByValue(m map[*websocket.Conn]*client, targetValue string) *websocket.Conn {
+	for key := range m {
+		if m[key].userID == targetValue {
 			return key
 		}
 	}
