@@ -51,13 +51,13 @@ cd real-time-forum
 Ensure Go is installed and set up the Go workspace.
 
 ```bash
-chmod +x ./run-api.sh; ./run-api.sh
+make run-api
 ```
 
 3. **Set up the Frontend(in separate terminal):**
 
 ```bash
-chmod +x ./run-client.sh; ./run-client.sh
+make run-client
 ```
 
 4. **Database Setup:**
