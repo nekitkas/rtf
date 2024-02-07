@@ -1,41 +1,41 @@
-import { Socket } from ".."
-import { GLOBAL_URL } from "../config"
-import { CURRENTUSER } from "../router/Router"
-import chatAvatar from "../assets/img/avatar.svg.png"
+import { Socket } from "..";
+import { GLOBAL_URL } from "../config";
+import { CURRENTUSER } from "../router/Router";
+import chatAvatar from "../assets/img/avatar.svg.png";
 
-import closeImg from "../assets/img/close.svg"
-import sendImg from "../assets/img/send.svg"
+import closeImg from "../assets/img/close.svg";
+import sendImg from "../assets/img/send.svg";
 
-export const OpenMessengers = []
+export const OpenMessengers = [];
 export class Messenger {
   constructor(userToId, username, imageUrl, RootElement) {
-    this.currentUserId = CURRENTUSER
-    this.userToId = userToId
-    this.username = username
-    this.imageUrl = imageUrl
-    this.RootElement = RootElement
-    this.chatBody = document.createElement("div")
-    this.messenger = document.createElement("div")
-    this.messages = []
-    this.chatId
-    this.openedAt = new Date().toISOString()
-    this.chatPage = 0
+    this.currentUserId = CURRENTUSER;
+    this.userToId = userToId;
+    this.username = username;
+    this.imageUrl = imageUrl;
+    this.RootElement = RootElement;
+    this.chatBody = document.createElement("div");
+    this.messenger = document.createElement("div");
+    this.messages = [];
+    this.chatId;
+    this.openedAt = new Date().toISOString();
+    this.chatPage = 0;
 
     this.chatBody.addEventListener(
       "wheel",
       Throttle(() => this.LoadOlderChats(), 300)
-    )
+    );
   }
 
   //Get messages from the back-end
 
   Close() {
-    this.RootElement.removeChild(this.messenger)
-    OpenMessengers.pop(this.messenger)
+    this.RootElement.removeChild(this.messenger);
+    OpenMessengers.pop(this.messenger);
   }
 
   async LoadChats() {
-    await this.GetChatId()
+    await this.GetChatId();
     //Initalize last messages from database (like 20 last messages)
     fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/init`, {
       method: "POST",
@@ -50,25 +50,25 @@ export class Messenger {
       credentials: "include",
     })
       .then((response) => {
-        return response.json()
+        return response.json();
       })
       .then((data) => {
         if (data.data != null) {
           data.data.forEach((item) => {
-            let toBeClass = "left"
+            let toBeClass = "left";
             if (item.user_id == this.currentUserId) {
-              toBeClass = "right"
+              toBeClass = "right";
             }
-            this.messages.push({ text: item.content, class: toBeClass })
-          })
+            this.messages.push({ text: item.content, class: toBeClass });
+          });
         }
-        this.AddChats()
-        this.chatPage++
+        this.AddChats();
+        this.chatPage++;
       })
       .catch((err) => {
-        console.log("ERROR WHILE CREATING CHATID: ", err)
-        return
-      })
+        console.log("ERROR WHILE CREATING CHATID: ", err);
+        return;
+      });
   }
 
   async GetChatId() {
@@ -81,23 +81,23 @@ export class Messenger {
       credentials: "include",
     })
       .then((response) => {
-        return response.json()
+        return response.json();
       })
       .then((data) => {
-        this.chatId = data.data.chat_id[0]
+        this.chatId = data.data.chat_id[0];
         // return data.data.chat_id[0]
       })
       .catch((err) => {
-        console.log("ERROR WHILE CREATING CHATID: ", err)
-        return
-      })
+        console.log("ERROR WHILE CREATING CHATID: ", err);
+        return;
+      });
   }
 
   async LoadOlderChats() {
     // If scollred up, add more messagesconst
     // await this.GetChatId()
-    const isAtTop = this.chatBody.scrollTop <= 400
-    console.log(this.chatBody.scrollTop)
+    const isAtTop = this.chatBody.scrollTop <= 400;
+    console.log(this.chatBody.scrollTop);
     if (isAtTop) {
       fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/init`, {
         method: "POST",
@@ -112,124 +112,149 @@ export class Messenger {
         credentials: "include",
       })
         .then((response) => {
-          return response.json()
+          return response.json();
         })
         .then((data) => {
-          console.log(data)
+          console.log(data);
           if (data.data != null) {
             data.data.forEach((element) => {
               if (element.user_id == this.currentUserId) {
-                this.AppendLine({ text: element.content, class: "right" }, true)
+                this.AppendLine(
+                  { text: element.content, class: "right" },
+                  true
+                );
               } else {
-                this.AppendLine({ text: element.content, class: "left" }, true)
+                this.AppendLine({ text: element.content, class: "left" }, true);
               }
-            })
-            this.chatPage++
+            });
+            this.chatPage++;
           }
-        })
+        });
     }
   }
 
   Create() {
     if (OpenMessengers.length > 0) {
       OpenMessengers.forEach((mess) => {
-        mess.Close()
-      })
+        mess.Close();
+      });
     }
     //Create new messenger
-    OpenMessengers.push(this)
+    OpenMessengers.push(this);
 
-    this.messenger.classList.add("messenger")
+    this.messenger.classList.add("messenger");
 
-    const chatHeader = document.createElement("div")
-    chatHeader.classList.add("chat-header")
+    const chatHeader = document.createElement("div");
+    chatHeader.classList.add("chat-header");
 
-    const userChatInfo = document.createElement("div")
-    userChatInfo.classList.add("user-chat-info")
+    const userChatInfo = document.createElement("div");
+    userChatInfo.classList.add("user-chat-info");
 
-    const userImage = document.createElement("img")
-    userImage.src = chatAvatar
-    userImage.alt = this.userToId
+    const userImage = document.createElement("img");
+    userImage.src = chatAvatar;
+    userImage.alt = this.userToId;
 
-    const userName = document.createElement("p")
-    userName.textContent = this.username
-    const closeIcon = document.createElement("img")
-    closeIcon.src = closeImg
-    closeIcon.alt = "close"
+    const userName = document.createElement("p");
+    userName.textContent = this.username;
+    const closeIcon = document.createElement("img");
+    closeIcon.src = closeImg;
+    closeIcon.alt = "close";
     closeIcon.addEventListener("click", () => {
-      this.Close()
-    })
+      this.Close();
+    });
 
-    userChatInfo.appendChild(userImage)
-    userChatInfo.appendChild(userName)
+    userChatInfo.appendChild(userImage);
+    userChatInfo.appendChild(userName);
 
-    chatHeader.appendChild(userChatInfo)
-    chatHeader.appendChild(closeIcon)
+    chatHeader.appendChild(userChatInfo);
+    chatHeader.appendChild(closeIcon);
 
-    this.chatBody.classList.add("chat-body")
+    this.chatBody.classList.add("chat-body");
 
-    this.LoadChats()
+    this.LoadChats();
 
-    const chatFooter = document.createElement("div")
-    chatFooter.className = "chat-footer"
+    const chatFooter = document.createElement("div");
+    chatFooter.className = "chat-footer";
 
     // Create form for message input
-    const messageForm = document.createElement("form")
+    const messageForm = document.createElement("form");
 
     // Create message input
-    const messageInput = document.createElement("input")
-    messageInput.type = "text"
-    messageInput.placeholder = "Aa"
-    messageInput.id = "message"
+    const messageInput = document.createElement("input");
+    messageInput.type = "text";
+    messageInput.placeholder = "Aa";
+    messageInput.id = "message";
 
     // Create send button
-    const sendButton = document.createElement("input")
-    sendButton.type = "image"
-    sendButton.src = sendImg
-    sendButton.name = "submit"
-    sendButton.alt = "submit"
-    sendButton.className = "form-img-submit"
-    sendButton.addEventListener("click", (event) => {
-      event.preventDefault()
-      let messageToSend = {
-        message: messageInput.value,
-        to_user: this.userToId,
+    const sendButton = document.createElement("input");
+    sendButton.type = "image";
+    sendButton.src = sendImg;
+    sendButton.name = "submit";
+    sendButton.alt = "submit";
+    sendButton.className = "form-img-submit";
+    sendButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      let is = false;
+      await fetch(GLOBAL_URL + `/api/v1/auth/checkCookie`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (CURRENTUSER != undefined && CURRENTUSER != data.data) {
+            console.log("User has changed.");
+            window.location.href = "/";
+            return;
+          }
+          is = true;
+        });
+
+      if (is) {
+        let messageToSend = {
+          message: messageInput.value,
+          to_user: this.userToId,
+        };
+        sendMessage(JSON.stringify(messageToSend));
+        let textLine = {
+          text: messageInput.value,
+          class: "right",
+        };
+        this.AddToDatabase(messageInput.value);
+        this.messages.push(textLine);
+        messageInput.value = "";
+        this.AppendLine(textLine);
       }
-      sendMessage(JSON.stringify(messageToSend))
-      let textLine = {
-        text: messageInput.value,
-        class: "right",
-      }
-      this.AddToDatabase(messageInput.value)
-      this.messages.push(textLine)
-      messageInput.value = ""
-      this.AppendLine(textLine)
-    })
+    });
 
-    messageForm.appendChild(messageInput)
-    messageForm.appendChild(sendButton)
+    messageForm.appendChild(messageInput);
+    messageForm.appendChild(sendButton);
 
-    chatFooter.appendChild(messageForm)
+    chatFooter.appendChild(messageForm);
 
-    this.messenger.appendChild(chatHeader)
-    this.messenger.appendChild(this.chatBody)
-    this.messenger.appendChild(chatFooter)
+    this.messenger.appendChild(chatHeader);
+    this.messenger.appendChild(this.chatBody);
+    this.messenger.appendChild(chatFooter);
     //appendToRoot
-    this.RootElement.appendChild(this.messenger)
+    this.RootElement.appendChild(this.messenger);
     //move the chat to bottom
-    this.chatBody.scrollTop = this.chatBody.scrollHeight
+    this.chatBody.scrollTop = this.chatBody.scrollHeight;
   }
 
   AddChats() {
     // const scrollTop = this.chatBody.scrollTop;
-    this.chatBody.innerHTML = ""
+    this.chatBody.innerHTML = "";
     this.messages.reverse().forEach((message) => {
-      this.AppendLine(message)
-    })
+      this.AppendLine(message);
+    });
   }
 
   async AddToDatabase(message) {
-    await this.GetChatId()
+    await this.GetChatId();
     await fetch(GLOBAL_URL + `/api/v1/jwt/chat/line/create`, {
       method: "POST",
       headers: {
@@ -243,58 +268,58 @@ export class Messenger {
       credentials: "include",
     })
       .then((response) => {
-        return response.json()
+        return response.json();
       })
       .then((data) => {
-        console.log(data)
+        console.log(data);
         // return data.data.chat_id[0]
       })
       .catch((err) => {
-        console.log("ERROR ADDING LINE TO DATABASE: ", err)
-        return
-      })
+        console.log("ERROR ADDING LINE TO DATABASE: ", err);
+        return;
+      });
   }
 
   AppendLine(message, top = false) {
-    const msgDiv = document.createElement("div")
-    msgDiv.classList.add("msg")
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("msg");
 
-    const msgText = document.createElement("p")
-    msgText.classList.add(message.class)
-    msgText.textContent = message.text
+    const msgText = document.createElement("p");
+    msgText.classList.add(message.class);
+    msgText.textContent = message.text;
 
-    msgDiv.appendChild(msgText)
+    msgDiv.appendChild(msgText);
 
     if (top) {
-      this.chatBody.insertBefore(msgDiv, this.chatBody.firstChild)
+      this.chatBody.insertBefore(msgDiv, this.chatBody.firstChild);
     } else {
-      this.chatBody.appendChild(msgDiv)
-      this.chatBody.scrollTop = this.chatBody.scrollHeight
+      this.chatBody.appendChild(msgDiv);
+      this.chatBody.scrollTop = this.chatBody.scrollHeight;
     }
     // return msgDiv
   }
 }
 
 export function Throttle(func, delay) {
-  let shouldWait = false
+  let shouldWait = false;
 
   return function (...args) {
-    if (shouldWait) return
-    func(...args)
-    shouldWait = true
+    if (shouldWait) return;
+    func(...args);
+    shouldWait = true;
 
     setTimeout(() => {
-      shouldWait = false
-    }, delay)
-  }
+      shouldWait = false;
+    }, delay);
+  };
 }
 
 // Append the 'messenger' element to the document or any other container element in your HTML
 function sendMessage(message) {
   if (Socket.readyState === WebSocket.OPEN) {
-    Socket.send(message)
+    Socket.send(message);
     // console.log('Message sent:', message);
   } else {
-    console.error("WebSocket connection not open. Cannot send message.")
+    console.error("WebSocket connection not open. Cannot send message.");
   }
 }
