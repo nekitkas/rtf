@@ -1,105 +1,113 @@
-import { Navbar } from "../components/Navbar.js"
-import "../styles/style.css"
-import "../styles/post.css"
-import "../styles/messenger.css"
-import "../styles/chat.css"
-import "../styles/users.css"
-import { RenderPost } from "../components/Post"
+import { Navbar } from "../components/Navbar.js";
+import "../styles/style.css";
+import "../styles/post.css";
+import "../styles/messenger.css";
+import "../styles/chat.css";
+import "../styles/users.css";
+import { RenderPost } from "../components/Post";
 
-import { GetAllUsers, GetPosts } from "../helpers/ServerRequests.js"
-import { CONTAINER, ROOT, USERSCONTAINER } from "../index.js"
-import { RenderPostFeed } from "../components/PostFeed.js"
-import { RenderFilter } from "../components/Filter.js"
-import { router } from "../router/Router.js"
-import { OpenMessengers, Throttle } from "../components/Messenger.js"
+import { GetAllUsers, curryGetPosts } from "../helpers/ServerRequests.js";
+import { CONTAINER, ROOT, USERSCONTAINER } from "../index.js";
+import { RenderPostFeed } from "../components/PostFeed.js";
+import { RenderFilter } from "../components/Filter.js";
+import { router } from "../router/Router.js";
+import { OpenMessengers, Throttle } from "../components/Messenger.js";
 import {
   CheckPosition,
   PostsLoadedIndex,
   setPostsLoadedIndex,
-} from "../helpers/LazyLoading.js"
-import { UserList } from "../components/UserList.js"
+} from "../helpers/LazyLoading.js";
+import { UserList } from "../components/UserList.js";
 
-export let POSTFEED
+export let POSTFEED;
 
 export async function Home() {
-  ROOT.innerHTML = ""
-  CONTAINER.innerHTML = ""
-  USERSCONTAINER.innerHTML = ""
+  ROOT.innerHTML = "";
+  CONTAINER.innerHTML = "";
+  USERSCONTAINER.innerHTML = "";
 
+  await Navbar();
 
-  await Navbar()
+  OpenMessengers.length = 0;
+  POSTFEED = RenderPostFeed();
+  ROOT.append(CONTAINER);
 
-  OpenMessengers.length = 0
-  POSTFEED = RenderPostFeed()
-  ROOT.append(CONTAINER)
-
-  await fetchPosts(POSTFEED)
+  const getPosts = curryGetPosts();
+  await fetchPosts(POSTFEED, getPosts);
 
   ///
-  const usersData = await GetAllUsers()
-  USERSCONTAINER.appendChild(UserList(usersData))
-  CONTAINER.appendChild(USERSCONTAINER)
-  
-  ///
-  const Filter = await RenderFilter()
+  const usersData = await GetAllUsers();
+  USERSCONTAINER.appendChild(UserList(usersData));
+  CONTAINER.appendChild(USERSCONTAINER);
 
-  ROOT.appendChild(Filter)
-  CONTAINER.appendChild(POSTFEED)
-  CONTAINER.appendChild(USERSCONTAINER)
+  ///
+
+  const Filter = await RenderFilter();
+
+  ROOT.appendChild(Filter);
+  CONTAINER.appendChild(POSTFEED);
+  CONTAINER.appendChild(USERSCONTAINER);
 
   //check for scrollin to lazy load posts
   function checkScroll() {
-    window.addEventListener("scroll", Throttle(CheckPosition, 250))
-    window.addEventListener("resize", Throttle(CheckPosition, 250))
+    window.addEventListener(
+      "wheel",
+      Throttle(() => CheckPosition(getPosts), 250)
+    );
+    window.addEventListener(
+      "resize",
+      Throttle(() => CheckPosition(getPosts), 250)
+    );
   }
-  checkScroll()
+  checkScroll();
 
   // AddNotification("Test1", "Looool")
   // AddNotification("Test2", "sadasdasdasd")
 
-  const selectBlock = document.querySelector(".select-block")
+  const selectBlock = document.querySelector(".select-block");
   if (selectBlock) {
-    selectBlock.addEventListener("click", displayCategoryModal)
-    const dropdown = document.querySelector(".select-dropdown")
-    const selectArrow = document.querySelector(".select-arrow")
+    selectBlock.addEventListener("click", displayCategoryModal);
+    const dropdown = document.querySelector(".select-dropdown");
+    const selectArrow = document.querySelector(".select-arrow");
 
     function displayCategoryModal() {
-      dropdown.classList.toggle("showSelectModal")
-      selectArrow.classList.toggle("select-arrow-rotate")
+      dropdown.classList.toggle("showSelectModal");
+      selectArrow.classList.toggle("select-arrow-rotate");
     }
   }
 }
 
-export async function fetchPosts(PostFeed, category_id = "") {
+export async function fetchPosts(PostFeed, getPosts) {
   try {
-    const postsData = await GetPosts(0, category_id)
-    console.log(postsData)
+    console.log("GET THE POSTS >>> ", getPosts);
+    const postsData = await getPosts();
+    console.log(postsData);
 
     if (postsData) {
       postsData.forEach((post) => {
-        const postLink = document.createElement("div")
-        postLink.classList.add("post-link")
+        const postLink = document.createElement("div");
+        postLink.classList.add("post-link");
 
         postLink.addEventListener("click", () => {
-          history.pushState({}, "", `post/${post.post.id}`)
-          router()
-        })
+          history.pushState({}, "", `post/${post.post.id}`);
+          router();
+        });
 
         if (post.categories) {
-          postLink.appendChild(RenderPost(post.post, post.categories))
+          postLink.appendChild(RenderPost(post.post, post.categories));
         } else {
-          postLink.appendChild(RenderPost(post.post))
+          postLink.appendChild(RenderPost(post.post));
         }
 
-        PostFeed.appendChild(postLink)
-      })
+        PostFeed.appendChild(postLink);
+      });
     } else {
       // Handle case when response is not OK
-      console.log("Error: Response not OK")
+      console.log("Error: Response not OK");
     }
   } catch (error) {
     // Handle errors that occurred during the fetch
-    console.error("Error during fetch:", error)
+    console.error("Error during fetch:", error);
   }
 }
 
@@ -107,36 +115,36 @@ export async function fetchPosts(PostFeed, category_id = "") {
 
 //create a link and calls function to create post out of provided data
 export function ProcessPostData(post) {
-  const postLink = document.createElement("div")
+  const postLink = document.createElement("div");
 
   postLink.addEventListener("click", () => {
-    history.pushState({}, "", `post/${post.id}`)
-    setPostsLoadedIndex(0)
-    router()
-  })
+    history.pushState({}, "", `post/${post.id}`);
+    setPostsLoadedIndex(0);
+    router();
+  });
 
-  postLink.classList.add("post-link")
+  postLink.classList.add("post-link");
 
   if (post.categories) {
-    postLink.appendChild(RenderPost(post, post.nickname))
+    postLink.appendChild(RenderPost(post.post, post.nickname));
   } else {
-    postLink.appendChild(RenderPost(post))
+    postLink.appendChild(RenderPost(post.post));
   }
 
-  return postLink
+  return postLink;
 }
 
 ///
 
 async function fetchUsers(usersContainer) {
   try {
-    const usersData = await GetAllUsers()
+    const usersData = await GetAllUsers();
     if (usersData) {
-      usersContainer.appendChild(UserList(usersData))
+      usersContainer.appendChild(UserList(usersData));
 
-      CONTAINER.appendChild(usersContainer)
+      CONTAINER.appendChild(usersContainer);
     }
   } catch (error) {
-    console.error("Error during fetch:", error)
+    console.error("Error during fetch:", error);
   }
 }

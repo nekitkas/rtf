@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"forum/internal/models"
@@ -91,7 +92,13 @@ WHERE p.timestamp <= ? AND (pc.category_id = ? OR ? IS NULL OR ? = '')
 ORDER BY p.timestamp DESC
 LIMIT ? OFFSET ?`
 
-	rows, err := r.store.Db.Query(query, timeStamp, categoryID, categoryID, categoryID, limit, offset)
+	dateTimeParts := strings.Split(timeStamp.String(), " ")
+
+	timeParts := strings.Split(dateTimeParts[1], ".")
+
+	nearestSecond := dateTimeParts[0] + "T" + timeParts[0]
+
+	rows, err := r.store.Db.Query(query, nearestSecond, categoryID, categoryID, categoryID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch posts from the database: %v", err)
 	}

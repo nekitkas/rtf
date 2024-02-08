@@ -77,7 +77,7 @@ export async function CreatePost() {
     e.preventDefault()
 
     console.log("VALUE: ")
-    const categoryValue = categoryInputValue.value.trim()
+    const categoryValue = categoryInputValue.value.trim().toLowerCase()
 
     // Check for valid characters (A-Z)
     const validCharsRegex = /^[a-zA-Z]+$/

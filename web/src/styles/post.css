@@ -3,7 +3,7 @@
 }
 
 .post {
-  width: 100%;
+  width: 600px;
   border-radius: 10px;
   background-color: var(--background-secondory);
   padding: 20px;

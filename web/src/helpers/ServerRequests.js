@@ -1,4 +1,4 @@
-import { GLOBAL_URL } from "../config"
+import { GLOBAL_URL } from "../config";
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
 export const isLoggedIn = async () => {
@@ -9,23 +9,23 @@ export const isLoggedIn = async () => {
         "Content-Type": "application/json",
       },
       credentials: "include",
-    })
+    });
 
     if (!response.ok) {
       if (response.status === 401) {
-        return false
+        return false;
       } else {
         // Handle other non-OK responses if necessary
-        return false
+        return false;
       }
     }
-    const result = await response.json()
-    return result.data
+    const result = await response.json();
+    return result.data;
   } catch (error) {
-    console.error("Fetch error:", error)
-    throw error // Rethrow the error if needed
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
   }
-}
+};
 
 export const Logout = async () => {
   try {
@@ -35,62 +35,67 @@ export const Logout = async () => {
         "Content-Type": "application/json",
       },
       credentials: "include",
-    })
+    });
 
     if (!response.ok) {
       if (response.status === 401) {
-        return false
+        return false;
       } else {
         // Handle other non-OK responses if necessary
-        return false
+        return false;
       }
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error("Fetch error:", error)
-    throw error // Rethrow the error if needed
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
   }
-}
+};
 
-export const GetPosts = async (index = 0, category_id = "") => {
-  let current_index = 0 + index
-  const requestData = {
-    current_index: current_index,
-    page_open_time_stamp: new Date().toISOString(),
-    category_id: category_id,
-  }
-  console.log("requestData: ", requestData.current_index)
-  try {
-    const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(requestData),
-    })
+export const curryGetPosts = (category_id = "") => {
+  const time_stamp = new Date().toISOString();
+  let index = 0;
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        console.error("Unauthorized: User needs to authenticate")
-      } else {
-        console.error(
-          `Non-OK response: ${response.status} - ${response.statusText}`
-        )
-        // Log additional details if available (e.g., response.json())
+  return async function GetPosts() {
+    const requestData = {
+      current_index: index,
+      page_open_time_stamp: time_stamp,
+      category_id: category_id,
+    };
+    index++;
+    console.log("requestData: ", requestData);
+    try {
+      const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.error("Unauthorized: User needs to authenticate");
+        } else {
+          console.error(
+            `Non-OK response: ${response.status} - ${response.statusText}`
+          );
+          // Log additional details if available (e.g., response.json())
+        }
+        return false;
       }
-      return false
-    }
 
-    const result = await response.json()
-    console.log(result.data)
-    return result.data
-  } catch (error) {
-    console.error("Fetch error:", error)
-    throw error // Rethrow the error if needed
-  }
-}
+      const result = await response.json();
+      console.log(result.data);
+      return result.data;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      throw error; // Rethrow the error if needed
+    }
+  };
+};
 
 export async function GetAllUsers() {
   try {
@@ -101,14 +106,14 @@ export async function GetAllUsers() {
         "Access-Control-Request-Method": "GET",
       },
       credentials: "include",
-    })
+    });
 
-    const result = await response.json()
+    const result = await response.json();
 
-    return result.data
+    return result.data;
   } catch (error) {
-    console.error("Fetch error:", error)
-    throw error // Rethrow the error if needed
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
   }
 }
 
@@ -121,19 +126,19 @@ export function SinglePostRequest(url, method, body = null, headers = {}) {
     },
 
     credentials: "include",
-  }
+  };
 
   return fetch(url, options)
     .then((response) => {
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.status}`)
+        throw new Error(`Network response was not ok: ${response.status}`);
       }
-      return response.json()
+      return response.json();
     })
     .catch((error) => {
-      console.error("Error during fetch operation:", error)
-      throw error
-    })
+      console.error("Error during fetch operation:", error);
+      throw error;
+    });
 }
 
 export const GetUserInfo = async (user_id) => {
@@ -144,26 +149,26 @@ export const GetUserInfo = async (user_id) => {
         "Content-Type": "application/json",
       },
       credentials: "include",
-    })
+    });
 
     if (!response.ok) {
       if (response.status === 401) {
-        console.error("Unauthorized: User needs to authenticate")
+        console.error("Unauthorized: User needs to authenticate");
       } else {
         console.error(
           `Non-OK response: ${response.status} - ${response.statusText}`
-        )
+        );
         // Log additional details if available (e.g., response.json())
       }
-      return false
+      return false;
     }
 
-    return await response.json()
+    return await response.json();
   } catch (error) {
-    console.error("Fetch error:", error)
-    throw error // Rethrow the error if needed
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
   }
-}
+};
 
 export const GetCategories = async () => {
   try {
@@ -173,25 +178,25 @@ export const GetCategories = async () => {
         "Content-Type": "application/json",
       },
       credentials: "include",
-    })
+    });
 
     if (!response.ok) {
       if (response.status === 401) {
-        console.error("Unauthorized: User needs to authenticate")
+        console.error("Unauthorized: User needs to authenticate");
       } else {
         console.error(
           `Non-OK response: ${response.status} - ${response.statusText}`
-        )
+        );
         // Log additional details if available (e.g., response.json())
       }
-      return false
+      return false;
     }
 
-    const result = await response.json()
+    const result = await response.json();
 
-    return result.data
+    return result.data;
   } catch (error) {
-    console.error("Fetch error:", error)
-    throw error // Rethrow the error if needed
+    console.error("Fetch error:", error);
+    throw error; // Rethrow the error if needed
   }
-}
+};

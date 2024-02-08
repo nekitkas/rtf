@@ -143,7 +143,7 @@ func (s *server) handleAllPostInformation() http.HandlerFunc {
 			return
 		}
 
-		posts, err := s.store.Post().GetFeed(request.Index*10, 10, request.Time, request.CategoryID)
+		posts, err := s.store.Post().GetFeed(request.Index*6, 6, request.Time, request.CategoryID)
 		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
