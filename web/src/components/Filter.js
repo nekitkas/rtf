@@ -58,7 +58,7 @@ export async function RenderFilter(getPosts) {
       e.preventDefault();
       POSTFEED.innerHTML = "";
 
-      fetchPosts(POSTFEED, getPosts(category.id));
+      fetchPosts(POSTFEED, getPosts, category.id);
     });
 
     selectDropdown.appendChild(categoryOption);

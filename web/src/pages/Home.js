@@ -77,9 +77,9 @@ export async function Home() {
   }
 }
 
-export async function fetchPosts(PostFeed, getPosts) {
+export async function fetchPosts(PostFeed, getPosts, category_id = "") {
   try {
-    const postsData = await getPosts();
+    const postsData = await getPosts(category_id);
     console.log(postsData);
 
     if (postsData) {
