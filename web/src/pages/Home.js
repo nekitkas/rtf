@@ -111,7 +111,7 @@ export async function fetchPosts(PostFeed, getPosts) {
   }
 }
 
-////
+///
 
 //create a link and calls function to create post out of provided data
 export function ProcessPostData(post) {
@@ -133,6 +133,8 @@ export function ProcessPostData(post) {
 
   return postLink;
 }
+
+///
 
 async function fetchUsers(usersContainer) {
   try {

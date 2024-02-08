@@ -10,6 +10,11 @@
   color: rgba(255, 255, 255, 0.745);
   margin-bottom: 20px;
   border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.post:hover {
+  background-color: #2a2828;
 }
 
 .post-body-img {
@@ -39,6 +44,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--primary-color);
+  word-wrap: break-word;
 }
 
 .post-body {
@@ -51,4 +57,19 @@
   font-weight: 600;
   text-wrap: wrap;
   word-wrap: break-word;
+}
+
+.tags {
+  margin-bottom: 10px;
+}
+
+.category-tag {
+  font-size: 10px;
+  padding: 2px 10px;
+  margin-right: 4px;
+  padding: 2px 8px;
+  background-color: #063639;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 10px;
 }

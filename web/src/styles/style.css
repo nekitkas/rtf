@@ -42,25 +42,11 @@ body {
   position: relative;
 }
 
-.filter {
-  width: 300px;
-  /* height: 150px; */
-  border: 1px solid var(--border-color);
-  position: fixed;
-  top: 85px;
-  left: 20px;
-  background-color: var(--background-secondory);
-  border-radius: 10px;
-  padding: 20px;
-}
-
 .post-link {
   text-decoration: none;
 }
 
-
 body::-webkit-scrollbar {
-
   width: 6px;
 }
 
@@ -74,7 +60,54 @@ body::-webkit-scrollbar-track {
   border-radius: 6px; /* Закругленные углы для трека */
 }
 
-
 .users-container::-webkit-scrollbar {
   display: none;
+}
+
+@media screen and (max-width: 1080px) {
+  .filter {
+    width: 24%;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .filter {
+    width: 30%;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  * {
+    margin: 0;
+  }
+  .filter {
+    width: 100%;
+    margin: 0;
+    left: 0;
+    top: 50px;
+
+    position: absolute;
+  }
+
+  .container {
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+
+  .post-feed {
+    width: 100%;
+    position: relative;
+    top: 75px;
+    margin: 0;
+  }
+
+  .post {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .user-list {
+    display: none;
+  }
 }
