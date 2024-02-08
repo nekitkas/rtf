@@ -44,6 +44,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--primary-color);
+  word-wrap: break-word;
 }
 
 .post-body {
