@@ -42,7 +42,7 @@ export async function Home() {
 
   ///
 
-  const Filter = await RenderFilter(getPosts);
+  const Filter = await RenderFilter();
 
   ROOT.appendChild(Filter);
   CONTAINER.appendChild(POSTFEED);
@@ -77,9 +77,10 @@ export async function Home() {
   }
 }
 
-export async function fetchPosts(PostFeed, getPosts, category_id = "") {
+export async function fetchPosts(PostFeed, getPosts) {
   try {
-    const postsData = await getPosts(category_id);
+    console.log("GET THE POSTS >>> ", getPosts);
+    const postsData = await getPosts();
     console.log(postsData);
 
     if (postsData) {

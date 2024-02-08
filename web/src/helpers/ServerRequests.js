@@ -64,7 +64,7 @@ export const curryGetPosts = () => {
       category_id: category_id,
     };
     index++;
-    console.log("requestData: ", requestData.current_index);
+    console.log("requestData: ", requestData);
     try {
       const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
         method: "POST",

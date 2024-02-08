@@ -1,9 +1,9 @@
 import searchSvg from "../assets/img//search.svg";
 import arrowSvg from "../assets/img/arrow.svg";
-import { GetCategories } from "../helpers/ServerRequests";
+import { GetCategories, curryGetPosts } from "../helpers/ServerRequests";
 import { POSTFEED, fetchPosts } from "../pages/Home";
 
-export async function RenderFilter(getPosts) {
+export async function RenderFilter() {
   // Create info-div container
   const infoDiv = document.createElement("div");
   infoDiv.classList.add("filter");
@@ -57,8 +57,8 @@ export async function RenderFilter(getPosts) {
     categoryOption.addEventListener("click", (e) => {
       e.preventDefault();
       POSTFEED.innerHTML = "";
-
-      fetchPosts(POSTFEED, getPosts, category.id);
+      const getPosts = curryGetPosts(category.id);
+      fetchPosts(POSTFEED, getPosts);
     });
 
     selectDropdown.appendChild(categoryOption);
