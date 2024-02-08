@@ -38,23 +38,25 @@
   background-color: rgba(240, 248, 255, 0.296);
 }
 
-.user-offline .online-indicator{
+.user-offline .online-indicator {
   width: 8px;
   height: 8px;
   background-color: red;
   border-radius: 50%;
   position: absolute;
-  bottom: 0;
-  left: 40px;
+  bottom: 4px;
+  left: 30px;
+  box-shadow: 0 0 10px red;
 }
 
-
-.user-online .online-indicator{
+.user-online .online-indicator {
   width: 8px;
   height: 8px;
   background-color: green;
+
+  box-shadow: 0 0 10px green;
   border-radius: 50%;
   position: absolute;
-  bottom: 0;
-  left: 40px;
+  bottom: 4px;
+  left: 30px;
 }

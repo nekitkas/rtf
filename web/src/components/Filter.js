@@ -35,7 +35,7 @@ export async function RenderFilter() {
   selectBlock.classList.add("select-block")
 
   const categoryText = document.createElement("p")
-  categoryText.textContent = "Category"
+  categoryText.textContent = "...select category"
 
   const selectArrow = document.createElement("img")
   selectArrow.src = arrowSvg // Assuming arrowSvg is a variable holding the path to your SVG
@@ -46,18 +46,18 @@ export async function RenderFilter() {
   selectDropdown.classList.add("select-dropdown")
 
   // Sample categories
-  const categories = [{ name: "ALL", id: "" }, ...(await GetCategories())]
-
-  console.log(categories)
+  const categories = [{ name: "all", id: "" }, ...(await GetCategories())]
 
   categories.forEach((category) => {
     const categoryOption = document.createElement("div")
+    categoryOption.className = "select-category-el"
     categoryOption.textContent = category.name
 
     categoryOption.addEventListener("click", (e) => {
       e.preventDefault()
       POSTFEED.innerHTML = ""
       fetchPosts(POSTFEED, category.id)
+      categoryText.textContent = category.name
     })
 
     selectDropdown.appendChild(categoryOption)
