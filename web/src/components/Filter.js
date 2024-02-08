@@ -3,7 +3,7 @@ import arrowSvg from "../assets/img/arrow.svg";
 import { GetCategories } from "../helpers/ServerRequests";
 import { POSTFEED, fetchPosts } from "../pages/Home";
 
-export async function RenderFilter() {
+export async function RenderFilter(getPosts) {
   // Create info-div container
   const infoDiv = document.createElement("div");
   infoDiv.classList.add("filter");
@@ -57,8 +57,8 @@ export async function RenderFilter() {
     categoryOption.addEventListener("click", (e) => {
       e.preventDefault();
       POSTFEED.innerHTML = "";
-      const getPosts = curryGetPosts(category.id);
-      fetchPosts(POSTFEED, getPosts);
+
+      fetchPosts(POSTFEED, getPosts(category.id));
     });
 
     selectDropdown.appendChild(categoryOption);

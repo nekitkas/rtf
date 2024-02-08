@@ -53,11 +53,11 @@ export const Logout = async () => {
   }
 };
 
-export const curryGetPosts = (category_id = "") => {
+export const curryGetPosts = () => {
   const time_stamp = new Date().toISOString();
   let index = 0;
 
-  return async function GetPosts() {
+  return async function GetPosts(category_id = "") {
     const requestData = {
       current_index: index,
       page_open_time_stamp: time_stamp,

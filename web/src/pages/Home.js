@@ -42,7 +42,7 @@ export async function Home() {
 
   ///
 
-  const Filter = await RenderFilter();
+  const Filter = await RenderFilter(getPosts);
 
   ROOT.appendChild(Filter);
   CONTAINER.appendChild(POSTFEED);
