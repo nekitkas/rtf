@@ -42,25 +42,13 @@ body {
   position: relative;
 }
 
-.filter {
-  width: 300px;
-  /* height: 150px; */
-  border: 1px solid var(--border-color);
-  position: fixed;
-  top: 85px;
-  left: 20px;
-  background-color: var(--background-secondory);
-  border-radius: 10px;
-  padding: 20px;
-}
+
 
 .post-link {
   text-decoration: none;
 }
 
-
 body::-webkit-scrollbar {
-
   width: 6px;
 }
 
@@ -73,7 +61,6 @@ body::-webkit-scrollbar-track {
   background-color: var(--background-secondory);
   border-radius: 6px; /* Закругленные углы для трека */
 }
-
 
 .users-container::-webkit-scrollbar {
   display: none;

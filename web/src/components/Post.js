@@ -1,5 +1,4 @@
 export function RenderPost(data, categories) {
-
   const { id, title, content, image_url, comment_count } = data
 
   const post = document.createElement("div")
@@ -7,14 +6,21 @@ export function RenderPost(data, categories) {
 
   const postHeader = document.createElement("div")
   postHeader.classList.add("post-header")
-  
+
   if (categories) {
-    const postHeaderCategory = document.createElement("p")
-    postHeaderCategory.classList.add("post-header-category")
+    const tags = document.createElement("div")
+    tags.className = "tags"
+
     categories.forEach((category) => {
-      postHeaderCategory.textContent += category.name + " "
-      postHeader.appendChild(postHeaderCategory)
+      const categoryTag = document.createElement("span")
+      categoryTag.className = "category-tag"
+
+      categoryTag.textContent = category.name
+
+      tags.appendChild(categoryTag)
     })
+
+    postHeader.appendChild(tags)
   }
 
   const postHeaderTitle = document.createElement("div")
@@ -34,7 +40,7 @@ export function RenderPost(data, categories) {
 
   // Создаем элемент для текста
 
-  postBodyText.className = "postBodyText"
+  postBodyText.className = "post-body-text"
   postBodyText.textContent = truncatedText
 
   // Добавляем элемент в контейнер
@@ -47,7 +53,6 @@ export function RenderPost(data, categories) {
     postBodyImg.classList.add("post-body-img")
     postBody.appendChild(postBodyImg)
   }
-
 
   const postFooter = document.createElement("div")
   postFooter.classList.add("post-footer")

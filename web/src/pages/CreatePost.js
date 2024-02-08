@@ -1,6 +1,6 @@
 import { Navbar } from "../components/Navbar.js"
 import { router } from "../router/Router"
-import "../styles/createPostPage.css"
+import "../styles/create-post.css"
 import addCategory from "../assets/img/addCategory.svg"
 import postImgIcon from "../assets/img/postImgIcon.svg"
 import closeIcon from "../assets/img/close.svg"
@@ -15,13 +15,9 @@ export async function CreatePost() {
   USERSCONTAINER.innerHTML = ""
   await Navbar()
 
-
-  // const main = document.createElement("main")
-  // main.className = "main"
-
   CONTAINER.innerHTML = `
 <div class="create-post-container">
-  <h2 class="auth-title">Create Post</h2>
+
   <form
     type="submit"
     action="/create-post"
@@ -29,19 +25,20 @@ export async function CreatePost() {
     method="POST"
   >
     <div class="post-title-container">
-      <label>Post Title</label>
+      <label>Title</label>
 
-      <input type="title" placeholder="Post title" required maxlength="100" name="title" />
+      <input type="title" placeholder="Title" pattern=".*\S+.*" required maxlength="100" name="title" />
     </div>
 
     <div class="label-container" >
-      <label>Post Content</label>
+      <label>Body</label>
       <textarea
         name=""
         id=""
         class="post-textarea"
         cols="20"
         rows="5"
+
       ></textarea>
       <div class="category-container"></div>
     </div>
@@ -50,14 +47,13 @@ export async function CreatePost() {
     <input type="text" name="add-category" class="add-category-input"  placeholder="Add category" required maxlength="15"/>
 
     <button class="input-add-category-btn">Add</button></div>
-      <button class="add-category-btn">Category <img class="category-item" src=${addCategory} alt="category-img"></button>
     </div>
 
 
     <div class="image-preview-container"></div>
 
     <div class="add-post-button-container">
-      <button class="add-post-button">Create</button>
+      <button class="add-post-button">SUBMIT POST</button>
     </div>
   </form>
 </div>
@@ -69,8 +65,6 @@ export async function CreatePost() {
 
   ROOT.appendChild(CONTAINER)
 
-  const addCategoryBtn = document.querySelector(".add-category-btn")
-  addCategoryBtn.addEventListener("click", (e) => showCategoryInput(e))
   const addCategorySubDiv = document.querySelector(".add-category-sub")
 
   const categoryInputBtn = document.querySelector(".input-add-category-btn")
@@ -79,18 +73,34 @@ export async function CreatePost() {
   const categoryInputValue = document.querySelector(".add-category-input")
   const categoryContainer = document.querySelector(".category-container")
 
-  function showCategoryInput(e) {
-    e.preventDefault()
-    addCategorySubDiv.classList.toggle("display-CategorySubDiv")
-  }
-
   function addCategoryToPost(e) {
     e.preventDefault()
+
+    console.log("VALUE: ")
     const categoryValue = categoryInputValue.value.trim()
 
-    const maxCategories = 5
+    // Check for valid characters (A-Z)
+    const validCharsRegex = /^[a-zA-Z]+$/
+    if (!validCharsRegex.test(categoryValue)) {
+      alert("Invalid characters. Please enter only letters from A to Z.")
+      return
+    }
+
+    // Check for duplicate entries
+    const lowerCaseCategoryValue = categoryValue.toLowerCase()
+    for (var i = 0; i < categoryContainer.children.length; i++) {
+      var elementInnerText =
+        categoryContainer.children[i].innerText.toLowerCase()
+      if (elementInnerText === lowerCaseCategoryValue) {
+        alert("Category already exists. Please enter a unique category.")
+        return // Exit the function if it's a duplicate
+      }
+    }
+
+    const maxCategories = 3
+
     if (categoryContainer.children.length >= maxCategories) {
-      alert("You can only add up to 5 categories.")
+      alert("You can only add up to 3 categories.")
       return
     }
 
@@ -115,64 +125,6 @@ export async function CreatePost() {
 
   const imgBtn = document.querySelector(".add-image-button")
   const imgInput = document.querySelector(".add-image-input")
-
-  // imgBtn.addEventListener("click", (e) => {
-  //   e.preventDefault()
-  //   imgInput.click()
-  // })
-
-  // imgInput.addEventListener("change", (e) => changeInputHandler(e))
-
-  // function changeInputHandler(e) {
-  //   const file = e.target.files[0]
-  //   if (!file.type.match("image")) {
-  //     alert("File must be an image.")
-  //     return
-  //   }
-
-  //   const reader = new FileReader()
-
-  //   reader.onload = (e) => {
-  //     const imgPreviewContainer = document.querySelector(
-  //       ".image-preview-container"
-  //     )
-
-  //     // Check if an existing preview is present
-  //     const existingPreview = document.querySelector(".image-preview-wrapper")
-
-  //     // If an existing preview is found, remove it
-  //     if (existingPreview) {
-  //       existingPreview.remove()
-  //     }
-
-  //     // Create a wrapper div for the image and close button
-  //     const wrapperDiv = document.createElement("div")
-  //     wrapperDiv.classList.add("image-preview-wrapper")
-
-  //     // Create the preview image
-  //     const previewImg = document.createElement("img")
-  //     previewImg.src = e.target.result
-  //     previewImg.classList.add("image-preview")
-
-  //     // Create the close button
-  //     const closePostImg = document.createElement("img")
-  //     closePostImg.src = closeIcon
-  //     closePostImg.classList.add("close-post-img")
-
-  //     // Append the close button and preview image to the wrapper
-  //     wrapperDiv.appendChild(previewImg)
-  //     wrapperDiv.appendChild(closePostImg)
-
-  //     // Append the wrapper to the preview container
-  //     imgPreviewContainer.appendChild(wrapperDiv)
-
-  //     closePostImg.addEventListener("click", () => {
-  //       wrapperDiv.remove()
-  //     })
-  //   }
-
-  //   reader.readAsDataURL(file)
-  // }
 
   const sendPostDataBtn = document.querySelector(".add-post-button")
   sendPostDataBtn.addEventListener("click", (e) => {
@@ -200,6 +152,8 @@ export async function CreatePost() {
     }
   })
 }
+
+///
 
 async function sendPostData(title, content, categories, image) {
   const url = GLOBAL_URL + "/api/v1/jwt/posts/create"
@@ -243,3 +197,64 @@ async function sendPostData(title, content, categories, image) {
 // <input type="file" name="add-image" class="add-image-input">
 //   <button class="add-image-button">Image<img class="add-img-icon" src=${postImgIcon}  alt="addimg"></button>
 // </div>
+
+///
+// imgBtn.addEventListener("click", (e) => {
+//   e.preventDefault()
+//   imgInput.click()
+// })
+
+// imgInput.addEventListener("change", (e) => changeInputHandler(e))
+
+// function changeInputHandler(e) {
+//   const file = e.target.files[0]
+//   if (!file.type.match("image")) {
+//     alert("File must be an image.")
+//     return
+//   }
+
+//   const reader = new FileReader()
+
+//   reader.onload = (e) => {
+//     const imgPreviewContainer = document.querySelector(
+//       ".image-preview-container"
+//     )
+
+//     // Check if an existing preview is present
+//     const existingPreview = document.querySelector(".image-preview-wrapper")
+
+//     // If an existing preview is found, remove it
+//     if (existingPreview) {
+//       existingPreview.remove()
+//     }
+
+//     // Create a wrapper div for the image and close button
+//     const wrapperDiv = document.createElement("div")
+//     wrapperDiv.classList.add("image-preview-wrapper")
+
+//     // Create the preview image
+//     const previewImg = document.createElement("img")
+//     previewImg.src = e.target.result
+//     previewImg.classList.add("image-preview")
+
+//     // Create the close button
+//     const closePostImg = document.createElement("img")
+//     closePostImg.src = closeIcon
+//     closePostImg.classList.add("close-post-img")
+
+//     // Append the close button and preview image to the wrapper
+//     wrapperDiv.appendChild(previewImg)
+//     wrapperDiv.appendChild(closePostImg)
+
+//     // Append the wrapper to the preview container
+//     imgPreviewContainer.appendChild(wrapperDiv)
+
+//     closePostImg.addEventListener("click", () => {
+//       wrapperDiv.remove()
+//     })
+//   }
+
+//   reader.readAsDataURL(file)
+// }
+
+///

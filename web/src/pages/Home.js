@@ -41,9 +41,6 @@ export async function Home() {
   CONTAINER.appendChild(USERSCONTAINER)
   
   ///
-
-
-
   const Filter = await RenderFilter()
 
   ROOT.appendChild(Filter)
@@ -106,7 +103,7 @@ export async function fetchPosts(PostFeed, category_id = "") {
   }
 }
 
-////
+///
 
 //create a link and calls function to create post out of provided data
 export function ProcessPostData(post) {
@@ -128,6 +125,8 @@ export function ProcessPostData(post) {
 
   return postLink
 }
+
+///
 
 async function fetchUsers(usersContainer) {
   try {

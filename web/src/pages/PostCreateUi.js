@@ -17,7 +17,7 @@ export function CreatePostUi(data, postId) {
   postPagePostHeader.className = "postPagePostHeader"
 
   const authorHeader = document.createElement("h5")
-  authorHeader.textContent = `Author: ${nickname}`
+  authorHeader.textContent = `${nickname}`
 
   const titleHeader = document.createElement("h2")
   titleHeader.textContent = title
@@ -80,7 +80,7 @@ export function CreatePostUi(data, postId) {
 
   const userNickname = document.querySelector(".username")
 
-  if(userNickname.textContent === nickname){
+  if (userNickname.textContent === nickname) {
     const deleteBtn = document.createElement("button")
     deleteBtn.textContent = "Delete post"
     deleteBtn.className = "PostDeleteBtn"
@@ -106,8 +106,6 @@ export function CreatePostUi(data, postId) {
         })
     })
   }
-
-
 
   return pagePost
 }

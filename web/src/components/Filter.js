@@ -48,10 +48,10 @@ export async function RenderFilter() {
   // Sample categories
   const categories = [{ name: "ALL", id: "" }, ...(await GetCategories())]
 
-  console.log(categories)
 
   categories.forEach((category) => {
     const categoryOption = document.createElement("div")
+    categoryOption.className = "select-category-el"
     categoryOption.textContent = category.name
 
     categoryOption.addEventListener("click", (e) => {
