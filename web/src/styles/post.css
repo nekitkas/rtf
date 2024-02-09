@@ -57,7 +57,7 @@
   font-weight: 400;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 20; /* Number of lines to show */
+  -webkit-line-clamp: 12; /* Number of lines to show */
   -webkit-box-orient: vertical;
 }
 
