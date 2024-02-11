@@ -1,8 +1,8 @@
 import searchSvg from "../assets/img//search.svg";
 import arrowSvg from "../assets/img/arrow.svg";
-import { setPostsLoadedIndex } from "../helpers/LazyLoading";
-import { GetCategories, curryGetPosts } from "../helpers/ServerRequests";
+import { GetCategories } from "../helpers/ServerRequests";
 import { POSTFEED, fetchPosts } from "../pages/Home";
+import { loader } from "../pages/Home";
 
 export async function RenderFilter() {
   // Create info-div container
@@ -54,12 +54,15 @@ export async function RenderFilter() {
     categoryOption.className = "select-category-el"
     categoryOption.textContent = category.name
 
-    categoryOption.addEventListener("click", (e) => {
+    categoryOption.addEventListener("click", async (e) => {
       e.preventDefault();
       POSTFEED.innerHTML = "";
-      setPostsLoadedIndex(0)
-      const getPosts = curryGetPosts(category.id);
-      fetchPosts(POSTFEED, getPosts);
+      
+      loader.reset()
+      loader.setTimestamp(new Date().toISOString());
+      loader.categoryId = category.id
+      console.log(loader);
+      fetchPosts(POSTFEED, await loader.Load());
       categoryText.textContent = category.name
     });
 

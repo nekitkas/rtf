@@ -6,20 +6,37 @@ import "../styles/chat.css";
 import "../styles/users.css";
 import { RenderPost } from "../components/Post";
 
-import { GetAllUsers, curryGetPosts } from "../helpers/ServerRequests.js";
+import { GetAllUsers } from "../helpers/ServerRequests.js";
 import { CONTAINER, ROOT, USERSCONTAINER } from "../index.js";
 import { RenderPostFeed } from "../components/PostFeed.js";
 import { RenderFilter } from "../components/Filter.js";
 import { router } from "../router/Router.js";
 import { OpenMessengers, Throttle } from "../components/Messenger.js";
-import {
-  CheckPosition,
-  PostsLoadedIndex,
-  setPostsLoadedIndex,
-} from "../helpers/LazyLoading.js";
+import { LazyLoader } from "../helpers/LazyLoading.js";
 import { UserList } from "../components/UserList.js";
+import { CheckPosition } from "../helpers/LazyLoading.js";
 
 export let POSTFEED;
+export const loader = new LazyLoader()
+
+window.addEventListener(
+  "wheel",
+  Throttle(async () => {
+    console.log('jep testing throtthle')
+    if(CheckPosition){
+      fetchPosts(POSTFEED, await loader.Load())
+    }
+  }, 250)
+);
+
+window.addEventListener(
+  "resize",
+  Throttle(async () => {
+    if(CheckPosition){
+      fetchPosts(POSTFEED, await loader.Load())
+    }
+  }, 250)
+);
 
 export async function Home() {
   ROOT.innerHTML = "";
@@ -32,9 +49,9 @@ export async function Home() {
   POSTFEED = RenderPostFeed();
   ROOT.append(CONTAINER);
 
-  setPostsLoadedIndex(0);
-  const getPosts = curryGetPosts();
-  await fetchPosts(POSTFEED, getPosts);
+  //reset the lazyLoader
+  loader.reset();
+  fetchPosts(POSTFEED, await loader.Load());
 
   const usersData = await GetAllUsers();
   USERSCONTAINER.appendChild(UserList(usersData));
@@ -45,19 +62,6 @@ export async function Home() {
   ROOT.appendChild(Filter);
   CONTAINER.appendChild(POSTFEED);
   CONTAINER.appendChild(USERSCONTAINER);
-
-  //check for scrollin to lazy load posts
-  function checkScroll() {
-    window.addEventListener(
-      "wheel",
-      Throttle(() => CheckPosition(getPosts), 250)
-    );
-    window.addEventListener(
-      "resize",
-      Throttle(() => CheckPosition(getPosts), 250)
-    );
-  }
-  checkScroll();
 
   const selectBlock = document.querySelector(".select-block");
   if (selectBlock) {
@@ -72,9 +76,9 @@ export async function Home() {
   }
 }
 
-export async function fetchPosts(PostFeed, getPosts) {
+export async function fetchPosts(PostFeed, data) {
   try {
-    const postsData = await getPosts();
+    const postsData = data
 
     if (postsData) {
       postsData.forEach((post) => {
@@ -123,19 +127,4 @@ export function ProcessPostData(post) {
   }
 
   return postLink;
-}
-
-///
-
-async function fetchUsers(usersContainer) {
-  try {
-    const usersData = await GetAllUsers();
-    if (usersData) {
-      usersContainer.appendChild(UserList(usersData));
-
-      CONTAINER.appendChild(usersContainer);
-    }
-  } catch (error) {
-    console.error("Error during fetch:", error);
-  }
 }

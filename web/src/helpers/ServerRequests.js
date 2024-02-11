@@ -1,5 +1,4 @@
 import { GLOBAL_URL } from "../config";
-import { getPostsLoadedIndex, setPostsLoadedIndex } from "./LazyLoading";
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
 export const isLoggedIn = async () => {
@@ -52,49 +51,6 @@ export const Logout = async () => {
     console.error("Fetch error:", error);
     throw error; // Rethrow the error if needed
   }
-};
-
-export const curryGetPosts = (category_id = "") => {
-  const time_stamp = new Date().toISOString();
-
-  return async function GetPosts() {
-    const requestData = {
-      current_index: getPostsLoadedIndex(),
-      page_open_time_stamp: time_stamp,
-      category_id: category_id,
-    };
-    setPostsLoadedIndex(getPostsLoadedIndex()+1)
-    console.log("requestData: ", requestData);
-    try {
-      const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.error("Unauthorized: User needs to authenticate");
-        } else {
-          console.error(
-            `Non-OK response: ${response.status} - ${response.statusText}`
-          );
-          // Log additional details if available (e.g., response.json())
-        }
-        return false;
-      }
-
-      const result = await response.json();
-      console.log(result.data);
-      return result.data;
-    } catch (error) {
-      console.error("Fetch error:", error);
-      throw error; // Rethrow the error if needed
-    }
-  };
 };
 
 export async function GetAllUsers() {

@@ -1,5 +1,71 @@
-import { ProcessPostData } from "../pages/Home";
-import { GetPosts } from "./ServerRequests";
+import { GLOBAL_URL } from "../config";
+
+export class LazyLoader{
+  constructor(){
+    this.timestamp;
+    this.categoryId;
+    this.index;
+    this.reset();
+  }
+
+  setIndex(value){
+    this.index = value;
+  }
+
+  getIndex(){
+    return this.index;
+  }
+
+  setTimestamp(value){
+    this.timestamp = value
+  }
+
+  setCategory(value){
+    this.categoryId = value;
+  }
+
+  getCategory() {
+    return this.categoryId
+  }
+
+  reset(){
+    this.index = 0;
+    this.timestamp = new Date().toISOString();
+    this.categoryId = "";
+  }
+
+  async Load(){
+      const requestData = {
+        current_index: this.index,
+        page_open_time_stamp: this.timestamp,
+        category_id: this.categoryId,
+      };
+
+      try {
+        const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(requestData),
+        });
+
+        if (response.status === 401) {
+            console.error("Unauthorized: User needs to authenticate");
+            return null; // or throw an error if appropriate
+        }
+
+        const data = await response.json();
+        this.index++;
+        return data.data;
+    } catch (error) {
+        console.error("While lazy loading an error occurred! ", error);
+        return null; // or throw an error if appropriate
+    }
+    }
+}
+
 
 export function Throttle(callee, timeout) {
   let timer = null;
@@ -15,18 +81,7 @@ export function Throttle(callee, timeout) {
   };
 }
 
-let _PostsLoadedIndex = 0;
-
-export const getPostsLoadedIndex = () => {
-  return _PostsLoadedIndex;
-};
-
-export const setPostsLoadedIndex = (value) => {
-  _PostsLoadedIndex = value;
-};
-let postsLoaded = false;
-
-export async function CheckPosition(getPosts) {
+export function CheckPosition() {
   const height = document.body.offsetHeight;
   const screenHeight = window.innerHeight;
 
@@ -35,32 +90,8 @@ export async function CheckPosition(getPosts) {
 
   const position = scrolled + screenHeight;
 
-  const PostFeed = document.querySelector(".post-feed");
-
-  if (!PostFeed) {
-    console.error("Element with class 'post-feed' not found");
-    return;
+  if (position >= threshold) {
+    return true
   }
-  if (position >= threshold && !postsLoaded) {
-    postsLoaded = true;
-    try {
-      const postData = await getPosts();
-      if (postData) {
-        postData.forEach((post) => {
-          const postLink = ProcessPostData(post);
-          PostFeed.appendChild(postLink);
-        });
-        postsLoaded = false;
-      } else {
-        // Handle case when response is not OK
-        console.log("Error: Response not OK");
-      }
-    } catch (error) {
-      // Handle errors that occurred during the fetch
-      console.error("Error during fetch:", error);
-    }
-  } else if (position < threshold) {
-    // Reset postsLoaded when scrolling back up
-    postsLoaded = false;
-  }
+  return false;
 }

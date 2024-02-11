@@ -3,7 +3,6 @@ import "../styles/navbar.css"
 import plusSvg from "../assets/img/plus.svg"
 import avatar from "../assets/img/avatar.svg.png"
 import arrowSvg from "../assets/img/arrow.svg"
-import messageButtonImage from "../assets/img/message.svg"
 import modalProfile from "../assets/img/modalProfile.svg"
 import notificationButtonImage from "../assets/img/notifications.svg"
 import logout from "../assets/img/logout.svg"
@@ -11,7 +10,6 @@ import { router } from "../router/Router"
 import {GetUserInfo, isLoggedIn, Logout} from "../helpers/ServerRequests"
 import {ROOT} from "../index";
 import { ShowNotificationsModal } from "../helpers/Notifications"
-
 
 
 document.addEventListener("click", async (e) => {
@@ -79,7 +77,6 @@ export async function Navbar() {
 
   Logo.addEventListener("click", ()=>{
 
-
     window.history.pushState({}, "", "/")
     router()
 
@@ -94,13 +91,6 @@ export async function Navbar() {
     router()
 
   })
-
-
-
-
-
-  // const
-
   return navbarHTML;
 }
 
