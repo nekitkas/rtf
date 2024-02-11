@@ -25,7 +25,6 @@ export function initializeWebSocket() {
 
   Socket.addEventListener("message", (event) => {
     const parsedData = JSON.parse(event.data)
-    console.log("PARSED DATA", parsedData)
     let onlineUsers = parsedData.online_users
     setTimeout(() => {
       if (onlineUsers != undefined) {

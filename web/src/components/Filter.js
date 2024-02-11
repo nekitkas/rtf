@@ -1,5 +1,6 @@
 import searchSvg from "../assets/img//search.svg";
 import arrowSvg from "../assets/img/arrow.svg";
+import { setPostsLoadedIndex } from "../helpers/LazyLoading";
 import { GetCategories, curryGetPosts } from "../helpers/ServerRequests";
 import { POSTFEED, fetchPosts } from "../pages/Home";
 
@@ -56,6 +57,7 @@ export async function RenderFilter() {
     categoryOption.addEventListener("click", (e) => {
       e.preventDefault();
       POSTFEED.innerHTML = "";
+      setPostsLoadedIndex(0)
       const getPosts = curryGetPosts(category.id);
       fetchPosts(POSTFEED, getPosts);
       categoryText.textContent = category.name

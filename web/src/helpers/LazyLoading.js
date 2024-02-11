@@ -27,7 +27,6 @@ export const setPostsLoadedIndex = (value) => {
 let postsLoaded = false;
 
 export async function CheckPosition(getPosts) {
-  console.log("Entering CheckPosition");
   const height = document.body.offsetHeight;
   const screenHeight = window.innerHeight;
 
@@ -42,11 +41,7 @@ export async function CheckPosition(getPosts) {
     console.error("Element with class 'post-feed' not found");
     return;
   }
-  console.log(postsLoaded);
   if (position >= threshold && !postsLoaded) {
-    console.log("LOAD!");
-    const currentValue = getPostsLoadedIndex();
-    setPostsLoadedIndex(currentValue + 1);
     postsLoaded = true;
     try {
       const postData = await getPosts();

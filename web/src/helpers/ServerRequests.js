@@ -1,4 +1,5 @@
 import { GLOBAL_URL } from "../config";
+import { getPostsLoadedIndex, setPostsLoadedIndex } from "./LazyLoading";
 
 // Function to check the presence of a cookie and return a boolean indicating whether the user is logged in
 export const isLoggedIn = async () => {
@@ -55,15 +56,14 @@ export const Logout = async () => {
 
 export const curryGetPosts = (category_id = "") => {
   const time_stamp = new Date().toISOString();
-  let index = 0;
 
   return async function GetPosts() {
     const requestData = {
-      current_index: index,
+      current_index: getPostsLoadedIndex(),
       page_open_time_stamp: time_stamp,
       category_id: category_id,
     };
-    index++;
+    setPostsLoadedIndex(getPostsLoadedIndex()+1)
     console.log("requestData: ", requestData);
     try {
       const response = await fetch(GLOBAL_URL + "/api/v1/jwt/posts", {

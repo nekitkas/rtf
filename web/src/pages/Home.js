@@ -32,15 +32,13 @@ export async function Home() {
   POSTFEED = RenderPostFeed();
   ROOT.append(CONTAINER);
 
+  setPostsLoadedIndex(0);
   const getPosts = curryGetPosts();
   await fetchPosts(POSTFEED, getPosts);
 
-  ///
   const usersData = await GetAllUsers();
   USERSCONTAINER.appendChild(UserList(usersData));
   CONTAINER.appendChild(USERSCONTAINER);
-
-  ///
 
   const Filter = await RenderFilter();
 
@@ -61,9 +59,6 @@ export async function Home() {
   }
   checkScroll();
 
-  // AddNotification("Test1", "Looool")
-  // AddNotification("Test2", "sadasdasdasd")
-
   const selectBlock = document.querySelector(".select-block");
   if (selectBlock) {
     selectBlock.addEventListener("click", displayCategoryModal);
@@ -79,9 +74,7 @@ export async function Home() {
 
 export async function fetchPosts(PostFeed, getPosts) {
   try {
-    console.log("GET THE POSTS >>> ", getPosts);
     const postsData = await getPosts();
-    console.log(postsData);
 
     if (postsData) {
       postsData.forEach((post) => {
@@ -116,10 +109,8 @@ export async function fetchPosts(PostFeed, getPosts) {
 //create a link and calls function to create post out of provided data
 export function ProcessPostData(post) {
   const postLink = document.createElement("div");
-
   postLink.addEventListener("click", () => {
-    history.pushState({}, "", `post/${post.id}`);
-    setPostsLoadedIndex(0);
+    history.pushState({}, "", `post/${post.post.id}`);
     router();
   });
 
