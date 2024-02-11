@@ -61,7 +61,7 @@ export async function RenderFilter() {
       loader.reset()
       loader.setTimestamp(new Date().toISOString());
       loader.categoryId = category.id
-      console.log(loader);
+
       fetchPosts(POSTFEED, await loader.Load());
       categoryText.textContent = category.name
     });
