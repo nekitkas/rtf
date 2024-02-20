@@ -42,7 +42,7 @@ The Real-Time Forum is an advanced web application designed to facilitate dynami
 1. **Clone the repository:**
 
 ```bash
-git clone "LINK HERE"
+git clone https://github.com/nekitkas/rtf
 cd real-time-forum
 ```
 
